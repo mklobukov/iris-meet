@@ -1,0 +1,11 @@
+.main-video {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    overflow: hidden;
+}
+
+.main-video video {
+    min-width: 100%;
+    min-height: 100%;
+}
