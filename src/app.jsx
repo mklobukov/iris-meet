@@ -1,8 +1,18 @@
-import { render } from 'react-dom';
-// import ReactDOM from 'react-dom';
-// var render = ReactDOM.render;
-
 import React from 'react';
+import { render } from 'react-dom';
+import { Router, Route, IndexRoute, useRouterHistory } from 'react-router';
+import { createHashHistory } from 'history';
 import App from './index';
+import Main from './components/main';
 
-render(<App />, document.querySelector('#target'));
+const appHistory = useRouterHistory(createHashHistory)({ queryKey: false });
+
+render(
+  <Router history={appHistory}>
+    <Route handler={App}>
+      <IndexRoute component={Main} />
+      <Route path='/' component={Main} />
+      <Route path='/:roomname' component={Main} />
+    </Route>
+  </Router>, document.querySelector('#target')
+);
