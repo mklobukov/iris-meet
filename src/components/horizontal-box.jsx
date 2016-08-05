@@ -4,11 +4,15 @@ export default class HorizontalBox extends React.Component {
     constructor(props) {
         super(props)
     }
-    
+
+/*
+<video autoPlay="1" src="assets/movie.mp4"></video>
+*/
+
     render() {
         return (
             <div className="horizontal-box">
-                <video autoPlay="1" src="assets/movie.mp4"></video>
+                {this.props.children}
             </div>
         );
     }

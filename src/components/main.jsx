@@ -7,8 +7,9 @@ import LoginPanel from './login-panel';
 import UserActions from '../actions/user-actions';
 import UserStore from '../stores/user-store';
 import UserStoreConstants from '../constants/user-store-constants';
+import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
 
-export default class Main extends React.Component {
+class Main extends React.Component {
     constructor(props) {
         super(props);
 
@@ -59,6 +60,8 @@ export default class Main extends React.Component {
       this.setState({
         showRoom: false,
         showUser: false,
+      }, () => {
+        this.props.initializeWebRTC(UserStore.user, UserStore.room, UserStore.domain, UserStore.token);
       });
     }
 
@@ -76,30 +79,38 @@ export default class Main extends React.Component {
     }
 
     render() {
-        return (
-            <div>
-                <MeetToolbar />
-                <MainVideo />
-                <HorizontalWrapper>
-                    <HorizontalBox />
-                    <HorizontalBox />
-                    <HorizontalBox />
-                    <HorizontalBox />
-                    <HorizontalBox />
-                    <HorizontalBox />
-                    <HorizontalBox />
-                    <HorizontalBox />
-                    <HorizontalBox />
-                    <HorizontalBox />
-                </HorizontalWrapper>
-                {this.state.showUser || this.state.showRoom ?
-                  <LoginPanel
-                    ref='loginpanel'
-                    showRoom={this.state.showRoom}
-                    showUser={this.state.showUser}
-                    onAction={this._onLoginPanelComplete.bind(this)}
-                  /> : null}
-            </div>
-        );
+      console.log('RENDER RENDER RENDER');
+      console.log(this.props.localVideos);
+      return (
+          <div>
+              <MeetToolbar />
+              <MainVideo />
+              <HorizontalWrapper>
+                  {this.props.localVideos.map((connection) => {
+                    return (
+                      <HorizontalBox>
+                        <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
+                      </HorizontalBox>
+                    );
+                  })}
+                  {this.props.remoteVideos.map((connection) => {
+                    return (
+                      <HorizontalBox>
+                        <RemoteVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
+                      </HorizontalBox>
+                    );
+                  })}
+              </HorizontalWrapper>
+              {this.state.showUser || this.state.showRoom ?
+                <LoginPanel
+                  ref='loginpanel'
+                  showRoom={this.state.showRoom}
+                  showUser={this.state.showUser}
+                  onAction={this._onLoginPanelComplete.bind(this)}
+                /> : null}
+          </div>
+      );
     }
 }
+
+export default withWebRTC(Main);
