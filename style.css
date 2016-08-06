@@ -42,7 +42,7 @@
   width: 300px;
   min-width: 300px;
   background-color: rgba(0, 0, 0, 0.5);
-  border-radius: 3px;
+  border-radius: 5px;
   z-index: 2; }
 
 #login-panel .form {
@@ -80,14 +80,22 @@
   background-color: transparent; }
 
 .main-video {
-  position: absolute;
-  height: 100%;
-  width: 100%;
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
   overflow: hidden; }
 
 .main-video video {
-  min-width: 100%;
-  min-height: 100%; }
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 0;
+  margin: auto;
+  min-height: 50%;
+  min-width: 50%; }
 
 #header {
   position: fixed;
@@ -135,4 +143,4 @@
 body {
   font-family: Arial;
   font-size: 14px;
-  background-color: #000000; }
+  background-color: #222222; }

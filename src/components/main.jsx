@@ -7,110 +7,136 @@ import LoginPanel from './login-panel';
 import UserActions from '../actions/user-actions';
 import UserStore from '../stores/user-store';
 import UserStoreConstants from '../constants/user-store-constants';
+import VideoControlStore from '../stores/video-control-store';
+import VideoControlStoreConstants from '../constants/video-control-store-constants';
+import { withRouter } from 'react-router';
 import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
 
-class Main extends React.Component {
-    constructor(props) {
-        super(props);
+export default withWebRTC(withRouter(class Main extends React.Component {
+  constructor(props) {
+    super(props);
 
-        this.state = {
-          showRoom: false,
-          showUser: false,
-        }
-
-        this.loginCallback = this._userLoggedIn.bind(this);
-        this.loginFailedCallback = this._userFailedLogin.bind(this);
+    this.state = {
+      showRoom: false,
+      showUser: false,
     }
 
-    componentDidMount() {
-      UserStore.addUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
-      UserStore.addUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
-      console.log('roomName: ' + this.props.params.roomname);
-      let showRoom = false;
-      let showUser = false;
-      if (this.props.params.roomname === undefined) {
-        // no room name specified in URL so show dialog
-        // to ask for room name
-        showRoom = true;
-      }
+    this.loginCallback = this._userLoggedIn.bind(this);
+    this.loginFailedCallback = this._userFailedLogin.bind(this);
+    this.mainVideoChangeCallback = this._onMainVideoChange.bind(this);
+  }
 
-      const userName = localStorage.getItem('irisMeet.userName');
-      if (userName === null) {
-        // we do not have user name stored so ask for user name
-        showUser = true;
-      }
-
-      if (showRoom || showUser) {
-        this.setState({
-          showRoom,
-          showUser,
-        });
-      } else {
-        // we have both userName and roomName so login
-        UserActions.loginUser(userName, this.props.params.roomname);
-      }
+  componentDidMount() {
+    UserStore.addUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
+    UserStore.addUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
+    VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
+    console.log('roomName: ' + this.props.params.roomname);
+    let showRoom = false;
+    let showUser = false;
+    if (this.props.params.roomname === undefined) {
+      // no room name specified in URL so show dialog
+      // to ask for room name
+      showRoom = true;
     }
 
-    componentWillUnmount() {
-      UserStore.removeUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
-      UserStore.removeUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
+    const userName = localStorage.getItem('irisMeet.userName');
+    if (userName === null) {
+      // we do not have user name stored so ask for user name
+      showUser = true;
     }
 
-    _userLoggedIn() {
+    if (showRoom || showUser) {
       this.setState({
-        showRoom: false,
-        showUser: false,
-      }, () => {
-        this.props.initializeWebRTC(UserStore.user, UserStore.room, UserStore.domain, UserStore.token);
+        showRoom,
+        showUser,
       });
+    } else {
+      // we have both userName and roomName so login
+      UserActions.loginUser(userName, this.props.params.roomname);
     }
+  }
 
-    _userFailedLogin(error) {
-      // TODO: login error handler
-      console.log('Login failure: ');
-      console.log(error);
-    }
+  componentWillUnmount() {
+    UserStore.removeUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
+    UserStore.removeUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
+    VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
+  }
 
-    _onLoginPanelComplete() {
-      let userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
-      let roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
-      localStorage.setItem('irisMeet.userName', userName);
-      UserActions.loginUser(userName, roomName);
-    }
+  _onMainVideoChange() {
+    console.log('Video type: ' + VideoControlStore.videoType);
+    console.log('Video index: ' + VideoControlStore.videoIndex);
+  }
 
-    render() {
-      console.log('RENDER RENDER RENDER');
-      console.log(this.props.localVideos);
-      return (
-          <div>
-              <MeetToolbar />
-              <MainVideo />
-              <HorizontalWrapper>
-                  {this.props.localVideos.map((connection) => {
-                    return (
-                      <HorizontalBox>
-                        <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
-                      </HorizontalBox>
-                    );
-                  })}
-                  {this.props.remoteVideos.map((connection) => {
-                    return (
-                      <HorizontalBox>
-                        <RemoteVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
-                      </HorizontalBox>
-                    );
-                  })}
-              </HorizontalWrapper>
-              {this.state.showUser || this.state.showRoom ?
-                <LoginPanel
-                  ref='loginpanel'
-                  showRoom={this.state.showRoom}
-                  showUser={this.state.showUser}
-                  onAction={this._onLoginPanelComplete.bind(this)}
-                /> : null}
-          </div>
-      );
-    }
-}
+  _userLoggedIn() {
+    this.setState({
+      showRoom: false,
+      showUser: false,
+    }, () => {
+      this.props.initializeWebRTC(UserStore.user, UserStore.room, UserStore.domain, UserStore.token);
+    });
+  }
 
-export default withWebRTC(Main);
+  _userFailedLogin(error) {
+    // TODO: login error handler
+    console.log('Login failure: ');
+    console.log(error);
+  }
+
+  _onLoginPanelComplete() {
+    let userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
+    let roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
+    localStorage.setItem('irisMeet.userName', userName);
+    //UserActions.loginUser(userName, roomName);
+    console.log(this);
+    this.props.router.push('/' + roomName);
+  }
+
+  render() {
+    console.log('RENDER RENDER RENDER');
+    console.log(this.props.localVideos);
+    return (
+      <div>
+      <MeetToolbar />
+      <MainVideo>
+        {this.props.localVideos.length > 0 ?
+          <LocalVideo
+            key={this.props.localVideos[0].video.index}
+            video={this.props.localVideos[0].video}
+            audio={this.props.localVideos[0].audio}
+          /> : null}
+      </MainVideo>
+      <HorizontalWrapper>
+          {this.props.localVideos.map((connection) => {
+            return (
+              <HorizontalBox
+                key={connection.video.index}
+                type='local'
+                id={connection.video.index}
+              >
+                <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
+              </HorizontalBox>
+            );
+          })}
+          {this.props.remoteVideos.map((connection) => {
+            return (
+              <HorizontalBox
+                key={connection.video.index}
+                type='remote'
+                id={connection.video.index}
+              >
+                <RemoteVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
+              </HorizontalBox>
+            );
+          })}
+      </HorizontalWrapper>
+      {this.state.showUser || this.state.showRoom ?
+        <LoginPanel
+          ref='loginpanel'
+          showRoom={this.state.showRoom}
+          showUser={this.state.showUser}
+          onAction={this._onLoginPanelComplete.bind(this)}
+        /> : null}
+      </div>
+    );
+  }
+}));
