@@ -94,7 +94,11 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     let roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
     localStorage.setItem('irisMeet.userName', userName);
     //UserActions.loginUser(userName, roomName);
-    this.props.router.replace('/' + roomName);
+    //this.props.router.push('/' + roomName);
+    const hostname = window.location.href;
+    const newLocation = hostname + roomName;
+    console.log('NEW LOCATION: ' + newLocation);
+    window.location.assign(hostname + roomName);
   }
 
   render() {

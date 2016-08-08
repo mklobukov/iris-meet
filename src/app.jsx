@@ -7,7 +7,7 @@ import Main from './components/main';
 render(
   <Router history={browserHistory}>
     <Route handler={App}>
-      //<IndexRoute component={Main} />
+      <IndexRoute component={Main} />
       //<Route path='/' component={Main} />
       <Route path='/:roomname' component={Main} />
     </Route>
