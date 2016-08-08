@@ -32,6 +32,9 @@ class UserStore extends BaseStore {
         if (action.data && action.data.userName && action.data.roomName) {
           this._handleUserLogin(action.data.userName, action.data.roomName);
         }
+
+      case UserStoreConstants.USER_LEAVE_ROOM:
+        this._handleUserLeaveRoom();
     }
   }
 
@@ -40,6 +43,16 @@ class UserStore extends BaseStore {
     this.userInfo.roomName = roomName;
     let authApi = new AuthManager({'managementApiUrl': authUrl, 'appKey': appKey});
     authApi.anonymousLogin(this.userName, this._onLoginSuccess.bind(this), this._onLoginFailure.bind(this));
+  }
+
+  _handleUserLeaveRoom() {
+    this.userInfo = {
+      userName: null,
+      roomName: null,
+      accessToken: null,
+      decodedToken: null,
+    }
+    this.emit(UserStoreConstants.USER_LEFT_ROOM_EVENT);
   }
 
   _onLoginSuccess(data) {

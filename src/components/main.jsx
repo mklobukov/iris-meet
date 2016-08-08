@@ -60,6 +60,13 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     UserStore.removeUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
     UserStore.removeUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
     VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
+    this.setState({
+      showRoom: false,
+      showUser: false,
+    }, () => {
+      UserActions.leaveRoom();
+      this.endSession();
+    });
   }
 
   _onMainVideoChange() {
@@ -87,13 +94,10 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     let roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
     localStorage.setItem('irisMeet.userName', userName);
     //UserActions.loginUser(userName, roomName);
-    console.log(this);
-    this.props.router.push('/' + roomName);
+    this.props.router.replace('/' + roomName);
   }
 
   render() {
-    console.log('RENDER RENDER RENDER');
-    console.log(this.props.localVideos);
     return (
       <div>
       <MeetToolbar />

@@ -11,6 +11,12 @@ class UserActions {
       }
     });
   }
+
+  leaveRoom() {
+    AppDispatcher.dispatch({
+      actionType: UserStoreConstants.USER_LEAVE_ROOM,
+    });
+  }
 }
 
 export default new UserActions();
