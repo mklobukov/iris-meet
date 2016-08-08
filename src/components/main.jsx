@@ -29,6 +29,8 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.loginFailedCallback = this._userFailedLogin.bind(this);
     this.mainVideoChangeCallback = this._onMainVideoChange.bind(this);
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
+    this.onLocalVideo = this._onLocalVideo.bind(this);
+    this.onRemoteVideo = this._onRemoteVideo.bind(this);
   }
 
   componentDidMount() {
@@ -36,6 +38,8 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     UserStore.addUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
     VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     console.log('roomName: ' + this.props.params.roomname);
     let showRoom = false;
     let showUser = false;
@@ -64,6 +68,8 @@ export default withWebRTC(withRouter(class Main extends React.Component {
 
   componentWillUnmount() {
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
+    this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
+    this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     UserStore.removeUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
     UserStore.removeUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
     VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
@@ -74,6 +80,28 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       UserActions.leaveRoom();
       this.endSession();
     });
+  }
+
+  _onLocalVideo(videoInfo) {
+    if (this.props.localVideos.length > 0) {
+      this.setState({
+        mainVideoConnection: {
+          connection: this.props.localVideos[0],
+          type: 'local',
+        }
+      });
+    }
+  }
+
+  _onRemoteVideo(videoInfo) {
+    if (this.props.remoteVideos.length > 0 && this.state.mainConnection.connection === null) {
+      this.setState({
+        mainVideoConnection: {
+          connection: this.props.remoteVideos[0],
+          type: 'remote',
+        }
+      });
+    }
   }
 
   _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
