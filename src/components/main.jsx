@@ -19,17 +19,23 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.state = {
       showRoom: false,
       showUser: false,
+      mainVideoConnection: {
+        connection: null,
+        type: '',
+      }
     }
 
     this.loginCallback = this._userLoggedIn.bind(this);
     this.loginFailedCallback = this._userFailedLogin.bind(this);
     this.mainVideoChangeCallback = this._onMainVideoChange.bind(this);
+    this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
   }
 
   componentDidMount() {
     UserStore.addUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
     UserStore.addUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
     VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     console.log('roomName: ' + this.props.params.roomname);
     let showRoom = false;
     let showUser = false;
@@ -57,6 +63,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
   }
 
   componentWillUnmount() {
+    this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     UserStore.removeUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
     UserStore.removeUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
     VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
@@ -69,9 +76,33 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     });
   }
 
+  _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
+    console.log('DOMINANT_SPEAKER_CHANGED: ' + dominantSpeakerEndpoint);
+  }
+
   _onMainVideoChange() {
     console.log('Video type: ' + VideoControlStore.videoType);
     console.log('Video index: ' + VideoControlStore.videoIndex);
+
+    if (VideoControlStore.videoType === 'local') {
+      const mainConnection = this.props.localVideos.find((connection) => {
+        return connection.video.index === VideoControlStore.videoIndex;
+      });
+      this.setState({
+        mainVideoConnection: {
+        connection: mainConnection,
+        type: 'local',
+      }});
+    } else {
+      const mainConnection = this.props.remoteVideos.find((connection) => {
+        return connection.video.index === VideoControlStore.videoIndex;
+      });
+      this.setState({
+        mainVideoConnection: {
+        connection: mainConnection,
+        type: 'remote',
+      }});
+    }
   }
 
   _userLoggedIn() {
@@ -99,7 +130,6 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     //this.props.router.push('/' + roomName);
     const hostname = window.location.href;
     const newLocation = hostname + roomName;
-    console.log('NEW LOCATION: ' + newLocation);
     window.location.assign(hostname + roomName);
   }
 
@@ -108,15 +138,23 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       <div>
       <MeetToolbar />
       <MainVideo>
-        {this.props.localVideos.length > 0 ?
+        {this.state.mainVideoConnection.type === 'remote' ?
+          <RemoteVideo
+            video={this.state.mainVideoConnection.connection.video}
+            audio={this.state.mainVideoConnection.connection.audio}
+          /> : null
+        }
+        {this.state.mainVideoConnection.type === 'local' ?
           <LocalVideo
-            key={this.props.localVideos[0].video.index}
-            video={this.props.localVideos[0].video}
-            audio={this.props.localVideos[0].audio}
-          /> : null}
+            video={this.state.mainVideoConnection.connection.video}
+            audio={this.state.mainVideoConnection.connection.audio}
+          /> : null
+        }
       </MainVideo>
       <HorizontalWrapper>
           {this.props.localVideos.map((connection) => {
+            console.log('LOCAL CONNECTION');
+            console.log(connection);
             return (
               <HorizontalBox
                 key={connection.video.index}
@@ -128,6 +166,9 @@ export default withWebRTC(withRouter(class Main extends React.Component {
             );
           })}
           {this.props.remoteVideos.map((connection) => {
+            console.log('REMOTE CONNECTION');
+            console.log(connection);
+            console.log(connection.track.getParticipantId());
             return (
               <HorizontalBox
                 key={connection.video.index}
