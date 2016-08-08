@@ -89,7 +89,9 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     console.log(error);
   }
 
-  _onLoginPanelComplete() {
+  _onLoginPanelComplete(e) {
+    e.preventDefault();
+    //e.stopPropagation();
     let userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
     let roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
     localStorage.setItem('irisMeet.userName', userName);

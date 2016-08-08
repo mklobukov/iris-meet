@@ -55,7 +55,7 @@ export default class LoginPanel extends React.Component {
             />
           </div> : null}
           <button
-            type="button"
+            type="submit"
             className="btn btn-default"
             onClick={this.props.onAction}
           >Accept</button>
