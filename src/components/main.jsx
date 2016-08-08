@@ -94,7 +94,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
   }
 
   _onRemoteVideo(videoInfo) {
-    if (this.props.remoteVideos.length > 0 && this.state.mainConnection.connection === null) {
+    if (this.props.remoteVideos.length > 0 && this.state.mainVideoConnection.connection === null) {
       this.setState({
         mainVideoConnection: {
           connection: this.props.remoteVideos[0],
