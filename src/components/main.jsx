@@ -9,6 +9,7 @@ import UserStore from '../stores/user-store';
 import UserStoreConstants from '../constants/user-store-constants';
 import VideoControlStore from '../stores/video-control-store';
 import VideoControlStoreConstants from '../constants/video-control-store-constants';
+import VideoControlActions from '../actions/video-control-actions';
 import { withRouter } from 'react-router';
 import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
 
@@ -84,23 +85,13 @@ export default withWebRTC(withRouter(class Main extends React.Component {
 
   _onLocalVideo(videoInfo) {
     if (this.props.localVideos.length > 0) {
-      this.setState({
-        mainVideoConnection: {
-          connection: this.props.localVideos[0],
-          type: 'local',
-        }
-      });
+      VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
     }
   }
 
   _onRemoteVideo(videoInfo) {
-    if (this.props.remoteVideos.length > 0 && this.state.mainVideoConnection.connection === null) {
-      this.setState({
-        mainVideoConnection: {
-          connection: this.props.remoteVideos[0],
-          type: 'remote',
-        }
-      });
+    if (this.props.remoteVideos.length === 1) {
+      VideoControlActions.changeMainView('remote', this.props.remoteVideos[0].video.index);
     }
   }
 
@@ -109,15 +100,16 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     //let participant = track.getParticipantId();
     //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
     const matchedConnection = this.props.remoteVideos.find((connection) => {
-      return connection.baseId === dominantSpeakerEndpoint;
+      const participantId = connection.track.getParticipantId();
+      console.log('participantId: ' + participantId);
+      const endPoint = participantId.substring(participantId.lastIndexOf("/") + 1);
+      return endPoint === dominantSpeakerEndpoint;
     });
 
+    console.log('FOUND DOMINANT SPEAKER: ');
+    console.log(matchedConnection);
     if (matchedConnection) {
-      this.setState({
-        mainVideoConnection: {
-        connection: mainConnection,
-        type: 'remote',
-      }});
+      VideoControlActions.changeMainView('remote', matchedConnection.video.index);
     }
   }
 
@@ -133,7 +125,9 @@ export default withWebRTC(withRouter(class Main extends React.Component {
         mainVideoConnection: {
         connection: mainConnection,
         type: 'local',
-      }});
+      }}, () => {
+        console.log('MainVideo: local');
+      });
     } else {
       const mainConnection = this.props.remoteVideos.find((connection) => {
         return connection.video.index === VideoControlStore.videoIndex;
@@ -142,7 +136,9 @@ export default withWebRTC(withRouter(class Main extends React.Component {
         mainVideoConnection: {
         connection: mainConnection,
         type: 'remote',
-      }});
+      }}, () => {
+        console.log('MainVideo: remote:' + mainConnection.baseId);
+      });
     }
   }
 
@@ -220,7 +216,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
                   <RemoteVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
                 </HorizontalBox>
               );
-            }  
+            }
           })}
       </HorizontalWrapper>
       {this.state.showUser || this.state.showRoom ?

@@ -26,6 +26,9 @@ class VideoControlStore extends BaseStore {
       case VideoControlStoreConstants.VIDEO_CONTROL_CHANGE_MAIN_VIEW:
         if (action.data && action.data.videoType && action.data.videoIndex) {
           this._handleMainVideoChange(action.data.videoType, action.data.videoIndex);
+        } else {
+          console.log('Invalid data object passed into VIDEO_CONTROL_CHANGE_MAIN_VIEW');
+          console.log(action);
         }
     }
   }
