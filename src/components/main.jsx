@@ -210,15 +210,17 @@ export default withWebRTC(withRouter(class Main extends React.Component {
             console.log('REMOTE CONNECTION');
             console.log(connection);
             console.log(connection.track.getParticipantId());
-            return (
-              <HorizontalBox
-                key={connection.video.index}
-                type='remote'
-                id={connection.video.index}
-              >
-                <RemoteVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
-              </HorizontalBox>
-            );
+            if (connection.video) {
+              return (
+                <HorizontalBox
+                  key={connection.video.index}
+                  type='remote'
+                  id={connection.video.index}
+                >
+                  <RemoteVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
+                </HorizontalBox>
+              );
+            }  
           })}
       </HorizontalWrapper>
       {this.state.showUser || this.state.showRoom ?
