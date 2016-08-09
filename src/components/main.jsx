@@ -32,6 +32,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
     this.onLocalVideo = this._onLocalVideo.bind(this);
     this.onRemoteVideo = this._onRemoteVideo.bind(this);
+    this.onParticipantLeft = this._onParticipantLeft.bind(this);
   }
 
   componentDidMount() {
@@ -41,6 +42,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
     console.log('roomName: ' + this.props.params.roomname);
     let showRoom = false;
     let showUser = false;
@@ -71,6 +73,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
+    this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
     UserStore.removeUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
     UserStore.removeUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
     VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
@@ -95,6 +98,25 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     }
   }
 
+  _onParticipantLeft(id) {
+    console.log('Remote participant left: ' + id);
+    if (this.props.remoteVideos.length === 0) {
+      if (this.props.localVideos.length > 0) {
+        // no participants so go back to local video
+        console.log('Remote participant back to local');
+        VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
+      }
+    }
+
+    if (this.state.mainVideoConnection.connection.track.getParticipantId() === id) {
+      if (this.props.localVideos.length > 0) {
+        // if the participant who left was on main screen replace it with local
+        // video
+        VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
+      }
+    }
+  }
+
   _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
     console.log('DOMINANT_SPEAKER_CHANGED: ' + dominantSpeakerEndpoint);
     //let participant = track.getParticipantId();
@@ -110,6 +132,9 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     console.log(matchedConnection);
     if (matchedConnection) {
       VideoControlActions.changeMainView('remote', matchedConnection.video.index);
+    } else if (this.props.localVideos.length > 0) {
+      // no remote participants found so assume it is local speaker
+      VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
     }
   }
 
