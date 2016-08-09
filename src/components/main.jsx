@@ -106,6 +106,19 @@ export default withWebRTC(withRouter(class Main extends React.Component {
 
   _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
     console.log('DOMINANT_SPEAKER_CHANGED: ' + dominantSpeakerEndpoint);
+    //let participant = track.getParticipantId();
+    //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
+    const matchedConnection = this.props.remoteVideos.find((connection) => {
+      return connection.baseId === dominantSpeakerEndpoint;
+    });
+
+    if (matchedConnection) {
+      this.setState({
+        mainVideoConnection: {
+        connection: mainConnection,
+        type: 'remote',
+      }});
+    }
   }
 
   _onMainVideoChange() {
