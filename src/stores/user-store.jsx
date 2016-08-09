@@ -32,9 +32,11 @@ class UserStore extends BaseStore {
         if (action.data && action.data.userName && action.data.roomName) {
           this._handleUserLogin(action.data.userName, action.data.roomName);
         }
+        break;
 
       case UserStoreConstants.USER_LEAVE_ROOM:
         this._handleUserLeaveRoom();
+        break;
     }
   }
 
