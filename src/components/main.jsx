@@ -108,7 +108,9 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       }
     }
 
-    if (this.state.mainVideoConnection.connection.track.getParticipantId() === id) {
+    if (this.state.mainVideoConnection.connection &&
+        this.state.mainVideoConnection.connection.track &&
+        this.state.mainVideoConnection.connection.track.getParticipantId() === id) {
       if (this.props.localVideos.length > 0) {
         // if the participant who left was on main screen replace it with local
         // video
