@@ -190,9 +190,8 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     let userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
     let roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
     localStorage.setItem('irisMeet.userName', userName);
-    const hostname = window.location.href;
-    const newLocation = hostname + roomName;
-    window.location.assign(hostname + roomName);
+    const hostname = window.location.origin;
+    window.location.assign(hostname + '/' + roomName);
   }
 
   _onLocalAudioMute() {
