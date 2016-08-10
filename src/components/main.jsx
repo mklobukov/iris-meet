@@ -190,8 +190,6 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     let userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
     let roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
     localStorage.setItem('irisMeet.userName', userName);
-    //UserActions.loginUser(userName, roomName);
-    //this.props.router.push('/' + roomName);
     const hostname = window.location.href;
     const newLocation = hostname + roomName;
     window.location.assign(hostname + roomName);
@@ -200,7 +198,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
   render() {
     return (
       <div>
-      <MeetToolbar />
+      {this.props.localVideos.length > 0 ? <MeetToolbar /> : null}
       <MainVideo>
         {this.state.mainVideoConnection.type === 'remote' ?
           <RemoteVideo
