@@ -3,20 +3,32 @@ import React from 'react';
 export default class MeetToolbar extends React.Component {
     constructor(props) {
         super(props)
+
+        this.state = {
+          microphoneMuted: false,
+          cameraMuted: false,
+        }
     }
 
     _onMicrophoneMute() {
-      console.log('Microphone muted');
+      this.setState({
+        microphoneMuted: !this.state.microphoneMuted,
+      }, () => {
+        this.props.onMicrophoneMute();
+      });
     }
 
     _onCameraMute() {
-      console.log('Camera muted');
+      this.setState({
+        cameraMuted: !this.state.cameraMuted,
+      }, () => {
+        this.props.onCameraMute();
+      });
     }
 
     _onHangup() {
       const hostname = window.location.href;
       const urlString = hostname.substring(0, hostname.lastIndexOf("/"));
-      console.log('Hangup: ' + urlString);
       window.location.assign(urlString);
     }
 
@@ -24,8 +36,18 @@ export default class MeetToolbar extends React.Component {
         return (
             <div id="header">
                 <span id="toolbar">
-                  <a className="button" onClick={this._onMicrophoneMute.bind(this)}><i className="fa fa-microphone" aria-hidden="true"></i></a>
-                  <a className="button" onClick={this._onCameraMute.bind(this)}><i className="fa fa-camera" aria-hidden="true"></i></a>
+                  <a className="button" onClick={this._onMicrophoneMute.bind(this)}>{this.state.microphoneMuted ?
+                    <span className="fa-stack">
+                      <i className="fa fa-microphone fa-stack-1x" aria-hidden="true"></i>
+                      <i className="fa fa-ban fa-stack-2x text-danger" aria-hidden="true"></i>
+                    </span>
+                    : <i className="fa fa-microphone" aria-hidden="true"></i>}</a>
+                  <a className="button" onClick={this._onCameraMute.bind(this)}>{this.state.cameraMuted ?
+                    <span className="fa-stack">
+                      <i className="fa fa-camera fa-stack-1x" aria-hidden="true"></i>
+                      <i className="fa fa-ban fa-stack-2x text-danger" aria-hidden="true"></i>
+                    </span>
+                    : <i className="fa fa-camera" aria-hidden="true"></i>}</a>
                   <a className="button"><i className="fa fa-comments" aria-hidden="true"></i></a>
                   <a className="button"><i className="fa fa-desktop" aria-hidden="true"></i></a>
                   <a className="button"><i className="fa fa-expand" aria-hidden="true"></i></a>

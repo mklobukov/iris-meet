@@ -195,10 +195,22 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     window.location.assign(hostname + roomName);
   }
 
+  _onLocalAudioMute() {
+    this.props.onAudioMute();
+  }
+
+  _onLocalVideoMute() {
+    this.props.onVideoMute();
+  }
+
   render() {
     return (
       <div>
-      {this.props.localVideos.length > 0 ? <MeetToolbar /> : null}
+      {this.props.localVideos.length > 0 ?
+        <MeetToolbar
+          onMicrophoneMute={this._onLocalAudioMute.bind(this)}
+          onCameraMute={this._onLocalVideoMute.bind(this)}
+        /> : null}
       <MainVideo>
         {this.state.mainVideoConnection.type === 'remote' ?
           <RemoteVideo

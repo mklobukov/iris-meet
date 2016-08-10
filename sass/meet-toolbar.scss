@@ -40,6 +40,13 @@
     vertical-align: middle;
 }
 
+#toolbar .button .fa-stack {
+  display: inline-block;
+  position: relative;
+  top: 0px;
+  font-size: 0.75em !important;
+}
+
 #toolbar .button:hover {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 1px;
