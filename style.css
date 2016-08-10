@@ -26,9 +26,19 @@
   overflow-x: scroll;
   -webkit-overflow-scrolling: touch;
   padding: 1rem;
+  transition-property: visibility, opacity;
+  transition-duration: 1s;
   background-color: transparent; }
   .horizontal-wrapper::-webkit-scrollbar {
     display: none; }
+
+.videoBarHide {
+  visibility: hidden;
+  opacity: 0; }
+
+.videoBarShow {
+  visibility: visible;
+  opacity: 1; }
 
 #login-panel {
   position: fixed;

@@ -5,10 +5,10 @@ class HorizontalWrapper extends React.Component {
     constructor(props) {
         super(props);
     }
-    
+
     render() {
         return (
-            <div className="horizontal-wrapper">
+            <div className={this.props.isHidden ? "horizontal-wrapper videoBarHide" : "horizontal-wrapper videoBarShow"}>
                 {this.props.children}
             </div>
         );

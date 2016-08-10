@@ -7,6 +7,7 @@ export default class MeetToolbar extends React.Component {
         this.state = {
           microphoneMuted: false,
           cameraMuted: false,
+          barHidden: false,
         }
     }
 
@@ -32,6 +33,14 @@ export default class MeetToolbar extends React.Component {
       window.location.assign(urlString);
     }
 
+    _onExpandHide() {
+      this.setState({
+        barHidden: !this.state.barHidden,
+      }, () => {
+        this.props.onExpandHide();
+      });
+    }
+
     render() {
         return (
             <div id="header">
@@ -50,7 +59,7 @@ export default class MeetToolbar extends React.Component {
                     : <i className="fa fa-camera" aria-hidden="true"></i>}</a>
                   <a className="button"><i className="fa fa-comments" aria-hidden="true"></i></a>
                   <a className="button"><i className="fa fa-desktop" aria-hidden="true"></i></a>
-                  <a className="button"><i className="fa fa-expand" aria-hidden="true"></i></a>
+                  <a className="button" onClick={this._onExpandHide.bind(this)}><i className={this.state.barHidden ? "fa fa-expand" : "fa fa-compress"} aria-hidden="true"></i></a>
                   <a className="button"><i className="fa fa-cogs" aria-hidden="true"></i></a>
                   <a className="button" onClick={this._onHangup.bind(this)}><i className="fa fa-phone text-danger" aria-hidden="true"></i></a>
                 </span>

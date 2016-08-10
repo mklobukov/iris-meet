@@ -25,6 +25,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
         type: '',
       },
       isVideoMuted: false,
+      isVideoBarHidden: false,
     }
 
     this.loginCallback = this._userLoggedIn.bind(this);
@@ -208,6 +209,12 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     });
   }
 
+  _onExpandHide() {
+    this.setState({
+      isVideoBarHidden: !this.state.isVideoBarHidden,
+    });
+  }
+
   render() {
     return (
       <div>
@@ -215,6 +222,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
         <MeetToolbar
           onMicrophoneMute={this._onLocalAudioMute.bind(this)}
           onCameraMute={this._onLocalVideoMute.bind(this)}
+          onExpandHide={this._onExpandHide.bind(this)}
         /> : null}
       <MainVideo>
         {this.state.mainVideoConnection.type === 'remote' ?
@@ -230,7 +238,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
           /> : null
         }
       </MainVideo>
-      <HorizontalWrapper>
+      <HorizontalWrapper isHidden={this.state.isVideoBarHidden}>
           {this.props.localVideos.map((connection) => {
             console.log('LOCAL CONNECTION');
             console.log(connection);
