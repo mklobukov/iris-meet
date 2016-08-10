@@ -14,7 +14,7 @@ export default class MeetToolbar extends React.Component {
       this.setState({
         microphoneMuted: !this.state.microphoneMuted,
       }, () => {
-        this.props.onMicrophoneMute();
+        this.props.onMicrophoneMute(this.state.microphoneMuted);
       });
     }
 
@@ -22,7 +22,7 @@ export default class MeetToolbar extends React.Component {
       this.setState({
         cameraMuted: !this.state.cameraMuted,
       }, () => {
-        this.props.onCameraMute();
+        this.props.onCameraMute(this.state.cameraMuted);
       });
     }
 

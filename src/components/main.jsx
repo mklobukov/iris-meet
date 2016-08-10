@@ -23,7 +23,8 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       mainVideoConnection: {
         connection: null,
         type: '',
-      }
+      },
+      isVideoMuted: false,
     }
 
     this.loginCallback = this._userLoggedIn.bind(this);
@@ -194,12 +195,20 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     window.location.assign(hostname + '/' + roomName);
   }
 
-  _onLocalAudioMute() {
+  _onLocalAudioMute(isMuted) {
     this.props.onAudioMute();
   }
 
-  _onLocalVideoMute() {
-    this.props.onVideoMute();
+  _onLocalVideoMute(isMuted) {
+    console.log('video muted: ' + isMuted);
+    this.setState({
+      isVideoMuted: isMuted,
+    }, () => {
+      if (this.state.mainVideoConnection.type === 'local') {
+        VideoControlActions.changeMainView('none', 0);
+      }
+      this.props.onVideoMute();
+    });
   }
 
   render() {
@@ -234,7 +243,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
                 type='local'
                 id={connection.video.index}
               >
-                <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
+                {!this.state.isVideoMuted ? <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} /> : null}
               </HorizontalBox>
             );
           })}
