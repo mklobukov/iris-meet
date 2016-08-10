@@ -204,9 +204,6 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.setState({
       isVideoMuted: isMuted,
     }, () => {
-      if (this.state.mainVideoConnection.type === 'local') {
-        VideoControlActions.changeMainView('none', 0);
-      }
       this.props.onVideoMute();
     });
   }
@@ -243,7 +240,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
                 type='local'
                 id={connection.video.index}
               >
-                {!this.state.isVideoMuted ? <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} /> : null}
+                <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
               </HorizontalBox>
             );
           })}
