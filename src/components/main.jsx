@@ -228,15 +228,23 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       this.timer = null;
     }
 
-    this.setState({
-      isToolbarHidden: false,
-    }, () => {
+    if (this.state.isToolbarHidden === false) {
       this.timer = setTimeout(() => {
         this.setState({
           isToolbarHidden: true,
         });
       }, 10000);
-    });
+    } else {
+      this.setState({
+        isToolbarHidden: false,
+      }, () => {
+        this.timer = setTimeout(() => {
+          this.setState({
+            isToolbarHidden: true,
+          });
+        }, 10000);
+      });
+    }
   }
 
   render() {
