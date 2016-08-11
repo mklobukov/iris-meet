@@ -26,6 +26,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       },
       isVideoMuted: false,
       isVideoBarHidden: false,
+      isToolbarHidden: false,
     }
 
     this.loginCallback = this._userLoggedIn.bind(this);
@@ -35,6 +36,12 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.onLocalVideo = this._onLocalVideo.bind(this);
     this.onRemoteVideo = this._onRemoteVideo.bind(this);
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
+
+    this.timer = setTimeout(() => {
+      this.setState({
+        isToolbarHidden: true,
+      });
+    }, 10000);
   }
 
   componentDidMount() {
@@ -215,11 +222,29 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     });
   }
 
+  _onMouseMove() {
+    if (this.timer) {
+      clearTimeout(this.timer);
+      this.timer = null;
+    }
+
+    this.setState({
+      isToolbarHidden: false,
+    }, () => {
+      this.timer = setTimeout(() => {
+        this.setState({
+          isToolbarHidden: true,
+        });
+      }, 10000);
+    });
+  }
+
   render() {
     return (
-      <div>
+      <div onMouseMove={this._onMouseMove.bind(this)}>
       {this.props.localVideos.length > 0 ?
         <MeetToolbar
+          isHidden={this.state.isToolbarHidden}
           onMicrophoneMute={this._onLocalAudioMute.bind(this)}
           onCameraMute={this._onLocalVideoMute.bind(this)}
           onExpandHide={this._onExpandHide.bind(this)}

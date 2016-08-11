@@ -22,6 +22,8 @@
   border-radius: 3px;
   pointer-events: auto;
   text-align: center;
+  transition-property: visibility, opacity;
+  transition-duration: 1s;
 }
 
 #toolbar .button {
@@ -51,4 +53,13 @@
   background: rgba(255, 255, 255, 0.1);
   border-radius: 1px;
   -webkit-border-radius: 1px;
+}
+
+.toolbarHide {
+  visibility: hidden;
+  opacity: 0;
+}
+.toolbarShow {
+  visibility: visible;
+  opacity: 1;
 }

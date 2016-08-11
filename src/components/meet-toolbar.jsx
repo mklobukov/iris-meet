@@ -44,7 +44,7 @@ export default class MeetToolbar extends React.Component {
     render() {
         return (
             <div id="header">
-                <span id="toolbar">
+                <span id="toolbar" className={this.props.isHidden ? "toolbarHide" : "toolbarShow"}>
                   <a className="button" onClick={this._onMicrophoneMute.bind(this)}>{this.state.microphoneMuted ?
                     <span className="fa-stack">
                       <i className="fa fa-microphone fa-stack-1x" aria-hidden="true"></i>
