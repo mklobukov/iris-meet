@@ -12,6 +12,7 @@ class UserStore extends BaseStore {
 
     this.userInfo = {
       userName: null,
+      routingId: null,
       roomName: null,
       accessToken: null,
       decodedToken: null,
@@ -29,8 +30,11 @@ class UserStore extends BaseStore {
   _actionsHandler(action) {
     switch (action.actionType) {
       case UserStoreConstants.USER_LOGIN:
-        if (action.data && action.data.userName && action.data.roomName) {
-          this._handleUserLogin(action.data.userName, action.data.roomName);
+        if (action.data && action.data.userName && action.data.routingId && action.data.roomName) {
+          this._handleUserLogin(action.data.userName, action.data.routingId, action.data.roomName);
+        } else {
+          console.log('Received USER_LOGIN action with invalid data:');
+          console.log(action);
         }
         break;
 
@@ -40,8 +44,9 @@ class UserStore extends BaseStore {
     }
   }
 
-  _handleUserLogin(userName, roomName) {
+  _handleUserLogin(userName, routingId, roomName) {
     this.userInfo.userName = userName;
+    this.userInfo.routingId = routingId;
     this.userInfo.roomName = roomName;
     let authApi = new AuthManager({'managementApiUrl': authUrl, 'appKey': appKey});
     authApi.anonymousLogin(this.userName, this._onLoginSuccess.bind(this), this._onLoginFailure.bind(this));
@@ -50,6 +55,7 @@ class UserStore extends BaseStore {
   _handleUserLeaveRoom() {
     this.userInfo = {
       userName: null,
+      routingId: null,
       roomName: null,
       accessToken: null,
       decodedToken: null,
@@ -71,6 +77,10 @@ class UserStore extends BaseStore {
 
   get user() {
     return this.userInfo.userName;
+  }
+
+  get userRoutingId() {
+    return this.userInfo.routingId;
   }
 
   get room() {

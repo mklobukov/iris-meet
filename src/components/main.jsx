@@ -12,6 +12,7 @@ import VideoControlStoreConstants from '../constants/video-control-store-constan
 import VideoControlActions from '../actions/video-control-actions';
 import { withRouter } from 'react-router';
 import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
+import Config from '../../config.json';
 
 export default withWebRTC(withRouter(class Main extends React.Component {
   constructor(props) {
@@ -74,7 +75,14 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       });
     } else {
       // we have both userName and roomName so login
-      UserActions.loginUser(userName, this.props.params.roomname);
+      // we should also have routingId but just in case
+      // we don't create one
+      let routingId = localStorage.getItem('irisMeet.routingId');
+      if (routingId === null) {
+        routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
+        localStorage.setItem('irisMeet.routingId', routingId);
+      }
+      UserActions.loginUser(userName, routingId, this.props.params.roomname);
     }
   }
 
@@ -183,7 +191,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       showRoom: false,
       showUser: false,
     }, () => {
-      this.props.initializeWebRTC(UserStore.user, UserStore.room, UserStore.domain, UserStore.token);
+      this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId, UserStore.room, UserStore.domain, Config.eventManagerUrl, UserStore.token);
     });
   }
 
@@ -196,8 +204,13 @@ export default withWebRTC(withRouter(class Main extends React.Component {
   _onLoginPanelComplete(e) {
     e.preventDefault();
     //e.stopPropagation();
-    let userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
-    let roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
+    let routingId = localStorage.getItem('irisMeet.routingId');
+    if (routingId === null) {
+      routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
+      localStorage.setItem('irisMeet.routingId', routingId);
+    }
+    const userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
+    const roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
     localStorage.setItem('irisMeet.userName', userName);
     const hostname = window.location.origin;
     window.location.assign(hostname + '/' + roomName);
