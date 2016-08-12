@@ -28,9 +28,7 @@ export default class MeetToolbar extends React.Component {
     }
 
     _onHangup() {
-      const hostname = window.location.href;
-      const urlString = hostname.substring(0, hostname.lastIndexOf("/"));
-      window.location.assign(urlString);
+      this.props.onHangup();
     }
 
     _onExpandHide() {

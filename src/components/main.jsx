@@ -77,7 +77,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       // we have both userName and roomName so login
       // we should also have routingId but just in case
       // we don't create one
-      let routingId = localStorage.getItem('irisMeet.routingId');
+      let routingId = null; //localStorage.getItem('irisMeet.routingId');
       if (routingId === null) {
         routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
         localStorage.setItem('irisMeet.routingId', routingId);
@@ -99,17 +99,19 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       showUser: false,
     }, () => {
       UserActions.leaveRoom();
-      this.endSession();
+      //this.endSession();
     });
   }
 
   _onLocalVideo(videoInfo) {
+    console.log('NUMBER OF LOCAL VIDEOS: ' + this.props.localVideos.length);
     if (this.props.localVideos.length > 0) {
       VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
     }
   }
 
   _onRemoteVideo(videoInfo) {
+    console.log('NUMBER OF REMOTE VIDEOS: ' + this.props.remoteVideos.length);
     if (this.props.remoteVideos.length === 1) {
       VideoControlActions.changeMainView('remote', this.props.remoteVideos[0].video.index);
     }
@@ -191,7 +193,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       showRoom: false,
       showUser: false,
     }, () => {
-      this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId, UserStore.room, UserStore.domain, Config.eventManagerUrl, UserStore.token);
+      this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId, UserStore.room, UserStore.domain.toLowerCase(), Config.eventManagerUrl, UserStore.token);
     });
   }
 
@@ -204,7 +206,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
   _onLoginPanelComplete(e) {
     e.preventDefault();
     //e.stopPropagation();
-    let routingId = localStorage.getItem('irisMeet.routingId');
+    let routingId = null; //localStorage.getItem('irisMeet.routingId');
     if (routingId === null) {
       routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
       localStorage.setItem('irisMeet.routingId', routingId);
@@ -260,6 +262,13 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     }
   }
 
+  _onHangup() {
+    this.props.endSession();
+    const hostname = window.location.href;
+    const urlString = hostname.substring(0, hostname.lastIndexOf("/"));
+    window.location.assign(urlString);
+  }
+
   render() {
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
@@ -269,6 +278,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
           onMicrophoneMute={this._onLocalAudioMute.bind(this)}
           onCameraMute={this._onLocalVideoMute.bind(this)}
           onExpandHide={this._onExpandHide.bind(this)}
+          onHangup={this._onHangup.bind(this)}
         /> : null}
       <MainVideo>
         {this.state.mainVideoConnection.type === 'remote' ?
