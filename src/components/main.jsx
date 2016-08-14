@@ -13,6 +13,8 @@ import VideoControlActions from '../actions/video-control-actions';
 import { withRouter } from 'react-router';
 import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
 import Config from '../../config.json';
+import getQueryParameter from '../utils/query-params';
+import validResolution from '../utils/verify-resolution';
 
 export default withWebRTC(withRouter(class Main extends React.Component {
   constructor(props) {
@@ -53,6 +55,8 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
+    const requestedResolution = getQueryParameter('resolution');
+    console.log(requestedResolution);
     console.log('roomName: ' + this.props.params.roomname);
     let showRoom = false;
     let showUser = false;
@@ -193,7 +197,13 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       showRoom: false,
       showUser: false,
     }, () => {
-      this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId, UserStore.room, UserStore.domain.toLowerCase(), Config.eventManagerUrl, UserStore.token);
+      let requestedResolution = getQueryParameter('resolution');
+      console.log(requestedResolution);
+      if (!validResolution(requestedResolution)) {
+        console.log('Requested resolution is not valid.  Switching to default hd.');
+        requestedResolution = 'hd';
+      }
+      this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId, UserStore.room, UserStore.domain.toLowerCase(), Config.eventManagerUrl, UserStore.token, requestedResolution);
     });
   }
 
