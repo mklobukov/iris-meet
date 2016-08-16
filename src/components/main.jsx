@@ -15,6 +15,10 @@ import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react
 import Config from '../../config.json';
 import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
+import TextChat from './text-chat';
+import MessageActions from '../actions/message-actions';
+import MessageConstants from '../constants/message-constants';
+import MessageStore from '../stores/message-store';
 
 export default withWebRTC(withRouter(class Main extends React.Component {
   constructor(props) {
@@ -30,6 +34,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       isVideoMuted: false,
       isVideoBarHidden: false,
       isToolbarHidden: false,
+      isChatHidden: true,
     }
 
     this.loginCallback = this._userLoggedIn.bind(this);
@@ -39,6 +44,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.onLocalVideo = this._onLocalVideo.bind(this);
     this.onRemoteVideo = this._onRemoteVideo.bind(this);
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
+    this.onSessionCreated = this._onSessionCreated.bind(this);
 
     this.timer = setTimeout(() => {
       this.setState({
@@ -55,6 +61,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_SESSION_CREATED, this.onSessionCreated);
     const requestedResolution = getQueryParameter('resolution');
     console.log(requestedResolution);
     console.log('roomName: ' + this.props.params.roomname);
@@ -95,9 +102,10 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
+    this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_SESSION_CREATED, this.onSessionCreated);
     UserStore.removeUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
     UserStore.removeUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
-    VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
+    VideoControlStore.removeVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
     this.setState({
       showRoom: false,
       showUser: false,
@@ -105,6 +113,11 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       UserActions.leaveRoom();
       //this.endSession();
     });
+  }
+
+  _onSessionCreated(sessionInfo) {
+    MessageActions.roomReady(UserStore.user, UserStore.room, UserStore.userRoutingId,
+      this.props.getRootNodeId(), this.props.getRootChildNodeId());
   }
 
   _onLocalVideo(videoInfo) {
@@ -279,6 +292,12 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     window.location.assign(urlString);
   }
 
+  _onChat() {
+    this.setState({
+      isChatHidden: !this.state.isChatHidden,
+    });
+  }
+
   render() {
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
@@ -289,6 +308,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
           onCameraMute={this._onLocalVideoMute.bind(this)}
           onExpandHide={this._onExpandHide.bind(this)}
           onHangup={this._onHangup.bind(this)}
+          onChat={this._onChat.bind(this)}
         /> : null}
       <MainVideo>
         {this.state.mainVideoConnection.type === 'remote' ?
@@ -335,6 +355,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
             }
           })}
       </HorizontalWrapper>
+      <TextChat isHidden={this.state.isChatHidden} />
       {this.state.showUser || this.state.showRoom ?
         <LoginPanel
           ref='loginpanel'
