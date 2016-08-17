@@ -1,9 +1,10 @@
 import BaseStore from './base-store';
 import UserStoreConstants from '../constants/user-store-constants';
 import { AuthManager } from 'iris-auth-js-sdk';
+import Config from '../../config.json';
 
-const authUrl = 'https://iris.xrtc.me/';
-const appKey = 'bJjeXEpiqXMBAJpuDr0ksg7pkUCQlNlV';
+const authUrl = Config.authUrl;
+const appKey = Config.appKey;
 
 class UserStore extends BaseStore {
   constructor() {

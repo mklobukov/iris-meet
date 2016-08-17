@@ -1,10 +1,57 @@
 'use strict';
 
 import React, { Component } from 'react';
+import MessageStore from '../stores/message-store';
+import MessageActions from '../actions/message-actions';
+import MessageConstants from '../constants/message-constants';
+import UserStore from '../stores/user-store';
 
 export default class TextChat extends Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      enteredText: '',
+      messages: [],
+    }
+
+    this.onNewMessages = this._onNewMessages.bind(this);
+    this.onMessageSend = this._onMessageSend.bind(this);
+  }
+
+  componentDidMount() {
+    MessageStore.addMessageListener(MessageConstants.MESSAGES_RECEIVED_EVENT, this.onNewMessages);
+    MessageStore.addMessageListener(MessageConstants.MESSAGE_SENT_EVENT, this.onMessageSend);
+  }
+
+  componentWillUnmount() {
+    MessageStore.removeMessageListener(MessageConstants.MESSAGES_RECEIVED_EVENT, this.onNewMessages);
+    MessageStore.removeMessageListener(MessageConstants.MESSAGE_SENT_EVENT, this.onMessageSend);
+  }
+
+  _onMessageSend() {
+    MessageActions.receiveMessages();
+  }
+
+  _onNewMessages() {
+    this.setState({
+      messages: MessageStore.latestMessages,
+    });
+  }
+
+  _onSendMessage() {
+    if (this.state.enteredText !== '') {
+      MessageActions.sendMessage(UserStore.user, UserStore.userRoutingId, UserStore.room, this.state.enteredText);
+      this.setState({
+        enteredText: '',
+      });
+    }
+  }
+
+  _onEnterMessage(e) {
+    this.setState({
+      enteredText: e.target.value,
+    });
   }
 
   render() {
@@ -14,69 +61,41 @@ export default class TextChat extends Component {
 
           <div className="panel-body">
               <ul className="chat">
-                  <li className="left clearfix"><span className="chat-img pull-left">
-                      <img src="assets/u-avatar.png" alt="User Avatar" className="img-circle" />
-                  </span>
-                      <div className="chat-body clearfix">
-                          <div className="header">
-                              <strong className="primary-font">Jack Sparrow</strong> <small className="pull-right text-muted">
-                                  <span className="glyphicon glyphicon-time"></span>12 mins ago</small>
+                  {this.state.messages.map((message) => {
+                    const isItMe = message.userName === MessageStore.user && message.routingId === MessageStore.userRoutingId;
+                    return (
+                      <li className={isItMe ? "right clearfix" : "left clearfix"}><span className={isItMe ? "chat-img pull-right" : "chat-img pull-left"}>
+                          <img src={isItMe ? "assets/me-avatar.png" : "assets/u-avatar.png"} alt="User Avatar" className="img-circle" />
+                      </span>
+                          <div className="chat-body clearfix">
+                              {isItMe ? <div className="header">
+                                  <small className=" text-muted"><span className="glyphicon glyphicon-time"></span>13 mins ago</small>
+                                  <strong className="pull-right primary-font">Bhaumik Patel</strong>
+                              </div> : <div className="header">
+                                  <strong className="primary-font">{message.userName}</strong> <small className="pull-right text-muted">
+                                      <span className="glyphicon glyphicon-time"></span>12 mins ago</small>
+                              </div>}
+                              <p>
+                                  {message.messageText}
+                              </p>
                           </div>
-                          <p>
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum ornare
-                              dolor, quis ullamcorper ligula sodales.
-                          </p>
-                      </div>
-                  </li>
-                  <li className="right clearfix"><span className="chat-img pull-right">
-                      <img src="assets/me-avatar.png" alt="User Avatar" className="img-circle" />
-                  </span>
-                      <div className="chat-body clearfix">
-                          <div className="header">
-                              <small className=" text-muted"><span className="glyphicon glyphicon-time"></span>13 mins ago</small>
-                              <strong className="pull-right primary-font">Bhaumik Patel</strong>
-                          </div>
-                          <p>
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum ornare
-                              dolor, quis ullamcorper ligula sodales.
-                          </p>
-                      </div>
-                  </li>
-                  <li className="left clearfix"><span className="chat-img pull-left">
-                      <img src="assets/u-avatar.png" alt="User Avatar" className="img-circle" />
-                  </span>
-                      <div className="chat-body clearfix">
-                          <div className="header">
-                              <strong className="primary-font">Jack Sparrow</strong> <small className="pull-right text-muted">
-                                  <span className="glyphicon glyphicon-time"></span>14 mins ago</small>
-                          </div>
-                          <p>
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum ornare
-                              dolor, quis ullamcorper ligula sodales.
-                          </p>
-                      </div>
-                  </li>
-                  <li className="right clearfix"><span className="chat-img pull-right">
-                      <img src="assets/me-avatar.png" alt="User Avatar" className="img-circle" />
-                  </span>
-                      <div className="chat-body clearfix">
-                          <div className="header">
-                              <small className=" text-muted"><span className="glyphicon glyphicon-time"></span>15 mins ago</small>
-                              <strong className="pull-right primary-font">Bhaumik Patel</strong>
-                          </div>
-                          <p>
-                              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur bibendum ornare
-                              dolor, quis ullamcorper ligula sodales.
-                          </p>
-                      </div>
-                  </li>
+                      </li>
+                    );
+                  })}
               </ul>
           </div>
           <div id="text-chat-footer" className="panel-footer">
               <div className="input-group">
-                  <input id="btn-input" type="text" className="form-control input-sm" placeholder="Type your message here..." />
+                  <input
+                    id="btn-input"
+                    type="text"
+                    className="form-control input-sm"
+                    placeholder="Type your message here..."
+                    value={this.state.enteredText}
+                    onChange={this._onEnterMessage.bind(this)}
+                  />
                   <span className="input-group-btn">
-                      <button className="btn btn-default btn-sm" id="btn-chat">
+                      <button onClick={this._onSendMessage.bind(this)} className="btn btn-default btn-sm" id="btn-chat">
                           Send</button>
                   </span>
               </div>

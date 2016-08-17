@@ -2,10 +2,11 @@ import AppDispatcher from '../dispatcher/app-dispatcher';
 import MessageConstants from '../constants/message-constants';
 
 class MessageActions {
-  roomReady(userName, roomName, routingId, rootNodeId, rootChildNodeId) {
+  roomReady(token, userName, roomName, routingId, rootNodeId, rootChildNodeId) {
     AppDispatcher.dispatch({
       actionType: MessageConstants.GET_ROOM,
       data: {
+        token,
         userName,
         roomName,
         routingId,
@@ -16,6 +17,7 @@ class MessageActions {
   }
 
   sendMessage(userName, routingId, roomName, messageText) {
+    console.log('sendMessage');
     AppDispatcher.dispatch({
       actionType: MessageConstants.MESSAGE_SEND,
       data: {

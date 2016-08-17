@@ -1,3 +1,5 @@
 {
-  "eventManagerUrl": "https://st-evmgr-cmce-002.poc.sys.comcast.net"
+  "eventManagerUrl": "https://st-evmgr-cmce-002.poc.sys.comcast.net",
+  "authUrl": "https://iris.xrtc.me/",
+  "appKey": "bJjeXEpiqXMBAJpuDr0ksg7pkUCQlNlV",
 }

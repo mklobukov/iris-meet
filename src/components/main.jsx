@@ -116,7 +116,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
   }
 
   _onSessionCreated(sessionInfo) {
-    MessageActions.roomReady(UserStore.user, UserStore.room, UserStore.userRoutingId,
+    MessageActions.roomReady(UserStore.token, UserStore.user, UserStore.room, UserStore.userRoutingId,
       this.props.getRootNodeId(), this.props.getRootChildNodeId());
   }
 
