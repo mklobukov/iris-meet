@@ -1,5 +1,7 @@
 {
   "eventManagerUrl": "https://st-evmgr-cmce-002.poc.sys.comcast.net",
+  "notificationServer": "https://ma-pushnotify-as-a-001.rtc.sys.comcast.net",
+  "nodeServer": "https://st-jssdk-wcdcc-001.poc.sys.comcast.net/node/",
   "authUrl": "https://iris.xrtc.me/",
   "appKey": "bJjeXEpiqXMBAJpuDr0ksg7pkUCQlNlV",
 }

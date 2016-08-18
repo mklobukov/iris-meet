@@ -35,6 +35,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       isVideoBarHidden: false,
       isToolbarHidden: false,
       isChatHidden: true,
+      isChatAvailable: false,
     }
 
     this.loginCallback = this._userLoggedIn.bind(this);
@@ -45,6 +46,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.onRemoteVideo = this._onRemoteVideo.bind(this);
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
     this.onSessionCreated = this._onSessionCreated.bind(this);
+    this.onChatRoomReady = this._onChatRoomReady.bind(this);
 
     this.timer = setTimeout(() => {
       this.setState({
@@ -57,6 +59,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     UserStore.addUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
     UserStore.addUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
     VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
+    MessageStore.addMessageListener(MessageConstants.ROOM_READY_EVENT, this.onChatRoomReady);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
@@ -88,7 +91,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       // we have both userName and roomName so login
       // we should also have routingId but just in case
       // we don't create one
-      let routingId = null; //localStorage.getItem('irisMeet.routingId');
+      let routingId = localStorage.getItem('irisMeet.routingId');
       if (routingId === null) {
         routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
         localStorage.setItem('irisMeet.routingId', routingId);
@@ -106,6 +109,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     UserStore.removeUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
     UserStore.removeUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
     VideoControlStore.removeVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
+    MessageStore.removeMessageListener(MessageConstants.ROOM_READY_EVENT, this.onChatRoomReady);
     this.setState({
       showRoom: false,
       showUser: false,
@@ -118,6 +122,12 @@ export default withWebRTC(withRouter(class Main extends React.Component {
   _onSessionCreated(sessionInfo) {
     MessageActions.roomReady(UserStore.token, UserStore.user, UserStore.room, UserStore.userRoutingId,
       this.props.getRootNodeId(), this.props.getRootChildNodeId());
+  }
+
+  _onChatRoomReady() {
+    this.setState({
+      isChatAvailable: true,
+    });
   }
 
   _onLocalVideo(videoInfo) {
@@ -216,7 +226,13 @@ export default withWebRTC(withRouter(class Main extends React.Component {
         console.log('Requested resolution is not valid.  Switching to default hd.');
         requestedResolution = 'hd';
       }
-      this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId, UserStore.room, UserStore.domain.toLowerCase(), Config.eventManagerUrl, UserStore.token, requestedResolution);
+      const hosts = {
+        eventManagerUrl: Config.eventManagerUrl,
+        notificationServer: Config.notificationServer,
+        nodeServer: Config.nodeServer
+      }
+      const routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
+      this.props.initializeWebRTC(UserStore.user, routingId, UserStore.room, UserStore.domain.toLowerCase(), hosts, UserStore.token, requestedResolution);
     });
   }
 
@@ -229,7 +245,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
   _onLoginPanelComplete(e) {
     e.preventDefault();
     //e.stopPropagation();
-    let routingId = null; //localStorage.getItem('irisMeet.routingId');
+    let routingId = localStorage.getItem('irisMeet.routingId');
     if (routingId === null) {
       routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
       localStorage.setItem('irisMeet.routingId', routingId);
@@ -293,6 +309,9 @@ export default withWebRTC(withRouter(class Main extends React.Component {
   }
 
   _onChat() {
+    if (!this.state.isChatAvailable) {
+      return;
+    }
     this.setState({
       isChatHidden: !this.state.isChatHidden,
     });
@@ -304,6 +323,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       {this.props.localVideos.length > 0 ?
         <MeetToolbar
           isHidden={this.state.isToolbarHidden}
+          isChatAvailable={this.state.isChatAvailable}
           onMicrophoneMute={this._onLocalAudioMute.bind(this)}
           onCameraMute={this._onLocalVideoMute.bind(this)}
           onExpandHide={this._onExpandHide.bind(this)}

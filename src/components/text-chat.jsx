@@ -40,7 +40,8 @@ export default class TextChat extends Component {
     });
   }
 
-  _onSendMessage() {
+  _onSendMessage(e) {
+    e.preventDefault();
     if (this.state.enteredText !== '') {
       MessageActions.sendMessage(UserStore.user, UserStore.userRoutingId, UserStore.room, this.state.enteredText);
       this.setState({
@@ -86,7 +87,8 @@ export default class TextChat extends Component {
               </ul>
           </div>
           <div id="text-chat-footer" className="panel-footer">
-              <div className="input-group">
+              <form className="form">
+                <div className="input-group">
                   <input
                     id="btn-input"
                     type="text"
@@ -96,10 +98,11 @@ export default class TextChat extends Component {
                     onChange={this._onEnterMessage.bind(this)}
                   />
                   <span className="input-group-btn">
-                      <button onClick={this._onSendMessage.bind(this)} className="btn btn-default btn-sm" id="btn-chat">
+                      <button type="submit" onClick={this._onSendMessage.bind(this)} className="btn btn-default btn-sm" id="btn-chat">
                           Send</button>
                   </span>
-              </div>
+                </div>
+              </form>
           </div>
         </div>
       </div>

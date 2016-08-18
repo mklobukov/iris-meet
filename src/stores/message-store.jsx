@@ -20,6 +20,7 @@ class MessageStore extends BaseStore {
     this.routingId = null;
     this.sessionRootNodeId = null;
     this.sessionRootChildNodeId = null;
+    this.pollTimer = null;
   }
 
   addMessageListener(name, callback) {
@@ -75,6 +76,25 @@ class MessageStore extends BaseStore {
     this.sessionRootNodeId = rootNodeId;
     this.sessionRootChildNodeId = rootChildNodeId;
     this.emit(MessageConstants.ROOM_READY_EVENT);
+    this._pollForMessages()
+  }
+
+  _pollForMessages() {
+    if (this.pollTimer) {
+      clearTimeout(this.pollTimer);
+      this.pollTimer = null;
+    }
+
+    this.pollTimer = setTimeout(() => {
+      this._handleReceiveMessages();
+    }, 3000);
+  }
+
+  _cancelPoll() {
+    if (this.pollTimer) {
+      clearTimeout(this.pollTimer);
+      this.pollTimer = null;
+    }
   }
 
   _handleSendMessage(userName, routingId, roomName, messageText) {
@@ -109,9 +129,10 @@ class MessageStore extends BaseStore {
   }
 
   _handleReceiveMessages() {
+    this._cancelPoll();
     console.log('in _handleReceiveMessages');
     const eventMgr = new EventManager({ emApiUrl: emUrl, jwt: this.token });
-    eventMgr.getChildEvents(this.sessionRootChildNodeId, 10, (childNodes) => {
+    eventMgr.getChildEvents(this.sessionRootChildNodeId, 100, (childNodes) => {
       console.log(childNodes);
       this.messages = [];
       childNodes.map((childNode) => {
@@ -124,9 +145,11 @@ class MessageStore extends BaseStore {
         return messageReceived;
       });
       this.emit(MessageConstants.MESSAGES_RECEIVED_EVENT);
+      this._pollForMessages();
     }, (error) => {
       console.log('Error occurred receiving messages:');
       console.log(error);
+      this._pollForMessages();
     });
   }
 
