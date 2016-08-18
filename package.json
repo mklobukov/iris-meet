@@ -16,6 +16,7 @@
     "iris-react-webrtc": "1.0.2",
     "keymirror": "^0.1.1",
     "lodash": "^3.6.0",
+    "moment": "2.14.1",
     "react": "^15.3.0",
     "react-dom": "^15.3.0",
     "react-router": "2.6.1"

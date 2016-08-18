@@ -5,6 +5,7 @@ import MessageStore from '../stores/message-store';
 import MessageActions from '../actions/message-actions';
 import MessageConstants from '../constants/message-constants';
 import UserStore from '../stores/user-store';
+import moment from 'moment';
 
 export default class TextChat extends Component {
   constructor(props) {
@@ -62,18 +63,18 @@ export default class TextChat extends Component {
           <div className="panel-body">
               <ul className="chat">
                   {this.state.messages.map((message) => {
-                    const isItMe = message.userName === MessageStore.user && message.routingId === MessageStore.userRoutingId;
+                    const isItMe = message.userName === UserStore.user && message.routingId === UserStore.userRoutingId;
                     return (
                       <li className={isItMe ? "right clearfix" : "left clearfix"}><span className={isItMe ? "chat-img pull-right" : "chat-img pull-left"}>
                           <img src={isItMe ? "assets/me-avatar.png" : "assets/u-avatar.png"} alt="User Avatar" className="img-circle" />
                       </span>
                           <div className="chat-body clearfix">
                               {isItMe ? <div className="header">
-                                  <small className=" text-muted"><span className="glyphicon glyphicon-time"></span>13 mins ago</small>
-                                  <strong className="pull-right primary-font">Bhaumik Patel</strong>
+                                  <small className=" text-muted"><span className="glyphicon glyphicon-time"></span>{moment(message.timePosted).fromNow()}</small>
+                                  <strong className="pull-right primary-font">{message.userName}</strong>
                               </div> : <div className="header">
                                   <strong className="primary-font">{message.userName}</strong> <small className="pull-right text-muted">
-                                      <span className="glyphicon glyphicon-time"></span>12 mins ago</small>
+                                      <span className="glyphicon glyphicon-time"></span>{moment(message.timePosted).fromNow()}</small>
                               </div>}
                               <p>
                                   {message.messageText}

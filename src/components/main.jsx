@@ -172,7 +172,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       VideoControlActions.changeMainView('remote', matchedConnection.video.index);
     } else if (this.props.localVideos.length > 0) {
       // no remote participants found so assume it is local speaker
-      VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
+      //VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
     }
   }
 

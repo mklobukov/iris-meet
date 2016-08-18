@@ -83,20 +83,16 @@ class MessageStore extends BaseStore {
       routingId,
       roomName,
       messageText,
+      timePosted: Number(new Date()),
     };
-    /*this.messages.push({
-      userName,
-      routingId,
-      roomName,
-      messageText,
-    });*/
+
     console.log('token: ' + this.token);
     const eventMgr = new EventManager({ emApiUrl: emUrl, jwt: this.token });
     const childOptions = {
       node_id: this.sessionRootChildNodeId,
       event_type: 'textMessage',
       from: this.routingId,
-      time_posted: Number(new Date()),
+      time_posted: textMessageObject.timePosted,
       root_node_id: this.sessionRootNodeId,
       userdata: JSON.stringify(textMessageObject)
     }
@@ -106,7 +102,6 @@ class MessageStore extends BaseStore {
       console.log('SEND MESSAGE SEND MESSAGE SEND MESSAGE');
       console.log(childData);
       this.emit(MessageConstants.MESSAGE_SENT_EVENT);
-      //this._handleReceiveMessages();
     }, (error) => {
       console.log('Error occurred sending message:');
       console.log(error);
@@ -125,7 +120,7 @@ class MessageStore extends BaseStore {
         console.log('before parse:');
         console.log(messageReceived);
         const messageObj = JSON.parse(messageReceived);
-        this.messages.push(messageObj);
+        this.messages.unshift(messageObj);
         return messageReceived;
       });
       this.emit(MessageConstants.MESSAGES_RECEIVED_EVENT);
