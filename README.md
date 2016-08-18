@@ -1,17 +1,7 @@
-# reactjs_flux_es6
-Reactjs + flux + es6 starter kit
+# iris-meet
+Video conferencing reference client for Iris Platform
 
-Use this as a starting point for reactjs with flux and es6 projects.
+## Usage
+Enter user name and conference room name.  Once the conference is created copy the url and send it with your invite.
+Other participants can simply click on provided url to join the meeting.
 
----
-
-##How to use it##
-
-Checkout this repo, install dependencies, then start the gulp process with the following:
-
-```
-	> git clone git@github.com:robjsliwa/reactjs_flux_es6.git
-	> cd reactjs_flux_es6.git
-	> npm install
-	> gulp
-```
