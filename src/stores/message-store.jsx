@@ -98,7 +98,7 @@ class MessageStore extends BaseStore {
   }
 
   _getPollInterval(pollAttempt) {
-    return Math.min(20, (Math.pow(2, pollAttempt) - 1)) * 1000;
+    return Math.min(5, (Math.pow(2, pollAttempt) - 1)) * 1000;
   }
 
   _cancelPoll() {
