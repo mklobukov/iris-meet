@@ -37,6 +37,12 @@ export default class TextChat extends Component {
   _onNewMessages() {
     this.setState({
       messages: MessageStore.latestMessages,
+    }, () => {
+      console.log('scrolling..................');
+      let element = document.getElementById("message-scroll");
+      console.log(element);
+      element.scrollTop = element.scrollHeight;
+      console.log(element);
     });
   }
 
@@ -61,8 +67,8 @@ export default class TextChat extends Component {
       <div className={this.props.isHidden ? "chat-panel chat-panel-hide" : "chat-panel chat-panel-show"}>
         <div id="text-chat-heading" className="panel panel-primary">
 
-          <div className="panel-body">
-              <ul className="chat">
+          <div id="message-scroll" className="panel-body">
+              <ol className="chat">
                   {this.state.messages.map((message) => {
                     const isItMe = message.userName === UserStore.user && message.routingId === UserStore.userRoutingId;
                     return (
@@ -84,7 +90,7 @@ export default class TextChat extends Component {
                       </li>
                     );
                   })}
-              </ul>
+              </ol>
           </div>
           <div id="text-chat-footer" className="panel-footer">
               <form className="form">

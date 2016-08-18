@@ -21,6 +21,7 @@ class MessageStore extends BaseStore {
     this.sessionRootNodeId = null;
     this.sessionRootChildNodeId = null;
     this.pollTimer = null;
+    this.pollAttempt = 1;
   }
 
   addMessageListener(name, callback) {
@@ -85,9 +86,19 @@ class MessageStore extends BaseStore {
       this.pollTimer = null;
     }
 
+    const interval = this._getPollInterval(this.pollAttempt);
+    console.log('Poll interval: ' + interval);
+    this.pollAttempt += 1;
+    if (this.pollAttempt > 1000) {
+      this.pollAttempt = 1;
+    }
     this.pollTimer = setTimeout(() => {
       this._handleReceiveMessages();
-    }, 3000);
+    }, interval);
+  }
+
+  _getPollInterval(pollAttempt) {
+    return Math.min(20, (Math.pow(2, pollAttempt) - 1)) * 1000;
   }
 
   _cancelPoll() {
@@ -134,6 +145,8 @@ class MessageStore extends BaseStore {
     const eventMgr = new EventManager({ emApiUrl: emUrl, jwt: this.token });
     eventMgr.getChildEvents(this.sessionRootChildNodeId, 100, (childNodes) => {
       console.log(childNodes);
+      const mostRecentMessageTime = this.messages.length > 0 ? this.messages[this.messages.length - 1].timePosted : 0;
+      let numberOfNewMessages = 0;
       this.messages = [];
       childNodes.map((childNode) => {
         console.log(childNode);
@@ -144,12 +157,27 @@ class MessageStore extends BaseStore {
         this.messages.unshift(messageObj);
         return messageReceived;
       });
+      if (this.messages.length > 0) {
+        this.messages.map((message) => {
+          if (message.timePosted > mostRecentMessageTime) {
+            numberOfNewMessages += 1;
+          }
+          return numberOfNewMessages;
+        });
+        console.log('Number of new messages: ' + numberOfNewMessages);
+        if (numberOfNewMessages > 0) {
+          this.pollAttempt = 1;
+        }
+      }
       this.emit(MessageConstants.MESSAGES_RECEIVED_EVENT);
       this._pollForMessages();
     }, (error) => {
+      this._pollForMessages();
+      if (error.response && error.response.status === 204) {
+        return;
+      }
       console.log('Error occurred receiving messages:');
       console.log(error);
-      this._pollForMessages();
     });
   }
 
