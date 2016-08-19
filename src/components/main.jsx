@@ -36,6 +36,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       isToolbarHidden: false,
       isChatHidden: true,
       isChatAvailable: false,
+      numberOfNewMessages: 0,
     }
 
     this.loginCallback = this._userLoggedIn.bind(this);
@@ -47,6 +48,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
     this.onSessionCreated = this._onSessionCreated.bind(this);
     this.onChatRoomReady = this._onChatRoomReady.bind(this);
+    this.onNewMessageArrived = this._onNewMessageArrived.bind(this);
 
     this.timer = setTimeout(() => {
       this.setState({
@@ -60,6 +62,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     UserStore.addUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
     VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
     MessageStore.addMessageListener(MessageConstants.ROOM_READY_EVENT, this.onChatRoomReady);
+    MessageStore.addMessageListener(MessageConstants.NEW_MESSAGE_ARRIVED_EVENT, this.onNewMessageArrived);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
@@ -110,6 +113,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     UserStore.removeUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
     VideoControlStore.removeVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
     MessageStore.removeMessageListener(MessageConstants.ROOM_READY_EVENT, this.onChatRoomReady);
+    MessageStore.removeMessageListener(MessageConstants.NEW_MESSAGE_ARRIVED_EVENT, this.onNewMessageArrived);
     this.setState({
       showRoom: false,
       showUser: false,
@@ -117,6 +121,21 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       UserActions.leaveRoom();
       //this.endSession();
     });
+  }
+
+  _onNewMessageArrived(numberOfNewMessages) {
+    if (this.state.isChatHidden) {
+      this.setState({
+        numberOfNewMessages: numberOfNewMessages,
+      }, () => {
+        this._onMouseMove();  // wake up toolbar to show up so the user can
+                              // see notification
+      });
+    } else {
+      this.setState({
+        numberOfNewMessages: 0,
+      });
+    }
   }
 
   _onSessionCreated(sessionInfo) {
@@ -312,8 +331,12 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     if (!this.state.isChatAvailable) {
       return;
     }
+    MessageActions.resetNewMessageCount();
     this.setState({
       isChatHidden: !this.state.isChatHidden,
+    });
+    this.setState({
+      numberOfNewMessages: 0,
     });
   }
 
@@ -324,6 +347,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
         <MeetToolbar
           isHidden={this.state.isToolbarHidden}
           isChatAvailable={this.state.isChatAvailable}
+          newMessageCount={this.state.numberOfNewMessages}
           onMicrophoneMute={this._onLocalAudioMute.bind(this)}
           onCameraMute={this._onLocalVideoMute.bind(this)}
           onExpandHide={this._onExpandHide.bind(this)}

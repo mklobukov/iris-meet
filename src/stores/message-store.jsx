@@ -22,6 +22,7 @@ class MessageStore extends BaseStore {
     this.sessionRootChildNodeId = null;
     this.pollTimer = null;
     this.pollAttempt = 1;
+    this.numberOfNewMessages = 0;
   }
 
   addMessageListener(name, callback) {
@@ -65,7 +66,19 @@ class MessageStore extends BaseStore {
       case MessageConstants.RECEIVE_MESSAGES:
         this._handleReceiveMessages();
         break;
+
+      case MessageConstants.RESET_MESSAGE_COUNT:
+        this._resetNewMessageCount();
+        break;
     }
+  }
+
+  get newMessageCount() {
+    return this.numberOfNewMessages;
+  }
+
+  _resetNewMessageCount() {
+    this.numberOfNewMessages = 0;
   }
 
   _handleRoomReady(token, userName, roomName, routingId, rootNodeId, rootChildNodeId) {
@@ -167,6 +180,8 @@ class MessageStore extends BaseStore {
         console.log('Number of new messages: ' + numberOfNewMessages);
         if (numberOfNewMessages > 0) {
           this.pollAttempt = 1;
+          this.numberOfNewMessages += numberOfNewMessages;
+          this.emit(MessageConstants.NEW_MESSAGE_ARRIVED_EVENT, this.numberOfNewMessages);
         }
       }
       this.emit(MessageConstants.MESSAGES_RECEIVED_EVENT);

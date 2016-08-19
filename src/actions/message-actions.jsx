@@ -34,6 +34,12 @@ class MessageActions {
       actionType: MessageConstants.RECEIVE_MESSAGES,
     });
   }
+
+  resetNewMessageCount() {
+    AppDispatcher.dispatch({
+      actionType: MessageConstants.RESET_MESSAGE_COUNT,
+    });
+  }
 }
 
 export default new MessageActions();
