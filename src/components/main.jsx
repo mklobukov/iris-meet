@@ -201,9 +201,9 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       console.log(requestedResolution);
       if (!validResolution(requestedResolution)) {
         console.log('Requested resolution is not valid.  Switching to default hd.');
-        requestedResolution = 'hd';
+        requestedResolution = '640';
       }
-      this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId, UserStore.room, UserStore.domain.toLowerCase(), Config.eventManagerUrl, UserStore.token, requestedResolution);
+      this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId, UserStore.room, UserStore.domain.toLowerCase(), { eventManagerUrl: Config.eventManagerUrl, notificationServer: Config.notificationServer }, UserStore.token, requestedResolution);
     });
   }
 
