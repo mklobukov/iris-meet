@@ -5,6 +5,7 @@ Video conferencing reference client for Iris Platform
 * git clone git@github.com:robjsliwa/iris-meet.git
 * cd iris-meet
 * npm install
+* copy sample.config.json to config.json and provide appropriate URLs.  
 * open another terminal and run 'gulp' (you can close the browser window it opens)
 * to start the webserver run node server.js
 
