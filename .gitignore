@@ -4,4 +4,8 @@ public/style.css
 config.json
 prod.config.json
 test.config.json
-
+config_prod.json
+config_dev.json
+public/iris-rtc-js-sdk.js
+.DS_Store
+public/.DS_Store

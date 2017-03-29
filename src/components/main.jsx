@@ -15,6 +15,7 @@ import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react
 import Config from '../../config.json';
 import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
+import { getRoomId } from '../api/RoomId';
 
 export default withWebRTC(withRouter(class Main extends React.Component {
   constructor(props) {
@@ -203,7 +204,20 @@ export default withWebRTC(withRouter(class Main extends React.Component {
         console.log('Requested resolution is not valid.  Switching to default hd.');
         requestedResolution = '640';
       }
-      this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId, UserStore.room, UserStore.domain.toLowerCase(), { eventManagerUrl: Config.eventManagerUrl, notificationServer: Config.notificationServer }, UserStore.token, requestedResolution);
+      getRoomId(UserStore.room, UserStore.token)
+      .then((response) => {
+        console.log(response);
+        const roomId = response.room_id;
+        this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId,
+          roomId, UserStore.domain.toLowerCase(),
+          {
+            eventManagerUrl: Config.eventManagerUrl,
+            notificationServer: Config.notificationServer },
+            UserStore.token,
+            '640',
+            true
+          );
+      })
     });
   }
 

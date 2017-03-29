@@ -57,6 +57,25 @@ gulp.task('build', function() {
   return rebundle();
 });
 
+gulp.task('buildonce', function() {
+  var entryFile = './src/app.jsx';
+  var bundleronce = browserify(entryFile, {extensions: [ ".js", ".jsx" ]});
+
+  bundleronce.transform(babelify);
+
+  function rebundleonce() {
+    var stream = bundleronce.bundle();
+    stream.on('error', notify);
+
+    stream
+      .pipe(source(entryFile))
+      .pipe(rename('index.js'))
+      .pipe(gulp.dest('public/'));
+  }
+
+  rebundleonce();
+});
+
 gulp.task('serve', function(done) {
   gulp.src('')
     .pipe(server({
