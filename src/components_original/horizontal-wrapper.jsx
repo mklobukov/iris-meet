@@ -1,20 +1,6 @@
 import React from 'react';
 import MainFooter from './main-footer';
 
-function HorizontalWrapper(props) {
-  return (
-      <div className={props.isHidden ? "horizontal-wrapper videoBarHide" : "horizontal-wrapper videoBarShow"}>
-          {props.children}
-      </div>
-  );
-}
-
-export default MainFooter(HorizontalWrapper)
-
-/*
-import React from 'react';
-import MainFooter from './main-footer';
-
 class HorizontalWrapper extends React.Component {
     constructor(props) {
         super(props);
@@ -30,4 +16,3 @@ class HorizontalWrapper extends React.Component {
 }
 
 export default MainFooter(HorizontalWrapper)
-*/

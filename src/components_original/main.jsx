@@ -2,8 +2,7 @@ import React from 'react';
 import MainVideo from './main-video';
 import MeetToolbar from './meet-toolbar';
 import HorizontalWrapper from './horizontal-wrapper';
-/*import HorizontalBox from './horizontal-box';*/
-import HorizontalBox from '../containers/horizontal-box';
+import HorizontalBox from './horizontal-box';
 import LoginPanel from './login-panel';
 import UserActions from '../actions/user-actions';
 import UserStore from '../stores/user-store';
