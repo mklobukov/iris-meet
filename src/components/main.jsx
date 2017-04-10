@@ -4,7 +4,7 @@ import MeetToolbar from './meet-toolbar';
 import HorizontalWrapper from './horizontal-wrapper';
 /*import HorizontalBox from './horizontal-box';*/
 import HorizontalBox from '../containers/horizontal-box';
-import LoginPanel from './login-panel';
+import LoginPanel from '../containers/login-panel';
 import UserActions from '../actions/user-actions';
 import UserStore from '../stores/user-store';
 import UserStoreConstants from '../constants/user-store-constants';

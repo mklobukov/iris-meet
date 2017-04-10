@@ -1,35 +1,42 @@
 import React from 'react';
 
-export default class LoginPanel extends React.Component {
-  constructor(props) {
-    super(props);
+function LoginPanelComponent (props) {
+  return (
+    <div id="login-panel">
+      <form className="form">
+        {props.showUser === true ? <div className="form-group">
+          <input
+            type="text"
+            className="form-control"
+            id="userName"
+            placeholder="User name"
+            value={props.userNameText}
+            onChange={props._onUserNameTextChange}
+          />
+        </div> : null}
+        {props.showRoom === true ? <div className="form-group">
+          <input
+            type="text"
+            className="form-control"
+            id="roomName"
+            placeholder="Room name"
+            value={props.roomNameText}
+            onChange={props._onRoomNameTextChange.bind(this)}
+          />
+        </div> : null}
+        <button
+          type="submit"
+          className="btn btn-default"
+          onClick={props.onAction}
+        >Accept</button>
+      </form>
+    </div>
+  );
 
-    this.state = {
-      userNameText: '',
-      roomNameText: '',
-    }
-  }
+}
 
-  _onRoomNameTextChange(e) {
-    this.setState({
-      roomNameText: e.target.value,
-    });
-  }
-
-  _onUserNameTextChange(e) {
-    this.setState({
-      userNameText: e.target.value,
-    });
-  }
-
-  get userName() {
-    return this.state.userNameText;
-  }
-
-  get roomName() {
-    return this.state.roomNameText;
-  }
-
+export default LoginPanelComponent
+/*
   render() {
     return (
       <div id="login-panel">
@@ -63,4 +70,5 @@ export default class LoginPanel extends React.Component {
       </div>
     );
   }
-}
+
+  */
