@@ -5,7 +5,7 @@ export default (ComposedComponent) => {
         constructor(props) {
             super(props);
         }
-        
+
         render() {
             return (
                 <div id="footer">
