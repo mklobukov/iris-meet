@@ -1,45 +1,5 @@
-//COMPONENT
 import React from 'react';
-/*
-export default class MeetToolbar extends React.Component {
-    constructor(props) {
-        super(props)
 
-        this.state = {
-          microphoneMuted: false,
-          cameraMuted: false,
-          barHidden: false,
-        }
-    }
-
-    _onMicrophoneMute() {
-      this.setState({
-        microphoneMuted: !this.state.microphoneMuted,
-      }, () => {
-        this.props.onMicrophoneMute(this.state.microphoneMuted);
-      });
-    }
-
-    _onCameraMute() {
-      this.setState({
-        cameraMuted: !this.state.cameraMuted,
-      }, () => {
-        this.props.onCameraMute(this.state.cameraMuted);
-      });
-    }
-
-    _onHangup() {
-      this.props.onHangup();
-    }
-
-    _onExpandHide() {
-      this.setState({
-        barHidden: !this.state.barHidden,
-      }, () => {
-        this.props.onExpandHide();
-      });
-    }
-*/
 function MeetToolbarComponent (props) {
   return (
     <div id="header">

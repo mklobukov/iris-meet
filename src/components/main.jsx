@@ -2,7 +2,6 @@ import React from 'react';
 import MainVideo from './main-video';
 import MeetToolbar from '../containers/meet-toolbar';
 import HorizontalWrapper from './horizontal-wrapper';
-/*import HorizontalBox from './horizontal-box';*/
 import HorizontalBox from '../containers/horizontal-box';
 import LoginPanel from '../containers/login-panel';
 import UserActions from '../actions/user-actions';

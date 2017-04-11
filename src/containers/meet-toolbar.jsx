@@ -1,4 +1,3 @@
-//CONTAINER
 import React from 'react';
 import MeetToolbarComponent from '../components/meet-toolbar';
 
