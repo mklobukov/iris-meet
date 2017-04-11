@@ -9,3 +9,4 @@ config_dev.json
 public/iris-rtc-js-sdk.js
 .DS_Store
 public/.DS_Store
+npm-debug.log

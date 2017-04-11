@@ -1,5 +1,4 @@
 import React from 'react';
-import MainFooter from './main-footer';
 
 export default function HorizontalWrapper(props) {
   return (
