@@ -1,6 +1,6 @@
 import React from 'react';
 import MainVideo from './main-video';
-import MeetToolbar from './meet-toolbar';
+import MeetToolbar from '../containers/meet-toolbar';
 import HorizontalWrapper from './horizontal-wrapper';
 /*import HorizontalBox from './horizontal-box';*/
 import HorizontalBox from '../containers/horizontal-box';
