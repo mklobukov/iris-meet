@@ -1,4 +1,5 @@
 import React from 'react';
+import './horizontal-box.css'
 
 export default function HorizontalBoxComponent (props) {
   return (

@@ -1,9 +1,9 @@
 import React from 'react';
 import MainVideo from './main-video';
-import MeetToolbar from './meet-toolbar';
+import MeetToolbar from '../containers/meet-toolbar';
 import HorizontalWrapper from './horizontal-wrapper';
-import HorizontalBox from './horizontal-box';
-import LoginPanel from './login-panel';
+import HorizontalBox from '../containers/horizontal-box';
+import LoginPanel from '../containers/login-panel';
 import UserActions from '../actions/user-actions';
 import UserStore from '../stores/user-store';
 import UserStoreConstants from '../constants/user-store-constants';
@@ -16,6 +16,7 @@ import Config from '../../config.json';
 import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
+import './style.css'
 
 export default withWebRTC(withRouter(class Main extends React.Component {
   constructor(props) {
@@ -41,7 +42,9 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.onRemoteVideo = this._onRemoteVideo.bind(this);
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
 
+
     this.timer = setTimeout(() => {
+      console.log('inside setTimeOut(), constructor')
       this.setState({
         isToolbarHidden: true,
       });
@@ -57,7 +60,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
     const requestedResolution = getQueryParameter('resolution');
-    console.log(requestedResolution);
+    console.log('req resolution: ' + requestedResolution);
     console.log('roomName: ' + this.props.params.roomname);
     let showRoom = false;
     let showUser = false;
@@ -66,6 +69,17 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       // to ask for room name
       showRoom = true;
     }
+
+    //Remove later:
+    /*
+    this.timer = setTimeout(() => {
+      console.log('inside setTimeOut()');
+      this.setState({
+        isToolbarHidden: true,
+      });
+    }, 10000);
+    */
+
 
     const userName = localStorage.getItem('irisMeet.userName');
     if (userName === null) {

@@ -1,4 +1,5 @@
 import React from 'react';
+import './meet-toolbar.css'
 
 function MeetToolbarComponent (props) {
   return (

@@ -1,4 +1,5 @@
 import React from 'react';
+import './login-panel.css'
 
 function LoginPanelComponent (props) {
   return (

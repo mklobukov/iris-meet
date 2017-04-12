@@ -8,8 +8,8 @@
   padding: 1rem;
   transition-property: visibility, opacity;
   transition-duration: 1s;
-  background-color: transparent; //#ccc;
-    // Toggle this depending upon whether you want to see the scrollbar
+  background-color: transparent; /*#ccc;
+    // Toggle this depending upon whether you want to see the scrollbar*/
     &::-webkit-scrollbar {
         display: none;
     }
