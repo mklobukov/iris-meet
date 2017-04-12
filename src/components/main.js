@@ -229,6 +229,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
             notificationServer: Config.notificationServer },
             UserStore.token,
             '640',
+            true,
             true
           );
       })
