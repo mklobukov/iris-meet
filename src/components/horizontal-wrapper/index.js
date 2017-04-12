@@ -1,7 +1,6 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import './horizontal-wrapper.css'
-import './main-footer.css'
 
 const HorizontalWrapper = (props) => (
   <div id="footer">
