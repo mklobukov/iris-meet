@@ -60,7 +60,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
     const requestedResolution = getQueryParameter('resolution');
-    console.log('req resolution: ' + requestedResolution);
+    console.log(requestedResolution);
     console.log('roomName: ' + this.props.params.roomname);
     let showRoom = false;
     let showUser = false;
