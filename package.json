@@ -12,9 +12,11 @@
     "iris-react-webrtc": "1.0.22",
     "keymirror": "^0.1.1",
     "lodash": "^3.6.0",
-    "react": "^15.5.3",
+    "react": "^15.5.4",
     "react-dom": "^15.5.3",
+    "react-redux": "^5.0.4",
     "react-router": "2.6.1",
+    "redux": "^3.6.0",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {

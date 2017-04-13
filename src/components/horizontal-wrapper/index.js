@@ -2,10 +2,10 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './horizontal-wrapper.css'
 
-const HorizontalWrapper = (props) => (
+const HorizontalWrapper = ({isHidden, children}) => (
   <div id="footer">
-    <div className={props.isHidden ? "horizontal-wrapper videoBarHide" : "horizontal-wrapper videoBarShow"}>
-        {props.children}
+    <div className={isHidden ? "horizontal-wrapper videoBarHide" : "horizontal-wrapper videoBarShow"}>
+        {children}
     </div>
   </div>
 );
