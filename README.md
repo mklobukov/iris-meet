@@ -2,7 +2,7 @@
 Video conferencing reference client for Iris Platform
 
 ## Install
-* git clone git@github.com:robjsliwa/iris-meet.git
+* git clone git@github.com:iris-platform/iris-meet.git
 * cd iris-meet
 * download Iris JS WebRTC SDK 3.0.2.18 or later to separate folder
 * copy iris-rtc-js-sdk.js from the folder where you downloaded Iris JS WebRTC to iris-meet/public
