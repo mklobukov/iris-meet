@@ -16,6 +16,7 @@ import Config from '../../config.json';
 import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
+import './style.css'
 
 export default withWebRTC(withRouter(class Main extends React.Component {
   constructor(props) {
@@ -41,7 +42,9 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     this.onRemoteVideo = this._onRemoteVideo.bind(this);
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
 
+
     this.timer = setTimeout(() => {
+      console.log('inside setTimeOut(), constructor')
       this.setState({
         isToolbarHidden: true,
       });
@@ -66,6 +69,17 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       // to ask for room name
       showRoom = true;
     }
+
+    //Remove later:
+    /*
+    this.timer = setTimeout(() => {
+      console.log('inside setTimeOut()');
+      this.setState({
+        isToolbarHidden: true,
+      });
+    }, 10000);
+    */
+
 
     const userName = localStorage.getItem('irisMeet.userName');
     if (userName === null) {
@@ -215,6 +229,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
             notificationServer: Config.notificationServer },
             UserStore.token,
             '640',
+            true,
             true
           );
       })

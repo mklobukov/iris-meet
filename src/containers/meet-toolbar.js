@@ -43,7 +43,7 @@ export default class MeetToolbar extends React.Component {
     render () {
       return (
         <MeetToolbarComponent
-          isHidden={this.state.isHidden}
+          isHidden={this.props.isHidden}
           _onMicrophoneMute={this._onMicrophoneMute.bind(this)}
           microphoneMuted={this.state.microphoneMuted}
           _onCameraMute={this._onCameraMute.bind(this)}
