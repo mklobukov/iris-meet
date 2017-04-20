@@ -4,12 +4,6 @@ import MeetToolbar from '../containers/meet-toolbar';
 import HorizontalWrapper from './horizontal-wrapper';
 import HorizontalBox from '../containers/horizontal-box';
 import LoginPanel from '../containers/login-panel';
-import UserActions from '../actions/user-actions';
-import UserStore from '../stores/user-store';
-import UserStoreConstants from '../constants/user-store-constants';
-import VideoControlStore from '../stores/video-control-store';
-import VideoControlStoreConstants from '../constants/video-control-store-constants';
-import VideoControlActions from '../actions/video-control-actions';
 import { withRouter } from 'react-router';
 import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
 import Config from '../../config.json';
@@ -17,8 +11,54 @@ import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
 import './style.css'
+import VideoControlActions from '../actions/video-control-actions'
+import { connect } from 'react-redux'
+import { bindActionCreators } from 'redux'
+import { loginUserAsync, leaveRoom } from '../actions/user-actions'
 
-export default withWebRTC(withRouter(class Main extends React.Component {
+const authUrl = Config.authUrl;
+const appKey = Config.appKey;
+
+/* NOTE:
+Since there are multiple reducers, the shape of the state tree is
+{
+  reducer1: {...},
+  reducer2: {...},
+  etc.
+}
+For this reason, in mapStateToProps(), it is necessary to
+specify which reducer manages a particular variable/structure
+*/
+
+const mapStateToProps = (state) => {
+  return {
+    videoIndex: state.videoReducer.videoIndex,
+    videoType: state.videoReducer.videoType,
+    connection: state.videoReducer.connection,
+    userName: state.userReducer.userName,
+    routingId: state.userReducer.routingId,
+    roomName: state.userReducer.roomName,
+    accessToken: state.userReducer.accessToken,
+    decodedToken: state.userReducer.decodedToken
+  }
+}
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return {
+    VideoControl: (videoType, videoIndex, localVideos, remoteVideos) => {
+      dispatch(VideoControlActions(videoType, videoIndex,
+                                        localVideos, remoteVideos ))
+    },
+    loginUserAsync: (userName, routingId, roomName, authUrl, appKey) => {
+      dispatch(loginUserAsync(userName, routingId, roomName, authUrl, appKey))
+    },
+    leaveRoom: () => {
+      dispatch(leaveRoom())
+    }
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRouter(class Main extends React.Component {
   constructor(props) {
     super(props);
 
@@ -34,14 +74,10 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       isToolbarHidden: false,
     }
 
-    this.loginCallback = this._userLoggedIn.bind(this);
-    this.loginFailedCallback = this._userFailedLogin.bind(this);
-    this.mainVideoChangeCallback = this._onMainVideoChange.bind(this);
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
     this.onLocalVideo = this._onLocalVideo.bind(this);
     this.onRemoteVideo = this._onRemoteVideo.bind(this);
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
-
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -52,13 +88,12 @@ export default withWebRTC(withRouter(class Main extends React.Component {
   }
 
   componentDidMount() {
-    UserStore.addUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
-    UserStore.addUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
-    VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
+    //WebRTC Listeners -- not related to Redux store
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
+
     const requestedResolution = getQueryParameter('resolution');
     console.log(requestedResolution);
     console.log('roomName: ' + this.props.params.roomname);
@@ -69,17 +104,6 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       // to ask for room name
       showRoom = true;
     }
-
-    //Remove later:
-    /*
-    this.timer = setTimeout(() => {
-      console.log('inside setTimeOut()');
-      this.setState({
-        isToolbarHidden: true,
-      });
-    }, 10000);
-    */
-
 
     const userName = localStorage.getItem('irisMeet.userName');
     if (userName === null) {
@@ -101,38 +125,44 @@ export default withWebRTC(withRouter(class Main extends React.Component {
         routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
         localStorage.setItem('irisMeet.routingId', routingId);
       }
-      UserActions.loginUser(userName, routingId, this.props.params.roomname);
+      console.log(this.props.params.roomname)
+      this.props.loginUserAsync(userName, routingId, this.props.params.roomname, authUrl, appKey)
     }
   }
+
+componentWillReceiveProps = (nextProps) => {
+  //Initially, the accessToken is undefined.
+  //It receives a value when the user is logged in
+  if (nextProps.accessToken !== this.props.accessToken) {
+       this._userLoggedIn();
+     }
+}
 
   componentWillUnmount() {
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
-    UserStore.removeUserListener(UserStoreConstants.USER_LOGGED_IN_EVENT, this.loginCallback);
-    UserStore.removeUserListener(UserStoreConstants.USER_LOGIN_FAILED_EVENT, this.loginFailedCallback);
-    VideoControlStore.addVideoControlListener(VideoControlStoreConstants.VIDEO_CONTROL_MAIN_VIEW_UPDATED_EVENT, this.mainVideoChangeCallback);
     this.setState({
       showRoom: false,
       showUser: false,
     }, () => {
-      UserActions.leaveRoom();
-      //this.endSession();
+      this.props.leaveRoom();
     });
   }
 
   _onLocalVideo(videoInfo) {
     console.log('NUMBER OF LOCAL VIDEOS: ' + this.props.localVideos.length);
     if (this.props.localVideos.length > 0) {
-      VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
+      this.props.VideoControl('local', this.props.localVideos[0].video.index, this.props.localVideos, this.props.remoteVideos)
     }
   }
 
   _onRemoteVideo(videoInfo) {
     console.log('NUMBER OF REMOTE VIDEOS: ' + this.props.remoteVideos.length);
     if (this.props.remoteVideos.length === 1) {
-      VideoControlActions.changeMainView('remote', this.props.remoteVideos[0].video.index);
+      this.props.VideoControl('remote', this.props.remoteVideos[0].video.index, this.props.localVideos, this.props.remoteVideos)
+
     }
   }
 
@@ -142,7 +172,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       if (this.props.localVideos.length > 0) {
         // no participants so go back to local video
         console.log('Remote participant back to local');
-        VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
+        this.props.VideoControl('local', this.props.localVideos[0].video.index, this.props.localVideos, this.props.remoteVideos)
       }
     }
 
@@ -152,7 +182,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       if (this.props.localVideos.length > 0) {
         // if the participant who left was on main screen replace it with local
         // video
-        VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
+        this.props.VideoControl('local', this.props.localVideos[0].video.index, this.props.localVideos, this.props.remoteVideos)
       }
     }
   }
@@ -161,7 +191,7 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     console.log('DOMINANT_SPEAKER_CHANGED: ' + dominantSpeakerEndpoint);
     //let participant = track.getParticipantId();
     //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
-    const matchedConnection = this.props.remoteVideos.find((connection) => {
+      const matchedConnection = this.props.remoteVideos.find((connection) => {
       const participantId = connection.track.getParticipantId();
       console.log('participantId: ' + participantId);
       const endPoint = participantId.substring(participantId.lastIndexOf("/") + 1);
@@ -171,71 +201,45 @@ export default withWebRTC(withRouter(class Main extends React.Component {
     console.log('FOUND DOMINANT SPEAKER: ');
     console.log(matchedConnection);
     if (matchedConnection) {
-      VideoControlActions.changeMainView('remote', matchedConnection.video.index);
+      this.props.VideoControl('remote', matchedConnection.video.index, this.props.localVideos, this.props.remoteVideos)
+
     } else if (this.props.localVideos.length > 0) {
       // no remote participants found so assume it is local speaker
-      VideoControlActions.changeMainView('local', this.props.localVideos[0].video.index);
+      this.props.VideoControl('local', this.props.localVideos[0].video.index, this.props.localVideos, this.props.remoteVideos)
     }
   }
 
-  _onMainVideoChange() {
-    console.log('Video type: ' + VideoControlStore.videoType);
-    console.log('Video index: ' + VideoControlStore.videoIndex);
-
-    if (VideoControlStore.videoType === 'local') {
-      const mainConnection = this.props.localVideos.find((connection) => {
-        return connection.video.index === VideoControlStore.videoIndex;
-      });
-      this.setState({
-        mainVideoConnection: {
-        connection: mainConnection,
-        type: 'local',
-      }}, () => {
-        console.log('MainVideo: local');
-      });
-    } else {
-      const mainConnection = this.props.remoteVideos.find((connection) => {
-        return connection.video.index === VideoControlStore.videoIndex;
-      });
-      this.setState({
-        mainVideoConnection: {
-        connection: mainConnection,
-        type: 'remote',
-      }}, () => {
-        console.log('MainVideo: remote:' + mainConnection.baseId);
-      });
+_userLoggedIn() {
+  this.setState({
+    showRoom: false,
+    showUser: false,
+  }, () => {
+    let requestedResolution = getQueryParameter('resolution');
+    console.log(requestedResolution);
+    if (!validResolution(requestedResolution)) {
+      console.log('Requested resolution is not valid.  Switching to default hd.');
+      requestedResolution = '640';
     }
-  }
+    getRoomId(this.props.roomName, this.props.accessToken)
+    .then((response) => {
+      console.log(response);
+      const roomId = response.room_id;
+      this.props.initializeWebRTC(this.props.userName, this.props.routingId,
+        roomId, this.props.decodedToken.payload['domain'].toLowerCase(),
+        {
+          eventManagerUrl: Config.eventManagerUrl,
+          notificationServer: Config.notificationServer },
+          this.props.accessToken,
+          '640',
+          true,
+          true
+        );
+    })
+  });
+}
 
-  _userLoggedIn() {
-    this.setState({
-      showRoom: false,
-      showUser: false,
-    }, () => {
-      let requestedResolution = getQueryParameter('resolution');
-      console.log(requestedResolution);
-      if (!validResolution(requestedResolution)) {
-        console.log('Requested resolution is not valid.  Switching to default hd.');
-        requestedResolution = '640';
-      }
-      getRoomId(UserStore.room, UserStore.token)
-      .then((response) => {
-        console.log(response);
-        const roomId = response.room_id;
-        this.props.initializeWebRTC(UserStore.user, UserStore.userRoutingId,
-          roomId, UserStore.domain.toLowerCase(),
-          {
-            eventManagerUrl: Config.eventManagerUrl,
-            notificationServer: Config.notificationServer },
-            UserStore.token,
-            '640',
-            true,
-            true
-          );
-      })
-    });
-  }
 
+//This is currently done in loginUserAsync()
   _userFailedLogin(error) {
     // TODO: login error handler
     console.log('Login failure: ');
@@ -319,17 +323,18 @@ export default withWebRTC(withRouter(class Main extends React.Component {
           onExpandHide={this._onExpandHide.bind(this)}
           onHangup={this._onHangup.bind(this)}
         /> : null}
+
       <MainVideo>
-        {this.state.mainVideoConnection.type === 'remote' ?
+        {this.props.videoType === 'remote' ?
           <RemoteVideo
-            video={this.state.mainVideoConnection.connection.video}
-            audio={this.state.mainVideoConnection.connection.audio}
+            video={this.props.connection.video}
+            audio={this.props.connection.audio}
           /> : null
         }
-        {this.state.mainVideoConnection.type === 'local' ?
+        {this.props.videoType === 'local' ?
           <LocalVideo
-            video={this.state.mainVideoConnection.connection.video}
-            audio={this.state.mainVideoConnection.connection.audio}
+            video={this.props.connection.video}
+            audio={this.props.connection.audio}
           /> : null
         }
       </MainVideo>
@@ -342,6 +347,8 @@ export default withWebRTC(withRouter(class Main extends React.Component {
                 key={connection.video.index}
                 type='local'
                 id={connection.video.index}
+                localVideos = {this.props.localVideos}
+                remoteVideos = {this.props.remoteVideos}
               >
                 <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
               </HorizontalBox>
@@ -357,6 +364,8 @@ export default withWebRTC(withRouter(class Main extends React.Component {
                   key={connection.video.index}
                   type='remote'
                   id={connection.video.index}
+                  localVideos = {this.props.localVideos}
+                  remoteVideos = {this.props.remoteVideos}
                 >
                   <RemoteVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
                 </HorizontalBox>
@@ -374,4 +383,4 @@ export default withWebRTC(withRouter(class Main extends React.Component {
       </div>
     );
   }
-}));
+})));
