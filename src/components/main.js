@@ -88,7 +88,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
   }
 
   componentDidMount() {
-    //WebRTC Listeners -- not related to Redux store
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
