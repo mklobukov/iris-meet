@@ -21,9 +21,21 @@ const VideoReducer = (state = {}, action) => {
           connection: mainConnection
         }
       } else {
-        console.log('Invalid data object passed to VideoControlReducer. Returning current state')
+        console.log('Invalid data object passed to VideoControlReducer. Returning previous state.')
         console.log('Action: ' + action);
         return state;
+      }
+
+    case VideoControlConstants.VIDEO_CONTROL_UPDATE_DOMINANT_SPEAKER:
+      if (action.data.dominantSpeakerIndex) {
+        console.log("changing dominant speaker to: " + action.data.dominantSpeakerIndex)
+        return Object.assign({}, state, {
+          dominantSpeakerIndex: action.data.dominantSpeakerIndex
+        })
+      }
+      else {
+        console.log("Invalid dominant speaker index passed to VideoControlReducer. Returning previous state.")
+        return state
       }
 
     default:
