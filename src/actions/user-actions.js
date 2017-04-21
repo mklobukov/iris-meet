@@ -1,23 +1,32 @@
-import AppDispatcher from '../dispatcher/app-dispatcher';
-import UserStoreConstants from '../constants/user-store-constants';
+import UserConstants from '../constants/user-constants';
+import { AuthManager } from 'iris-auth-js-sdk';
 
-class UserActions {
-  loginUser(userName, routingId, roomName) {
-    AppDispatcher.dispatch({
-      actionType: UserStoreConstants.USER_LOGIN,
-      data: {
-        userName,
-        routingId,
-        roomName,
-      }
-    });
-  }
+export const storeLoginData = (userName, routingId, roomName, accessToken, decodedToken) => ({
+    type: UserConstants.USER_LOGIN,
+    data: {
+      userName,
+      routingId,
+      roomName,
+      accessToken,
+      decodedToken
+    }
+})
 
-  leaveRoom() {
-    AppDispatcher.dispatch({
-      actionType: UserStoreConstants.USER_LEAVE_ROOM,
-    });
-  }
+export function loginUserAsync (userName, routingId, roomName, authUrl, appKey) {
+  return function(dispatch) {
+    let authApi = new AuthManager({'managementApiUrl': authUrl, 'appkey': appKey});
+    return authApi.anonymousLoginAsync(userName).then(
+      data => {
+          dispatch(storeLoginData(userName, routingId, roomName,
+                    data.Token, authApi.decodeToken(data.Token)))}
+      )
+      .catch(
+        error => { console.log('ERROR LOGGING IN ' + error);
+        dispatch(storeLoginData(userName, routingId, roomName, null, null)) }
+      );
+    };
 }
 
-export default new UserActions();
+export const leaveRoom = () => ({
+      type: UserConstants.USER_LEAVE_ROOM
+})

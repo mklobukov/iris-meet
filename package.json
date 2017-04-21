@@ -8,7 +8,7 @@
   "dependencies": {
     "flux": "^2.1.1",
     "font-awesome": "^4.3.0",
-    "iris-auth-js-sdk": "1.0.3",
+    "iris-auth-js-sdk": "1.0.8",
     "iris-react-webrtc": "1.0.22",
     "keymirror": "^0.1.1",
     "lodash": "^3.6.0",
@@ -17,6 +17,7 @@
     "react-redux": "^5.0.4",
     "react-router": "2.6.1",
     "redux": "^3.6.0",
+    "redux-thunk": "^2.2.0",
     "whatwg-fetch": "^2.0.3"
   },
   "devDependencies": {
