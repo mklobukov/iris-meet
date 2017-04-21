@@ -2,33 +2,33 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './login-panel.css'
 
-const LoginPanelComponent = (props) => (
+const LoginPanelComponent = ({showUser, userNameText, _onUserNameTextChange, showRoom, roomNameText, _onRoomNameTextChange, onAction}) => (
   <div id="login-panel">
     <form className="form">
-      {props.showUser === true ? <div className="form-group">
+      {showUser === true ? <div className="form-group">
         <input
           type="text"
           className="form-control"
           id="userName"
           placeholder="User name"
-          value={props.userNameText}
-          onChange={props._onUserNameTextChange}
+          value={userNameText}
+          onChange={_onUserNameTextChange}
         />
       </div> : null}
-      {props.showRoom === true ? <div className="form-group">
+      {showRoom === true ? <div className="form-group">
         <input
           type="text"
           className="form-control"
           id="roomName"
           placeholder="Room name"
-          value={props.roomNameText}
-          onChange={props._onRoomNameTextChange.bind(this)}
+          value={roomNameText}
+          onChange={_onRoomNameTextChange.bind(this)}
         />
       </div> : null}
       <button
         type="submit"
         className="btn btn-default"
-        onClick={props.onAction}
+        onClick={onAction}
       >Accept</button>
     </form>
   </div>

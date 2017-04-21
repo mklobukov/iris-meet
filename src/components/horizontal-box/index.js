@@ -2,9 +2,9 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './horizontal-box.css'
 
-const HorizontalBoxComponent = (props) => (
-    <div className="horizontal-box" onClick={props.onClick}>
-      {props.children}
+const HorizontalBoxComponent = ({children, onClick}) => (
+    <div className="horizontal-box" onClick={onClick}>
+      {children}
     </div>
   );
 
