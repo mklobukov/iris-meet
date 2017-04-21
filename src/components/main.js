@@ -191,10 +191,12 @@ componentWillReceiveProps = (nextProps) => {
     //let participant = track.getParticipantId();
     //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
       const matchedConnection = this.props.remoteVideos.find((connection) => {
-      const participantId = connection.track.getParticipantId();
-      console.log('participantId: ' + participantId);
-      const endPoint = participantId.substring(participantId.lastIndexOf("/") + 1);
-      return endPoint === dominantSpeakerEndpoint;
+        const participantId = connection.track.getParticipantId();
+        console.log('participantId: ' + participantId);
+        dominantSpeakerEndpoint = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"))
+        const endPoint = participantId.substring(0, participantId.lastIndexOf("@"))
+        console.log("endpoint and dom: " + endPoint + " " + dominantSpeakerEndpoint)
+        return endPoint === dominantSpeakerEndpoint;
     });
 
     console.log('FOUND DOMINANT SPEAKER: ');
@@ -337,6 +339,7 @@ _userLoggedIn() {
           /> : null
         }
       </MainVideo>
+
       <HorizontalWrapper isHidden={this.state.isVideoBarHidden}>
           {this.props.localVideos.map((connection) => {
             console.log('LOCAL CONNECTION');
