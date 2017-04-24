@@ -1,0 +1,27 @@
+.black-box {
+  //float: right;
+  margin-left: 5px;
+  margin-right: 5px;
+  display: inline-block;
+  background-color: #000000; /*wheat;*/
+  position: relative;
+  width: auto;
+  //max-height: 120px;
+  //min-height: 120px;
+  text-align: center;
+  vertical-align: top;
+}
+
+.black-box .user-text {
+  width: auto;
+  max-height: 120px;
+  min-height: 120px;
+  border-radius: 3px;
+  border: 1px solid #000000;
+}
+
+.black-box:hover {
+  box-shadow: inset 0 0 5px #111111, 0 0 10px #111111, inset 0 0 80px #006d91;
+  border: 1px solid #000000;
+  background-color: #82b9d6;
+}

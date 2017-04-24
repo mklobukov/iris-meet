@@ -3,6 +3,7 @@ import MainVideo from './main-video';
 import MeetToolbar from '../containers/meet-toolbar';
 import HorizontalWrapper from './horizontal-wrapper';
 import HorizontalBox from '../containers/horizontal-box';
+import BlackBox from '../components/black-box'
 import LoginPanel from '../containers/login-panel';
 import { withRouter } from 'react-router';
 import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
@@ -139,6 +140,9 @@ componentWillReceiveProps = (nextProps) => {
   if (nextProps.accessToken !== this.props.accessToken) {
        this._userLoggedIn();
      }
+  // if (nextProps.dominantSpeakerIndex && nextProps.dominantSpeakerIndex !== this.props.dominantSpeakerIndex) {
+  //   this._onDominantSpeakerChanged(nextProps.dominantSpeakerIndex);
+  // }
 }
 
   componentWillUnmount() {
@@ -397,7 +401,7 @@ _isDominant(index) {
                 <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
               </HorizontalBox>
             )
-            : ( null ) ;
+            : ( <BlackBox key={connection.video.index} userName={this.props.userName}> </BlackBox>  ) ;
           })}
           {this.props.remoteVideos.map((connection) => {
             console.log('REMOTE CONNECTION');
@@ -415,7 +419,7 @@ _isDominant(index) {
                   <RemoteVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
                 </HorizontalBox>
               )
-              : ( null ) ;
+              : ( <BlackBox key={connection.video.index} userName={this.props.userName}> </BlackBox> ) ;
             }
           })}
       </HorizontalWrapper>
