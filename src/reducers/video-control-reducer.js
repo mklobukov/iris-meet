@@ -15,12 +15,18 @@ const VideoReducer = (state = {}, action) => {
             return connection.video.index === action.data.videoIndex;
             });
           }
-        return {
-          videoType: action.data.videoType,
-          videoIndex: action.data.videoIndex,
-          connection: mainConnection
-        }
-      } else {
+        // return {
+        //   videoType: action.data.videoType,
+        //   videoIndex: action.data.videoIndex,
+        //   connection: mainConnection
+        // }
+          return Object.assign({}, state, {
+               videoType: action.data.videoType,
+               videoIndex: action.data.videoIndex,
+               connection: mainConnection
+             })
+          }
+       else {
         console.log('Invalid data object passed to VideoControlReducer. Returning previous state.')
         console.log('Action: ' + action);
         return state;
