@@ -5,7 +5,8 @@ import './black-box.css'
 const BlackBox = ({userName}) => (
   <div className="black-box">
     <div className="user-text">
-    Dom Speaker: {userName}
+      <div>Current Speaker:</div>
+      <p>{userName}</p>
     </div>
   </div>
 );
