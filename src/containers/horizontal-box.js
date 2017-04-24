@@ -1,11 +1,11 @@
 import React from 'react';
-import VideoControlActions from '../actions/video-control-actions';
+import { changeMainView } from '../actions/video-control-actions';
 import HorizontalBoxComponent from '../components/horizontal-box';
 import { connect } from 'react-redux'
 
 let clickHandlerCreator = function(dispatch) {
   let clickHandler = function(type, id, localVideos, remoteVideos) {
-    dispatch(VideoControlActions(type, id, localVideos, remoteVideos))
+    dispatch(changeMainView(type, id, localVideos, remoteVideos))
   };
 
   return clickHandler

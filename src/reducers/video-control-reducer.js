@@ -15,15 +15,33 @@ const VideoReducer = (state = {}, action) => {
             return connection.video.index === action.data.videoIndex;
             });
           }
-        return {
-          videoType: action.data.videoType,
-          videoIndex: action.data.videoIndex,
-          connection: mainConnection
-        }
-      } else {
-        console.log('Invalid data object passed to VideoControlReducer. Returning current state')
+        // return {
+        //   videoType: action.data.videoType,
+        //   videoIndex: action.data.videoIndex,
+        //   connection: mainConnection
+        // }
+          return Object.assign({}, state, {
+               videoType: action.data.videoType,
+               videoIndex: action.data.videoIndex,
+               connection: mainConnection
+             })
+          }
+       else {
+        console.log('Invalid data object passed to VideoControlReducer. Returning previous state.')
         console.log('Action: ' + action);
         return state;
+      }
+
+    case VideoControlConstants.VIDEO_CONTROL_UPDATE_DOMINANT_SPEAKER:
+      if (action.data.dominantSpeakerIndex) {
+        console.log("changing dominant speaker to: " + action.data.dominantSpeakerIndex)
+        return Object.assign({}, state, {
+          dominantSpeakerIndex: action.data.dominantSpeakerIndex
+        })
+      }
+      else {
+        console.log("Invalid dominant speaker index passed to VideoControlReducer. Returning previous state.")
+        return state
       }
 
     default:

@@ -4,7 +4,7 @@ var compression = require('compression')
 var http = require('http');
 var https = require('https');
 var fs = require('fs');
-import Config from ('./config')
+var Config = require('./config')
 
 var app = express()
 
@@ -21,7 +21,10 @@ var PORT = process.env.PORT || 8080
 /*app.listen(PORT, function() {
   console.log('Production Express server running at localhost:' + PORT)
 })*/
-var options = Config.options
+var options = {
+  key: fs.readFileSync(Config.options.key),
+  cert: fs.readFileSync(Config.options.cert)
+}
 
 app.server = https.createServer(options, app);
 

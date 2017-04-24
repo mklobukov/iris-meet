@@ -3,6 +3,7 @@ import MainVideo from './main-video';
 import MeetToolbar from '../containers/meet-toolbar';
 import HorizontalWrapper from './horizontal-wrapper';
 import HorizontalBox from '../containers/horizontal-box';
+import BlackBox from '../components/black-box'
 import LoginPanel from '../containers/login-panel';
 import { withRouter } from 'react-router';
 import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
@@ -11,7 +12,7 @@ import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
 import './style.css'
-import VideoControlActions from '../actions/video-control-actions'
+import { changeMainView, changeDominantSpeaker } from '../actions/video-control-actions'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { loginUserAsync, leaveRoom } from '../actions/user-actions'
@@ -39,14 +40,15 @@ const mapStateToProps = (state) => {
     routingId: state.userReducer.routingId,
     roomName: state.userReducer.roomName,
     accessToken: state.userReducer.accessToken,
-    decodedToken: state.userReducer.decodedToken
+    decodedToken: state.userReducer.decodedToken,
+    dominantSpeakerIndex: state.videoReducer.dominantSpeakerIndex
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
     VideoControl: (videoType, videoIndex, localVideos, remoteVideos) => {
-      dispatch(VideoControlActions(videoType, videoIndex,
+      dispatch(changeMainView(videoType, videoIndex,
                                         localVideos, remoteVideos ))
     },
     loginUserAsync: (userName, routingId, roomName, authUrl, appKey) => {
@@ -54,6 +56,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     leaveRoom: () => {
       dispatch(leaveRoom())
+    },
+    changeDominantSpeaker: (dominantSpeakerIndex) => {
+      dispatch(changeDominantSpeaker(dominantSpeakerIndex))
     }
   }
 }
@@ -135,6 +140,9 @@ componentWillReceiveProps = (nextProps) => {
   if (nextProps.accessToken !== this.props.accessToken) {
        this._userLoggedIn();
      }
+  // if (nextProps.dominantSpeakerIndex && nextProps.dominantSpeakerIndex !== this.props.dominantSpeakerIndex) {
+  //   this._onDominantSpeakerChanged(nextProps.dominantSpeakerIndex);
+  // }
 }
 
   componentWillUnmount() {
@@ -186,6 +194,30 @@ componentWillReceiveProps = (nextProps) => {
     }
   }
 
+  // _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
+  //   console.log('DOMINANT_SPEAKER_CHANGED: ' + dominantSpeakerEndpoint);
+  //   //let participant = track.getParticipantId();
+  //   //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
+  //     const matchedConnection = this.props.remoteVideos.find((connection) => {
+  //       const participantId = connection.track.getParticipantId();
+  //       console.log('participantId: ' + participantId);
+  //       dominantSpeakerEndpoint = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"))
+  //       const endPoint = participantId.substring(0, participantId.lastIndexOf("@"))
+  //       console.log("endpoint and dom: " + endPoint + " " + dominantSpeakerEndpoint)
+  //       return endPoint === dominantSpeakerEndpoint;
+  //   });
+  //
+  //   console.log('FOUND DOMINANT SPEAKER: ');
+  //   console.log(matchedConnection);
+  //   if (matchedConnection) {
+  //     this.props.VideoControl('remote', matchedConnection.video.index, this.props.localVideos, this.props.remoteVideos)
+  //
+  //   } else if (this.props.localVideos.length > 0) {
+  //     // no remote participants found so assume it is local speaker
+  //     this.props.VideoControl('local', this.props.localVideos[0].video.index, this.props.localVideos, this.props.remoteVideos)
+  //   }
+  // }
+
   _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
     console.log('DOMINANT_SPEAKER_CHANGED: ' + dominantSpeakerEndpoint);
     //let participant = track.getParticipantId();
@@ -203,12 +235,17 @@ componentWillReceiveProps = (nextProps) => {
     console.log(matchedConnection);
     if (matchedConnection) {
       this.props.VideoControl('remote', matchedConnection.video.index, this.props.localVideos, this.props.remoteVideos)
+      //??
+      this.props.changeDominantSpeaker(matchedConnection.video.index)
 
     } else if (this.props.localVideos.length > 0) {
       // no remote participants found so assume it is local speaker
       this.props.VideoControl('local', this.props.localVideos[0].video.index, this.props.localVideos, this.props.remoteVideos)
+      //??
+      this.props.changeDominantSpeaker(this.props.localVideos[0].video.index)
     }
   }
+
 
 _userLoggedIn() {
   this.setState({
@@ -313,6 +350,14 @@ _userLoggedIn() {
     window.location.assign(urlString);
   }
 
+_isDominant(index) {
+  console.log('inside isDominant')
+  console.log('index === this.props.dominantSpeakerIndex: ' + index + " === " + this.props.dominantSpeakerIndex + " ?")
+  console.log(index === this.props.dominantSpeakerIndex)
+  return index === this.props.dominantSpeakerIndex;
+}
+
+
   render() {
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
@@ -344,7 +389,8 @@ _userLoggedIn() {
           {this.props.localVideos.map((connection) => {
             console.log('LOCAL CONNECTION');
             console.log(connection);
-            return (
+
+            return !this._isDominant(connection.video.index) ? (
               <HorizontalBox
                 key={connection.video.index}
                 type='local'
@@ -354,14 +400,15 @@ _userLoggedIn() {
               >
                 <LocalVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
               </HorizontalBox>
-            );
+            )
+            : ( <BlackBox key={connection.video.index} userName={this.props.userName}> </BlackBox>  ) ;
           })}
           {this.props.remoteVideos.map((connection) => {
             console.log('REMOTE CONNECTION');
             console.log(connection);
             console.log(connection.track.getParticipantId());
             if (connection.video) {
-              return (
+              return !this._isDominant(connection.video.index) ? (
                 <HorizontalBox
                   key={connection.video.index}
                   type='remote'
@@ -371,7 +418,8 @@ _userLoggedIn() {
                 >
                   <RemoteVideo key={connection.video.index} video={connection.video} audio={connection.audio} />
                 </HorizontalBox>
-              );
+              )
+              : ( <BlackBox key={connection.video.index} userName={this.props.userName}> </BlackBox> ) ;
             }
           })}
       </HorizontalWrapper>
