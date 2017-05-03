@@ -4,15 +4,15 @@ const VideoReducer = (state = {}, action) => {
 
   switch(action.type) {
     case VideoControlConstants.VIDEO_CONTROL_CHANGE_MAIN_VIEW:
-      if (action.data && action.data.videoType && action.data.videoIndex) {
+      if (action.data && action.data.videoType && action.data.videoId) {
         let mainConnection = 0
         if (action.data.videoType === 'local') {
             mainConnection = action.data.localVideos.find((connection) => {
-            return connection.video.index === action.data.videoIndex;
+            return connection.id === action.data.videoId;
           });
         } else {
             mainConnection = action.data.remoteVideos.find((connection) => {
-            return connection.video.index === action.data.videoIndex;
+            return connection.id === action.data.videoId;
             });
           }
         // return {
@@ -33,10 +33,10 @@ const VideoReducer = (state = {}, action) => {
       }
 
     case VideoControlConstants.VIDEO_CONTROL_UPDATE_DOMINANT_SPEAKER:
-      if (action.data.dominantSpeakerIndex) {
-        console.log("changing dominant speaker to: " + action.data.dominantSpeakerIndex)
+      if (action.data.dominantSpeakerId) {
+        console.log("changing dominant speaker to: " + action.data.dominantSpeakerId)
         return Object.assign({}, state, {
-          dominantSpeakerIndex: action.data.dominantSpeakerIndex
+          dominantSpeakerIndex: action.data.dominantSpeakerId
         })
       }
       else {

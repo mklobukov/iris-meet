@@ -1,18 +1,18 @@
 import VideoControlConstants from '../constants/video-control-constants';
 
-export const changeMainView = (videoType, videoIndex, localVideos, remoteVideos) => ({
+export const changeMainView = (videoType, videoId, localVideos, remoteVideos) => ({
     type: VideoControlConstants.VIDEO_CONTROL_CHANGE_MAIN_VIEW,
     data: {
       videoType,
-      videoIndex,
+      videoId,
       localVideos,
       remoteVideos
     }
 })
 
-export const changeDominantSpeaker = (dominantSpeakerIndex) => ({
+export const changeDominantSpeaker = (dominantSpeakerId) => ({
   type: VideoControlConstants.VIDEO_CONTROL_UPDATE_DOMINANT_SPEAKER,
   data: {
-    dominantSpeakerIndex
+    dominantSpeakerId
   }
 })
