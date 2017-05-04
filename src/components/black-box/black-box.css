@@ -8,11 +8,14 @@
   width: auto;
   //max-height: 120px;
   //min-height: 120px;
+  min-width: 160px;
   text-align: center;
   vertical-align: top;
+  border-radius: 3px;
 }
 
 .black-box .user-text {
+  color: #ffffff;
   width: auto;
   max-height: 120px;
   min-height: 120px;

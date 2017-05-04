@@ -14,14 +14,13 @@ Format of this reducer's part of state tree:
 */
 
 const UserReducer = (state = {}, action) => {
-  console.log('ACTIONS!');
+  console.log('Received action: ')
   console.log(action);
   switch(action.type) {
       case UserStoreConstants.USER_LOGIN:
         if (action.data && action.data.userName &&
             action.data.routingId && action.data.roomName &&
             action.data.accessToken && action.data.decodedToken) {
-              console.log('action.data: ' +action.data)
             return {
               userName: action.data.userName,
               routingId: action.data.routingId,
