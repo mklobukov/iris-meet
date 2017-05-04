@@ -3,7 +3,7 @@ import MainVideo from './main-video';
 import MeetToolbar from '../containers/meet-toolbar';
 import HorizontalWrapper from './horizontal-wrapper';
 import HorizontalBox from '../containers/horizontal-box';
-import BlackBox from '../components/black-box'
+import BlackBox from '../containers/black-box'
 import LoginPanel from '../containers/login-panel';
 import { withRouter } from 'react-router';
 import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
@@ -362,7 +362,13 @@ componentWillReceiveProps = (nextProps) => {
                 <LocalVideo key={connection.id} video={connection} audio={connection.audio} />
               </HorizontalBox>
             )
-            : ( <BlackBox key={connection.id} userName={this.props.userName}> </BlackBox>  ) ;
+            : ( <BlackBox
+              key={connection.id}
+              userName={this.props.userName}
+              type='local'
+              id={connection.id}
+              localVideos={this.props.localVideos}
+              remoteVideos = {this.props.remoteVideos}> </BlackBox>  ) ;
           })}
           {this.props.remoteVideos.map((connection) => {
 
@@ -379,7 +385,13 @@ componentWillReceiveProps = (nextProps) => {
                   <RemoteVideo key={connection.id} video={connection} audio={connection.audio} />
                 </HorizontalBox>
               )
-              : ( <BlackBox key={connection.id} userName={this.props.userName}> </BlackBox> ) ;
+              : ( <BlackBox
+                key={connection.id}
+                userName={this.props.userName}
+                type='remote'
+                id={connection.id}
+                localVideos={this.props.localVideos}
+                remoteVideos={this.props.remoteVideos} > </BlackBox> ) ;
             }
           })}
       </HorizontalWrapper>
