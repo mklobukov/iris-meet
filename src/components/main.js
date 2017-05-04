@@ -351,7 +351,7 @@ componentWillReceiveProps = (nextProps) => {
             console.log('LOCAL CONNECTION');
             console.log(connection);
 
-            return !this._isDominant(connection.id) ? (
+            return (!this._isDominant(connection.id) && this.props.remoteVideos.length > 0) ? (
               <HorizontalBox
                 key={connection.id}
                 type='local'
