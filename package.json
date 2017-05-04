@@ -9,7 +9,7 @@
     "flux": "^2.1.1",
     "font-awesome": "^4.3.0",
     "iris-auth-js-sdk": "1.0.8",
-    "iris-react-webrtc": "1.0.25",
+    "iris-react-webrtc": "1.0.26",
     "keymirror": "^0.1.1",
     "lodash": "^3.6.0",
     "react": "^15.5.4",
