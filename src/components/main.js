@@ -335,13 +335,11 @@ componentWillReceiveProps = (nextProps) => {
         {this.props.videoType === 'remote' ?
           <RemoteVideo
             video={this.props.connection}
-            audio={this.props.connection.audio}
           /> : null
         }
         {this.props.videoType === 'local' ?
           <LocalVideo
             video={this.props.localVideos[0]}
-            audio={this.props.connection.audio}
           /> : null
         }
       </MainVideo>
@@ -359,7 +357,7 @@ componentWillReceiveProps = (nextProps) => {
                 localVideos = {this.props.localVideos}
                 remoteVideos = {this.props.remoteVideos}
               >
-                <LocalVideo key={connection.id} video={connection} audio={connection.audio} />
+                <LocalVideo key={connection.id} video={connection} />
               </HorizontalBox>
             )
             : ( <BlackBox
@@ -367,8 +365,7 @@ componentWillReceiveProps = (nextProps) => {
               userName={this.props.userName}
               type='local'
               id={connection.id}
-              localVideos={this.props.localVideos}
-              remoteVideos = {this.props.remoteVideos}> </BlackBox>  ) ;
+              />  ) ;
           })}
           {this.props.remoteVideos.map((connection) => {
 
@@ -382,7 +379,7 @@ componentWillReceiveProps = (nextProps) => {
                   localVideos = {this.props.localVideos}
                   remoteVideos = {this.props.remoteVideos}
                 >
-                  <RemoteVideo key={connection.id} video={connection} audio={connection.audio} />
+                  <RemoteVideo key={connection.id} video={connection} />
                 </HorizontalBox>
               )
               : ( <BlackBox
@@ -390,8 +387,7 @@ componentWillReceiveProps = (nextProps) => {
                 userName={this.props.userName}
                 type='remote'
                 id={connection.id}
-                localVideos={this.props.localVideos}
-                remoteVideos={this.props.remoteVideos} > </BlackBox> ) ;
+                /> ) ;
             }
           })}
       </HorizontalWrapper>
