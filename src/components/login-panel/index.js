@@ -1,6 +1,9 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import './login-panel.css'
+import {
+  Button
+} from 'react-bootstrap';
 
 const LoginPanelComponent = ({showUser, userNameText, _onUserNameTextChange, showRoom, roomNameText, _onRoomNameTextChange, onAction}) => (
   <div id="login-panel">
@@ -25,11 +28,10 @@ const LoginPanelComponent = ({showUser, userNameText, _onUserNameTextChange, sho
           onChange={_onRoomNameTextChange.bind(this)}
         />
       </div> : null}
-      <button
+      <Button
         type="submit"
-        className="btn btn-default"
         onClick={onAction}
-      >Accept</button>
+      >Accept</Button>
     </form>
   </div>
 );
