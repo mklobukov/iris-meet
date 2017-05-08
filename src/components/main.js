@@ -196,14 +196,23 @@ componentWillReceiveProps = (nextProps) => {
     console.log('FOUND DOMINANT SPEAKER: ');
     console.log(matchedConnection);
     if (matchedConnection) {
-      this.props.VideoControl('remote', matchedConnection.id, this.props.localVideos, this.props.remoteVideos)
       this.props.changeDominantSpeaker(matchedConnection.id)
+      //change main view only if current speaker is remote
+      if (matchedConnection.id !== this.props.localVideos[0].id) {
+        this.props.VideoControl('remote', matchedConnection.id, this.props.localVideos, this.props.remoteVideos)
+      }
 
     } else if (this.props.localVideos.length > 0) {
       // no remote participants found so assume it is local speaker
-      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
-      //??
+      //Leave this outside the if-statement to initialize a call and have
+      //the only participant's video on the main screen
+
+      //change dominant speaker but do not put local video on the main screen
+      //if there are any remote videos
       this.props.changeDominantSpeaker(this.props.localVideos[0].id)
+      if (this.props.remoteVideos.length === 0) {
+        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
+      }
     }
   }
 
@@ -349,7 +358,7 @@ componentWillReceiveProps = (nextProps) => {
             console.log('LOCAL CONNECTION');
             console.log(connection);
 
-            return !this._isDominant(connection.id) ? (
+            return (!this._isDominant(connection.id) && this.props.remoteVideos.length > 0) ? (
               <HorizontalBox
                 key={connection.id}
                 type='local'
