@@ -121,6 +121,610 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       console.log(this.props.params.roomname)
       this.props.loginUserAsync(userName, routingId, this.props.params.roomname, authUrl, appKey)
     }
+//
+// //**Listener for screen share
+// window.addEventListener('message', (event) => {
+//   console.log("RECEIVED EVENT: ", typeof event)
+//   console.log(event)
+//
+//   console.log("window location origin: ")
+//   console.log(window.location.origin)
+//   console.log("event origin: ", event.origin)
+//   console.log("event data outside: ", event)
+//
+//   //if (event.origin === window.location.origin) {
+//     //if (event.data.video && event.origin !== "https://www.webrtc-experiment.com") {
+//       console.log("Received event with data.video")
+//       if (!this.props.isSharingScreen && event.dat) {
+//       console.log("Launching screenshare in window listener with chrome id ", event.data)
+//       this.props.startScreenshare(event.data);
+//     //}
+//   }
+// }, false);
+// //**
+//
+//
+// //**Self-calling function defining screen-id
+//
+// const this_main = this;
+//     (function() {
+//         window.getScreenId = function(callback) {
+//             // for Firefox:
+//             // sourceId == 'firefox'
+//             // screen_constraints = {...}
+//             if (!!navigator.mozGetUserMedia) {
+//                 callback(null, 'firefox', {
+//                     video: {
+//                         mozMediaSource: 'window',
+//                         mediaSource: 'window'
+//                     }
+//                 });
+//                 return;
+//             }
+//
+//             window.addEventListener('message', onIFrameCallback);
+//
+//             function onIFrameCallback(event) {
+//                 if (!event.data) return;
+//
+//                 if (event.data.chromeMediaSourceId) {
+//                   console.log("GOT A CHROMEMEDIASOURCEID ", event.data.chromeMediaSourceId)
+//                     if (event.data.chromeMediaSourceId === 'PermissionDeniedError') {
+//                         callback('permission-denied');
+//                     } else callback(null, event.data.chromeMediaSourceId, getScreenConstraints(null, event.data.chromeMediaSourceId));
+//                 }
+//
+//                 if (event.data.chromeExtensionStatus) {
+//                     callback(event.data.chromeExtensionStatus, null, getScreenConstraints(event.data.chromeExtensionStatus));
+//                 }
+//
+//                 // this event listener is no more needed
+//                 window.removeEventListener('message', onIFrameCallback);
+//             }
+//
+//     setTimeout(postGetSourceIdMessage, 100);
+//         };
+//
+//
+//         function getScreenConstraints(error, sourceId) {
+//             var screen_constraints = {
+//                 audio: false,
+//                 video: {
+//                     mandatory: {
+//                         chromeMediaSource: error ? 'screen' : 'desktop',
+//                         maxWidth: window.screen.width > 1920 ? window.screen.width : 1920,
+//                         maxHeight: window.screen.height > 1080 ? window.screen.height : 1080
+//                     },
+//                     optional: []
+//                 }
+//             };
+//             console.log("Screen constraints original: ")
+//             console.log(screen_constraints)
+//
+//             if (sourceId) {
+//                 screen_constraints.video.mandatory.chromeMediaSourceId = sourceId;
+//             }
+//
+//             return screen_constraints;
+//         }
+//
+//         function postGetSourceIdMessage() {
+//     if (!iframe) {
+//                 loadIFrame(postGetSourceIdMessage);
+//                 return;
+//             }
+//
+//             if (!iframe.isLoaded) {
+//                 setTimeout(postGetSourceIdMessage, 100);
+//                 return;
+//             }
+//
+//             iframe.contentWindow.postMessage({
+//                 captureSourceId: true
+//             }, '*');
+//         }
+//
+//         var iframe;
+//
+//         // this function is used in RTCMultiConnection v3
+//         window.getScreenConstraints = function(callback) {
+//             loadIFrame(function() {
+//               //??
+//                 window.getScreenId(function(error, sourceId, screen_constraints) {
+//                     callback(error, screen_constraints.video);
+//                 });
+//             });
+//         };
+//
+//     function loadIFrame(loadCallback) {
+//             if (iframe) {
+//                 loadCallback();
+//                 return;
+//             }
+//
+//             iframe = document.createElement('iframe');
+//             iframe.onload = function() {
+//                 iframe.isLoaded = true;
+//
+//                 loadCallback();
+//             };
+//             iframe.src = 'https://www.webrtc-experiment.com/getSourceId/'; // https://wwww.yourdomain.com/getScreenId.html
+//             //iframe.src = './getScreenId.html/'
+//             iframe.style.display = 'none';
+//             (document.body || document.documentElement).appendChild(iframe);
+//         }
+//
+//     window.getChromeExtensionStatus = function(callback) {
+//             // for Firefox:
+//             if (!!navigator.mozGetUserMedia) {
+//                 callback('installed-enabled');
+//                 return;
+//             }
+//
+//             window.addEventListener('message', onIFrameCallback);
+//
+//             function onIFrameCallback(event) {
+//                 if (!event.data) return;
+//
+//     if (event.data.chromeExtensionStatus) {
+//                     callback(event.data.chromeExtensionStatus);
+//                 }
+//
+//                 // this event listener is no more needed
+//                 window.removeEventListener('message', onIFrameCallback);
+//             }
+//
+//     setTimeout(postGetChromeExtensionStatusMessage, 100);
+//         };
+//
+//     function postGetChromeExtensionStatusMessage() {
+//             if (!iframe) {
+//                 loadIFrame(postGetChromeExtensionStatusMessage);
+//                 return;
+//             }
+//
+//             if (!iframe.isLoaded) {
+//                 setTimeout(postGetChromeExtensionStatusMessage, 100);
+//                 return;
+//             }
+//
+//     iframe.contentWindow.postMessage({
+//                 getChromeExtensionStatus: true
+//             }, '*');
+//         }
+//     })();
+// //**
+//
+// //**Final screen share code
+// var maxTries = 0;
+//     function showChromeExtensionStatus() {
+//       if(typeof window.getChromeExtensionStatus !== 'function') return;
+//
+//       var gotResponse;
+//       window.getChromeExtensionStatus(function(status) {
+//         gotResponse = true;
+//         //??document.getElementById('chrome-extension-status').innerHTML = 'Chrome extension status is: <b>' + status + '</b>';
+//         console.info('getChromeExtensionStatus', status);
+//       });
+//
+//       maxTries++;
+//       if(maxTries > 15) return;
+//       setTimeout(function() {
+//         if(!gotResponse) showChromeExtensionStatus();
+//       }, 1000);
+//     }
+//
+//     showChromeExtensionStatus();
+//
+//             // via: https://bugs.chromium.org/p/chromium/issues/detail?id=487935#c17
+//             // you can capture screen on Android Chrome >= 55 with flag: "Experimental ScreenCapture android"
+//             window.IsAndroidChrome = false;
+//             try {
+//                 if (navigator.userAgent.toLowerCase().indexOf("android") > -1 && /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)) {
+//                     window.IsAndroidChrome = true;
+//                 }
+//             } catch (e) {}
+//
+//             document.getElementById('capture-screen').onclick = function() {
+//                 console.log("EXECUTING NOW")
+//                 document.getElementById('capture-screen').disabled = true;
+//
+//                 setTimeout(function() {
+//                   if(document.getElementById('capture-screen').disabled && !document.querySelector('video').src) {
+//                     document.getElementById('capture-screen').disabled = false;
+//                   }
+//                 }, 5000);
+//
+//     //ONCLICK!!!
+//                 //??
+//                 window.getScreenId(function(error, sourceId, screen_constraints) {
+//                     // error    == null || 'permission-denied' || 'not-installed' || 'installed-disabled' || 'not-chrome'
+//                     // sourceId == null || 'string' || 'firefox'
+//                     // getUserMedia(screen_constraints, onSuccess, onFailure);
+//                     console.log("SourceId: " ,sourceId);
+//                     console.log("Test screen constraints", screen_constraints)
+//                     document.getElementById('capture-screen').disabled = false;
+//
+//                     // if (IsAndroidChrome) {
+//                     //     screen_constraints = {
+//                     //         mandatory: {
+//                     //             chromeMediaSource: 'screen'
+//                     //         },
+//                     //         optional: []
+//                     //     };
+//                     //
+//                     //     screen_constraints = {
+//                     //         video: screen_constraints
+//                     //     };
+//                     //
+//                     //     error = null;
+//                     // }
+//
+//                     if(error == 'not-installed') {
+//                       alert('Please install Chrome extension. See the link below.');
+//                       return;
+//                     }
+//
+//                     if(error == 'installed-disabled') {
+//                       alert('Please install or enable Chrome extension. Please check "chrome://extensions" page.');
+//                       return;
+//                     }
+//
+//                     if(error == 'permission-denied') {
+//                       alert('Please make sure you are using HTTPs. Because HTTPs is required.');
+//                       return;
+//                     }
+//
+//                     console.info('getScreenId callback \n(error, sourceId, screen_constraints) =>\n', error, sourceId, screen_constraints);
+//
+//                     document.getElementById('capture-screen').disabled = true;
+//                     navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+//                     console.log("Constraints passed to getUserMedia: ", screen_constraints)
+//                     navigator.getUserMedia(screen_constraints, function(stream) {
+//                         // share this "MediaStream" object using RTCPeerConnection API
+//
+//                         ///////
+//                         //ADD STREAMS HERE!!!
+//                         //////
+//                         // Example from the author:
+//                         //   peer.addStream( stream );
+//                         //   peer.createOffer(.....);
+//
+//                         //window.postMessage(screen_constraints, window.location.origin)
+//                         console.log("screen constraints: ", screen_constraints)
+//                         window.postMessage(screen_constraints.video.mandatory.chromeMediaSourceId, window.location.origin)
+//                         stream.oninactive = stream.onended = function() {
+//                             console.log("STREAM ENDED!")
+//                             //??will this work?
+//                             //this.props.VideoControl('local', this.props.localVideos[0].video.index, this.props.localVideos, this.props.remoteVideos)
+//                              //document.querySelector('video').src = null;
+//                              document.getElementById('sharing').src = null;
+//                              this_main.stopSharingScreen()
+//                             //document.querySelector('video').src = prevIndex
+//                             document.getElementById('capture-screen').disabled = false;
+//                         };
+//
+//                         document.getElementById('capture-screen').disabled = false;
+//                     }, function(error) {
+//                         console.error('getScreenId error', error);
+//                         console.log('Failed to capture your screen. Please check Chrome console logs for further information.')
+//                         //alert('Failed to capture your screen. Please check Chrome console logs for further information.');
+//                     });
+//                 });
+//             };
+// //**
+
+//**Older version::
+
+
+    //////////////////////////////
+    window.addEventListener('message', (event) => {
+      console.log("RECEIVED EVENT: ", typeof event)
+      console.log(event)
+
+      console.log("window location origin: ")
+      console.log(window.location.origin)
+      console.log("event origin: ", event.origin)
+      console.log("event data outside: ", event)
+
+      //if (event.origin === window.location.origin) {
+        if (event.data.chromeMediaSourceId) {
+          console.log("GOT CHROME ID")
+        console.log("event")
+        //??console.log(event.data.sourceId)
+        console.log(event)
+        console.log("Chrome id: " , event.data.chromeMediaSourceId)
+        //??if (typeof event.data.sourceId === 'string') {
+          //if (event.data.chromeMediaSourceId && typeof event.data.chromeMediaSourceId === 'string' && !this.props.isSharingScreen) {
+          if (event.data.chromeMediaSourceId && !this.props.isSharingScreen) {
+            console.log(event.data.chromeMediaSourceId)
+
+          this.props.startScreenshare(event.data.chromeMediaSourceId);
+          //Nothing in local videos, so throws error. Fix this.
+          //this.props.VideoControl('local', this.props.localVideos[0].video.index, this.props.localVideos, this.props.remoteVideos)
+          console.log("actually starting screenshare in listener")
+        }
+      }
+    }, false);
+
+    ///////////////////////Screenshare codes start
+    const this_main = this;
+    (function() {
+        window.getScreenId = function(callback) {
+            // for Firefox:
+            // sourceId == 'firefox'
+            // screen_constraints = {...}
+            if (!!navigator.mozGetUserMedia) {
+                callback(null, 'firefox', {
+                    video: {
+                        mozMediaSource: 'window',
+                        mediaSource: 'window'
+                    }
+                });
+                return;
+            }
+
+            window.addEventListener('message', onIFrameCallback);
+
+            function onIFrameCallback(event) {
+                if (!event.data) return;
+
+                if (event.data.chromeMediaSourceId) {
+                  console.log("GOT A CHROMEMEDIASOURCEID")
+                    if (event.data.chromeMediaSourceId === 'PermissionDeniedError') {
+                        callback('permission-denied');
+                    } else callback(null, event.data.chromeMediaSourceId, getScreenConstraints(null, event.data.chromeMediaSourceId));
+                }
+
+                if (event.data.chromeExtensionStatus) {
+                    callback(event.data.chromeExtensionStatus, null, getScreenConstraints(event.data.chromeExtensionStatus));
+                }
+
+                // this event listener is no more needed
+                window.removeEventListener('message', onIFrameCallback);
+            }
+
+    setTimeout(postGetSourceIdMessage, 100);
+        };
+
+        function getScreenConstraints(error, sourceId) {
+            var screen_constraints = {
+                audio: false,
+                video: {
+                    mandatory: {
+                        chromeMediaSource: error ? 'screen' : 'desktop',
+                        maxWidth: window.screen.width > 1920 ? window.screen.width : 1920,
+                        maxHeight: window.screen.height > 1080 ? window.screen.height : 1080
+                    },
+                    optional: []
+                }
+            };
+            console.log("Screen constraints original: ")
+            console.log(screen_constraints)
+
+            if (sourceId) {
+                screen_constraints.video.mandatory.chromeMediaSourceId = sourceId;
+            }
+
+            return screen_constraints;
+        }
+
+        function postGetSourceIdMessage() {
+    if (!iframe) {
+                loadIFrame(postGetSourceIdMessage);
+                return;
+            }
+
+            if (!iframe.isLoaded) {
+                setTimeout(postGetSourceIdMessage, 100);
+                return;
+            }
+
+            iframe.contentWindow.postMessage({
+                captureSourceId: true
+            }, '*');
+        }
+
+        var iframe;
+
+        // this function is used in RTCMultiConnection v3
+        window.getScreenConstraints = function(callback) {
+            loadIFrame(function() {
+              //??
+                window.getScreenId(function(error, sourceId, screen_constraints) {
+                    callback(error, screen_constraints.video);
+                });
+            });
+        };
+
+    function loadIFrame(loadCallback) {
+            if (iframe) {
+                loadCallback();
+                return;
+            }
+
+            iframe = document.createElement('iframe');
+            iframe.onload = function() {
+                iframe.isLoaded = true;
+
+                loadCallback();
+            };
+            iframe.src = 'https://www.webrtc-experiment.com/getSourceId/'; // https://wwww.yourdomain.com/getScreenId.html
+            //iframe.src = './getScreenId.html/'
+            iframe.style.display = 'none';
+            (document.body || document.documentElement).appendChild(iframe);
+        }
+
+    window.getChromeExtensionStatus = function(callback) {
+            // for Firefox:
+            if (!!navigator.mozGetUserMedia) {
+                callback('installed-enabled');
+                return;
+            }
+
+            window.addEventListener('message', onIFrameCallback);
+
+            function onIFrameCallback(event) {
+                if (!event.data) return;
+
+    if (event.data.chromeExtensionStatus) {
+                    callback(event.data.chromeExtensionStatus);
+                }
+
+                // this event listener is no more needed
+                window.removeEventListener('message', onIFrameCallback);
+            }
+
+    setTimeout(postGetChromeExtensionStatusMessage, 100);
+        };
+
+    function postGetChromeExtensionStatusMessage() {
+            if (!iframe) {
+                loadIFrame(postGetChromeExtensionStatusMessage);
+                return;
+            }
+
+            if (!iframe.isLoaded) {
+                setTimeout(postGetChromeExtensionStatusMessage, 100);
+                return;
+            }
+
+    iframe.contentWindow.postMessage({
+                getChromeExtensionStatus: true
+            }, '*');
+        }
+    })();
+
+    /////////////////////////////////////////////////subsetstart
+
+
+    /////////////////////////////////////////////////subsetend
+    var maxTries = 0;
+    function showChromeExtensionStatus() {
+      if(typeof window.getChromeExtensionStatus !== 'function') return;
+
+      var gotResponse;
+      window.getChromeExtensionStatus(function(status) {
+        gotResponse = true;
+        //??document.getElementById('chrome-extension-status').innerHTML = 'Chrome extension status is: <b>' + status + '</b>';
+        console.info('getChromeExtensionStatus', status);
+      });
+
+      maxTries++;
+      if(maxTries > 15) return;
+      setTimeout(function() {
+        if(!gotResponse) showChromeExtensionStatus();
+      }, 1000);
+    }
+
+    showChromeExtensionStatus();
+
+            // via: https://bugs.chromium.org/p/chromium/issues/detail?id=487935#c17
+            // you can capture screen on Android Chrome >= 55 with flag: "Experimental ScreenCapture android"
+            window.IsAndroidChrome = false;
+            try {
+                if (navigator.userAgent.toLowerCase().indexOf("android") > -1 && /Chrome/.test(navigator.userAgent) && /Google Inc/.test(navigator.vendor)) {
+                    window.IsAndroidChrome = true;
+                }
+            } catch (e) {}
+
+            document.getElementById('capture-screen').onclick = function() {
+                console.log("EXECUTING NOW")
+                document.getElementById('capture-screen').disabled = true;
+
+                setTimeout(function() {
+                  if(document.getElementById('capture-screen').disabled && !document.querySelector('video').src) {
+                    document.getElementById('capture-screen').disabled = false;
+                  }
+                }, 5000);
+
+    //ONCLICK!!!
+                //??
+                window.getScreenId(function(error, sourceId, screen_constraints) {
+                    // error    == null || 'permission-denied' || 'not-installed' || 'installed-disabled' || 'not-chrome'
+                    // sourceId == null || 'string' || 'firefox'
+                    // getUserMedia(screen_constraints, onSuccess, onFailure);
+
+                    document.getElementById('capture-screen').disabled = false;
+
+                    // if (IsAndroidChrome) {
+                    //     screen_constraints = {
+                    //         mandatory: {
+                    //             chromeMediaSource: 'screen'
+                    //         },
+                    //         optional: []
+                    //     };
+                    //
+                    //     screen_constraints = {
+                    //         video: screen_constraints
+                    //     };
+                    //
+                    //     error = null;
+                    // }
+
+                    if(error == 'not-installed') {
+                      alert('Please install Chrome extension. See the link below.');
+                      return;
+                    }
+
+                    if(error == 'installed-disabled') {
+                      alert('Please install or enable Chrome extension. Please check "chrome://extensions" page.');
+                      return;
+                    }
+
+                    if(error == 'permission-denied') {
+                      alert('Please make sure you are using HTTPs. Because HTTPs is required.');
+                      return;
+                    }
+
+                    console.info('getScreenId callback \n(error, sourceId, screen_constraints) =>\n', error, sourceId, screen_constraints);
+
+                    document.getElementById('capture-screen').disabled = true;
+                    navigator.getUserMedia = navigator.mozGetUserMedia || navigator.webkitGetUserMedia;
+                    navigator.getUserMedia(screen_constraints, function(stream) {
+                        // share this "MediaStream" object using RTCPeerConnection API
+
+                        ///////
+                        //ADD STREAMS HERE!!!
+                        //////
+                        // Example from the author:
+                        //   peer.addStream( stream );
+                        //   peer.createOffer(.....);
+
+                        //Original way
+                        //??document.querySelector('video').src = URL.createObjectURL(stream);
+
+                        document.getElementById('sharing').src = URL.createObjectURL(stream);
+                        //document.getElement("div.main-video div video").src = URL.createObjectURL(stream)
+                        //this2.props.startScreenshare(stream.id);
+                        window.postMessage(stream.id, window.location.origin);
+                        stream.oninactive = stream.onended = function() {
+                            console.log("STREAM ENDED!")
+                            //??will this work?
+                            //this.props.VideoControl('local', this.props.localVideos[0].video.index, this.props.localVideos, this.props.remoteVideos)
+                             //document.querySelector('video').src = null;
+                             document.getElementById('sharing').src = null;
+                             this_main.stopSharingScreen()
+                            //document.querySelector('video').src = prevIndex
+                            document.getElementById('capture-screen').disabled = false;
+                        };
+
+                        document.getElementById('capture-screen').disabled = false;
+                    }, function(error) {
+                        console.error('getScreenId error', error);
+
+                        alert('Failed to capture your screen. Please check Chrome console logs for further information.');
+                    });
+                });
+            };
+
+
+
+    ///////////////////////////////////////// screenshare end
+
+
+
+
   }
 
 componentWillReceiveProps = (nextProps) => {
