@@ -16,6 +16,7 @@ import { changeMainView, changeDominantSpeaker } from '../actions/video-control-
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { loginUserAsync, leaveRoom } from '../actions/user-actions'
+import {getSourceId} from './getSourceId'
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -66,12 +67,14 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       isVideoMuted: false,
       isVideoBarHidden: false,
       isToolbarHidden: false,
+      isSharingScreen: false
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
     this.onLocalVideo = this._onLocalVideo.bind(this);
     this.onRemoteVideo = this._onRemoteVideo.bind(this);
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
+    this.startScreenShare = this.props.startScreenshare.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -81,12 +84,14 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     }, 10000);
   }
 
+
   componentDidMount() {
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
 
+    //this.shareScreen()
     const requestedResolution = getQueryParameter('resolution');
     console.log(requestedResolution);
     console.log('roomName: ' + this.props.params.roomname);
@@ -181,31 +186,40 @@ componentWillReceiveProps = (nextProps) => {
   }
 
   _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
-    //let participant = track.getParticipantId();
-    //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
-      const matchedConnection = this.props.remoteVideos.find((connection) => {
-        let participantId = connection.participantJid;
-        participantId = participantId.substring(participantId.indexOf("/")+1, participantId.indexOf("@iris-meet.comcast.com"))
-        //participantId = participantId.substring(0, participantId.indexOf("/"))
-        dominantSpeakerEndpoint = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"))
-        const endPoint = participantId.substring(participantId.lastIndexOf("/")+1)
-        console.log("endpoint and dom: " + endPoint + ", " + dominantSpeakerEndpoint)
-        return endPoint === dominantSpeakerEndpoint;
-    });
+     //let participant = track.getParticipantId();
+     //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
+       const matchedConnection = this.props.remoteVideos.find((connection) => {
+         let participantId = connection.participantJid;
+         participantId = participantId.substring(participantId.indexOf("/")+1, participantId.indexOf("@iris-meet.comcast.com"))
+         //participantId = participantId.substring(0, participantId.indexOf("/"))
+         dominantSpeakerEndpoint = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"))
+         const endPoint = participantId.substring(participantId.lastIndexOf("/")+1)
+         console.log("endpoint and dom: " + endPoint + ", " + dominantSpeakerEndpoint)
+         return endPoint === dominantSpeakerEndpoint;
+     });
 
-    console.log('FOUND DOMINANT SPEAKER: ');
-    console.log(matchedConnection);
-    if (matchedConnection) {
-      this.props.VideoControl('remote', matchedConnection.id, this.props.localVideos, this.props.remoteVideos)
-      this.props.changeDominantSpeaker(matchedConnection.id)
+     console.log('FOUND DOMINANT SPEAKER: ');
+     console.log(matchedConnection);
+     if (matchedConnection) {
+       this.props.changeDominantSpeaker(matchedConnection.id)
+       //change main view only if current speaker is remote
+       if (matchedConnection.id !== this.props.localVideos[0].id) {
+         this.props.VideoControl('remote', matchedConnection.id, this.props.localVideos, this.props.remoteVideos)
+       }
 
-    } else if (this.props.localVideos.length > 0) {
-      // no remote participants found so assume it is local speaker
-      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
-      //??
-      this.props.changeDominantSpeaker(this.props.localVideos[0].id)
-    }
-  }
+     } else if (this.props.localVideos.length > 0) {
+       // no remote participants found so assume it is local speaker
+       //Leave this outside the if-statement to initialize a call and have
+       //the only participant's video on the main screen
+
+       //change dominant speaker but do not put local video on the main screen
+       //if there are any remote videos
+       this.props.changeDominantSpeaker(this.props.localVideos[0].id)
+       if (this.props.remoteVideos.length === 0) {
+         this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
+       }
+     }
+   }
 
 
   _userLoggedIn() {
@@ -313,10 +327,69 @@ componentWillReceiveProps = (nextProps) => {
   }
 
   _isDominant(index) {
-    console.log(index === this.props.dominantSpeakerIndex)
+    //console.log(index === this.props.dominantSpeakerIndex)
     return index === this.props.dominantSpeakerIndex;
   }
 
+
+_shareScreen() {
+  //if (client.Session) {
+   var this_main = this;
+   var constraints = {};
+   console.log("window chrome: ", window.chrome)
+   window.chrome.runtime.sendMessage(
+     //NOTE: this ID will vary from client to client because
+     //currently the desktop share extension is not on Chrome or
+     //Firefox store yet. The ID may also update when the cache is cleared
+       'omgaahegahkjnlogadbaadmoomfoflan', {
+           // getVersion: true,
+           getStream: true,
+           sources: ['screen', 'window']
+       },
+       response => {
+           if (!response) {
+               const lastError = window.chrome.runtime.lastError;
+           }
+           console.log('Response from extension: ', response);
+
+           //These constraints are not necessary,
+           //they are being rebuilt inside startScreenShare function
+           //But I'm leaving them here for now anyways
+           constraints.audio = false;
+           constraints.video = {
+               mandatory: {
+                   chromeMediaSource: "desktop",
+                   chromeMediaSourceId: response.streamId,
+                   maxWidth: window.screen.width,
+                   maxHeight: window.screen.height,
+                   maxFrameRate: 3
+               },
+               optional: []
+           };
+           //userConfig.switchStream = true;
+
+           var streamConfig = {
+               "constraints": constraints
+           }
+           console.log("about to call start screen")
+           //client.Session.switchStream(client.Stream, streamConfig);
+           this.startScreenShare(response.streamId)
+       }
+   );
+//}
+}
+
+//Function passed to the menu button
+_screenShareControl() {
+  if (!this.state.isSharingScreen) {
+    this._shareScreen()
+  } else {
+    console.log("Implement end of screen share logic!!")
+  }
+  this.setState({
+    isSharingScreen: !this.state.isSharingScreen,
+  });
+}
 
   render() {
 
@@ -324,6 +397,7 @@ componentWillReceiveProps = (nextProps) => {
       <div onMouseMove={this._onMouseMove.bind(this)}>
       {this.props.localVideos.length > 0 ?
         <MeetToolbar
+          screenShareControl={this._screenShareControl.bind(this)}
           isHidden={this.state.isToolbarHidden}
           onMicrophoneMute={this._onLocalAudioMute.bind(this)}
           onCameraMute={this._onLocalVideoMute.bind(this)}
@@ -348,7 +422,7 @@ componentWillReceiveProps = (nextProps) => {
 
       <HorizontalWrapper isHidden={this.state.isVideoBarHidden}>
           {this.props.localVideos.map((connection) => {
-            console.log('LOCAL CONNECTION');
+            console.log('Main.js, rendering local horiz box:');
             console.log(connection);
 
             return !this._isDominant(connection.id) ? (
