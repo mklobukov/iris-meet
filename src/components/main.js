@@ -327,7 +327,7 @@ componentWillReceiveProps = (nextProps) => {
   }
 
   _isDominant(index) {
-    console.log(index === this.props.dominantSpeakerIndex)
+    //console.log(index === this.props.dominantSpeakerIndex)
     return index === this.props.dominantSpeakerIndex;
   }
 
@@ -336,6 +336,7 @@ _shareScreen() {
   //if (client.Session) {
    var this_main = this;
    var constraints = {};
+   console.log("window chrome: ", window.chrome)
    window.chrome.runtime.sendMessage(
      //NOTE: this ID will vary from client to client because
      //currently the desktop share extension is not on Chrome or
@@ -421,7 +422,7 @@ _screenShareControl() {
 
       <HorizontalWrapper isHidden={this.state.isVideoBarHidden}>
           {this.props.localVideos.map((connection) => {
-            console.log('LOCAL CONNECTION');
+            console.log('Main.js, rendering local horiz box:');
             console.log(connection);
 
             return !this._isDominant(connection.id) ? (
