@@ -73,6 +73,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.onRemoteVideo = this._onRemoteVideo.bind(this);
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
     this.startScreenShare = this.props.startScreenshare.bind(this);
+    this.endScreenshare = this.props.endScreenshare.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -380,6 +381,7 @@ _screenShareControl() {
   if (!this.state.isSharingScreen) {
     this._shareScreen()
   } else {
+    this.endScreenshare()
     console.log("Implement end of screen share logic!!")
   }
   this.setState({
