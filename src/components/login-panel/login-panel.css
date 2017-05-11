@@ -39,9 +39,11 @@
   border-color: #FFFFFF;
 }
 
-#login-panel .btn {
+#login-panel .btn-default {
   margin-right: 5px;
   margin-left: 5px;
-  background-color: rgba(0,0,0,0.65);
+  //background-color: rgba(0,0,0,0.65);
+  background: rgba(0,0,0,0.25);
   color: gray;
+  text-shadow: none;
 }

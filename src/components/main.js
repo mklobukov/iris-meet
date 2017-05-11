@@ -186,41 +186,40 @@ componentWillReceiveProps = (nextProps) => {
   }
 
   _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
-     //let participant = track.getParticipantId();
-     //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
-       const matchedConnection = this.props.remoteVideos.find((connection) => {
-         let participantId = connection.participantJid;
-         participantId = participantId.substring(participantId.indexOf("/")+1, participantId.indexOf("@iris-meet.comcast.com"))
-         //participantId = participantId.substring(0, participantId.indexOf("/"))
-         dominantSpeakerEndpoint = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"))
-         const endPoint = participantId.substring(participantId.lastIndexOf("/")+1)
-         console.log("endpoint and dom: " + endPoint + ", " + dominantSpeakerEndpoint)
-         return endPoint === dominantSpeakerEndpoint;
-     });
+    //let participant = track.getParticipantId();
+    //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
+      const matchedConnection = this.props.remoteVideos.find((connection) => {
+        let participantId = connection.participantJid;
+        participantId = participantId.substring(participantId.indexOf("/")+1, participantId.indexOf("@iris-meet.comcast.com"))
+        //participantId = participantId.substring(0, participantId.indexOf("/"))
+        dominantSpeakerEndpoint = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"))
+        const endPoint = participantId.substring(participantId.lastIndexOf("/")+1)
+        console.log("endpoint and dom: " + endPoint + ", " + dominantSpeakerEndpoint)
+        return endPoint === dominantSpeakerEndpoint;
+    });
 
-     console.log('FOUND DOMINANT SPEAKER: ');
-     console.log(matchedConnection);
-     if (matchedConnection) {
-       this.props.changeDominantSpeaker(matchedConnection.id)
-       //change main view only if current speaker is remote
-       if (matchedConnection.id !== this.props.localVideos[0].id) {
-         this.props.VideoControl('remote', matchedConnection.id, this.props.localVideos, this.props.remoteVideos)
-       }
+    console.log('FOUND DOMINANT SPEAKER: ');
+    console.log(matchedConnection);
+    if (matchedConnection) {
+      this.props.changeDominantSpeaker(matchedConnection.id)
+      //change main view only if current speaker is remote
+      if (matchedConnection.id !== this.props.localVideos[0].id) {
+        this.props.VideoControl('remote', matchedConnection.id, this.props.localVideos, this.props.remoteVideos)
+      }
 
-     } else if (this.props.localVideos.length > 0) {
-       // no remote participants found so assume it is local speaker
-       //Leave this outside the if-statement to initialize a call and have
-       //the only participant's video on the main screen
+    } else if (this.props.localVideos.length > 0) {
+      // no remote participants found so assume it is local speaker
+      //Leave this outside the if-statement to initialize a call and have
+      //the only participant's video on the main screen
 
-       //change dominant speaker but do not put local video on the main screen
-       //if there are any remote videos
-       this.props.changeDominantSpeaker(this.props.localVideos[0].id)
-       if (this.props.remoteVideos.length === 0) {
-         this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
-       }
-     }
-   }
-
+      //change dominant speaker but do not put local video on the main screen
+      //if there are any remote videos
+      this.props.changeDominantSpeaker(this.props.localVideos[0].id)
+      if (this.props.remoteVideos.length === 0) {
+        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
+      }
+    }
+  }
 
   _userLoggedIn() {
     this.setState({
@@ -409,13 +408,11 @@ _screenShareControl() {
         {this.props.videoType === 'remote' ?
           <RemoteVideo
             video={this.props.connection}
-            audio={this.props.connection.audio}
           /> : null
         }
         {this.props.videoType === 'local' ?
           <LocalVideo
             video={this.props.localVideos[0]}
-            audio={this.props.connection.audio}
           /> : null
         }
       </MainVideo>
@@ -425,7 +422,7 @@ _screenShareControl() {
             console.log('Main.js, rendering local horiz box:');
             console.log(connection);
 
-            return !this._isDominant(connection.id) ? (
+            return (!this._isDominant(connection.id) && this.props.remoteVideos.length > 0) ? (
               <HorizontalBox
                 key={connection.id}
                 type='local'
@@ -433,7 +430,7 @@ _screenShareControl() {
                 localVideos = {this.props.localVideos}
                 remoteVideos = {this.props.remoteVideos}
               >
-                <LocalVideo key={connection.id} video={connection} audio={connection.audio} />
+                <LocalVideo key={connection.id} video={connection} />
               </HorizontalBox>
             )
             : ( <BlackBox
@@ -441,8 +438,7 @@ _screenShareControl() {
               userName={this.props.userName}
               type='local'
               id={connection.id}
-              localVideos={this.props.localVideos}
-              remoteVideos = {this.props.remoteVideos}> </BlackBox>  ) ;
+              />  ) ;
           })}
           {this.props.remoteVideos.map((connection) => {
 
@@ -456,7 +452,7 @@ _screenShareControl() {
                   localVideos = {this.props.localVideos}
                   remoteVideos = {this.props.remoteVideos}
                 >
-                  <RemoteVideo key={connection.id} video={connection} audio={connection.audio} />
+                  <RemoteVideo key={connection.id} video={connection} />
                 </HorizontalBox>
               )
               : ( <BlackBox
@@ -464,8 +460,7 @@ _screenShareControl() {
                 userName={this.props.userName}
                 type='remote'
                 id={connection.id}
-                localVideos={this.props.localVideos}
-                remoteVideos={this.props.remoteVideos} > </BlackBox> ) ;
+                /> ) ;
             }
           })}
       </HorizontalWrapper>
