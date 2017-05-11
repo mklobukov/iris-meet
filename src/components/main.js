@@ -440,6 +440,8 @@ _screenShareControl() {
               userName={this.props.userName}
               type='local'
               id={connection.id}
+              localVideos={this.props.localVideos}
+              remoteVideos={this.props.remoteVideos}
               />  ) ;
           })}
           {this.props.remoteVideos.map((connection) => {
@@ -460,6 +462,8 @@ _screenShareControl() {
                 userName={this.props.userName}
                 type='remote'
                 id={connection.id}
+                localVideos={this.props.localVideos}
+                remoteVideos={this.props.remoteVideos}
                 /> ) ;
             }
 
