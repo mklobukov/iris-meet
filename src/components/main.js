@@ -190,25 +190,19 @@ componentWillReceiveProps = (nextProps) => {
     //let participant = track.getParticipantId();
     //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
     console.log("Got a new dominant speaker notification\nLooking through remotes...")
+
+    //extract the part of dominantSpeakerEndpoint to use for comparison with connection id
+    const dom = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"));
     const matchedConnection = this.props.remoteVideos.find((connection) => {
       let participantId = connection.participantJid;
       participantId = participantId.substring(participantId.indexOf("/")+1, participantId.indexOf("@iris-meet.comcast.com"))
-      let dom = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"))
       const endPoint = participantId.substring(participantId.lastIndexOf("/")+1)
       console.log("endpoint and dom: " + endPoint + ", " + dom)
       return endPoint === dom;
       });
 
-    // if (!matchedConnection) {
-    //   //just for testing
-    //     console.log("No matched connection among remotes. Trying local...")
-    //     console.log(this.props.localVideos)
-    //     console.log("Compare with: ", this.props.remoteVideos)
-    //   }
-
     if (matchedConnection) {
       console.log("New dominant speaker among remotes: ", matchedConnection.participantJid)
-      console.log("Compare to domEndpoint: ", dominantSpeakerEndpoint)
       //entering this if statement implies that the dominant speaker is remote
       //no further checks are necessary
       this.props.changeDominantSpeaker(matchedConnection.id)
@@ -216,9 +210,7 @@ componentWillReceiveProps = (nextProps) => {
 
     } else if (this.props.localVideos.length > 0) {
       console.log("Local speaker is dominant: ", this.props.localVideos[0])
-      console.log("compare to endpoint: ", dominantSpeakerEndpoint)
-      console.log(dominantSpeakerEndpoint)
-      // no remote participants found so assume it is local speaker
+      //no remote participants found so assume it is local speaker
       //change dominant speaker but don't change main view, keep displaying
       //the most recent remote dominant speaker
       this.props.changeDominantSpeaker(this.props.localVideos[0].id)

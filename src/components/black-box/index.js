@@ -5,7 +5,7 @@ import './black-box.css'
 const BlackBox = ({userName, onClick}) => (
   <div className="black-box" onClick={onClick}>
     <div className="user-text">
-      <div>Current Speaker</div>
+      <div>Speaker Name</div>
     </div>
   </div>
 );
