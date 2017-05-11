@@ -11,12 +11,10 @@ import Config from '../../config.json';
 import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
-import './style.css'
-import { changeMainView, changeDominantSpeaker } from '../actions/video-control-actions'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { loginUserAsync, leaveRoom } from '../actions/user-actions'
-import {getSourceId} from './getSourceId'
+import './style.css';
+import { changeMainView, changeDominantSpeaker } from '../actions/video-control-actions';
+import { connect } from 'react-redux';
+import { loginUserAsync, leaveRoom } from '../actions/user-actions';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -120,7 +118,10 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       // we don't create one
       let routingId = null; //localStorage.getItem('irisMeet.routingId');
       if (routingId === null) {
-        routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
+        routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = Math.random() * 16 | 0, v=c==='x' ? r : ((r & 0x3) | 0x8);
+          return v.toString(16);
+        });
         localStorage.setItem('irisMeet.routingId', routingId);
       }
       console.log(this.props.params.roomname)
@@ -265,7 +266,10 @@ componentWillReceiveProps = (nextProps) => {
     //e.stopPropagation();
     let routingId = null; //localStorage.getItem('irisMeet.routingId');
     if (routingId === null) {
-      routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {var r = Math.random()*16|0,v=c=='x'?r:r&0x3|0x8;return v.toString(16);});
+      routingId = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        const r = Math.random() * 16 | 0, v=c==='x' ? r : ((r & 0x3) | 0x8);
+        return v.toString(16);
+      });
       localStorage.setItem('irisMeet.routingId', routingId);
     }
     const userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
@@ -332,8 +336,6 @@ componentWillReceiveProps = (nextProps) => {
 
 
 _shareScreen() {
-  //if (client.Session) {
-   var this_main = this;
    var constraints = {};
    console.log("window chrome: ", window.chrome)
    window.chrome.runtime.sendMessage(
@@ -348,6 +350,7 @@ _shareScreen() {
        response => {
            if (!response) {
                const lastError = window.chrome.runtime.lastError;
+               console.log(lastError);
            }
            console.log('Response from extension: ', response);
 
@@ -367,15 +370,14 @@ _shareScreen() {
            };
            //userConfig.switchStream = true;
 
-           var streamConfig = {
-               "constraints": constraints
-           }
+           //var streamConfig = {
+           //"constraints": constraints
+           //}
            console.log("about to call start screen")
            //client.Session.switchStream(client.Stream, streamConfig);
            this.startScreenShare(response.streamId)
        }
    );
-//}
 }
 
 //Function passed to the menu button
@@ -427,8 +429,8 @@ _screenShareControl() {
                 key={connection.id}
                 type='local'
                 id={connection.id}
-                localVideos = {this.props.localVideos}
-                remoteVideos = {this.props.remoteVideos}
+                localVideos={this.props.localVideos}
+                remoteVideos={this.props.remoteVideos}
               >
                 <LocalVideo key={connection.id} video={connection} />
               </HorizontalBox>
@@ -438,19 +440,19 @@ _screenShareControl() {
               userName={this.props.userName}
               type='local'
               id={connection.id}
+              localVideos={this.props.localVideos}
+              remoteVideos={this.props.remoteVideos}
               />  ) ;
           })}
           {this.props.remoteVideos.map((connection) => {
-
-
             if (connection) {
               return !this._isDominant(connection.id) ? (
                 <HorizontalBox
                   key={connection.id}
                   type='remote'
                   id={connection.id}
-                  localVideos = {this.props.localVideos}
-                  remoteVideos = {this.props.remoteVideos}
+                  localVideos={this.props.localVideos}
+                  remoteVideos={this.props.remoteVideos}
                 >
                   <RemoteVideo key={connection.id} video={connection} />
                 </HorizontalBox>
@@ -460,8 +462,12 @@ _screenShareControl() {
                 userName={this.props.userName}
                 type='remote'
                 id={connection.id}
+                localVideos={this.props.localVideos}
+                remoteVideos={this.props.remoteVideos}
                 /> ) ;
             }
+
+            return null;
           })}
       </HorizontalWrapper>
       {this.state.showUser || this.state.showRoom ?
