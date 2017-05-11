@@ -11,12 +11,11 @@ import Config from '../../config.json';
 import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
-import './style.css'
-import { changeMainView, changeDominantSpeaker } from '../actions/video-control-actions'
-import { connect } from 'react-redux'
-import { bindActionCreators } from 'redux'
-import { loginUserAsync, leaveRoom } from '../actions/user-actions'
-import {getSourceId} from './getSourceId'
+import './style.css';
+import { changeMainView, changeDominantSpeaker } from '../actions/video-control-actions';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
+import { loginUserAsync, leaveRoom } from '../actions/user-actions';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
