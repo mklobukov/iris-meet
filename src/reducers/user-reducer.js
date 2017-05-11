@@ -1,7 +1,4 @@
 import UserStoreConstants from '../constants/user-constants';
-import { AuthManager } from 'iris-auth-js-sdk';
-import Config from '../../config.json';
-
 /*
 Format of this reducer's part of state tree:
 {

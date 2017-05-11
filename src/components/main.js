@@ -16,6 +16,7 @@ import { changeMainView, changeDominantSpeaker } from '../actions/video-control-
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
 import { loginUserAsync, leaveRoom } from '../actions/user-actions'
+import {getSourceId} from './getSourceId'
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -66,12 +67,14 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       isVideoMuted: false,
       isVideoBarHidden: false,
       isToolbarHidden: false,
+      isSharingScreen: false
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
     this.onLocalVideo = this._onLocalVideo.bind(this);
     this.onRemoteVideo = this._onRemoteVideo.bind(this);
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
+    this.startScreenShare = this.props.startScreenshare.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -81,12 +84,14 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     }, 10000);
   }
 
+
   componentDidMount() {
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
 
+    //this.shareScreen()
     const requestedResolution = getQueryParameter('resolution');
     console.log(requestedResolution);
     console.log('roomName: ' + this.props.params.roomname);
@@ -216,7 +221,6 @@ componentWillReceiveProps = (nextProps) => {
     }
   }
 
-
   _userLoggedIn() {
     this.setState({
       showRoom: false,
@@ -322,10 +326,69 @@ componentWillReceiveProps = (nextProps) => {
   }
 
   _isDominant(index) {
-    console.log(index === this.props.dominantSpeakerIndex)
+    //console.log(index === this.props.dominantSpeakerIndex)
     return index === this.props.dominantSpeakerIndex;
   }
 
+
+_shareScreen() {
+  //if (client.Session) {
+   var this_main = this;
+   var constraints = {};
+   console.log("window chrome: ", window.chrome)
+   window.chrome.runtime.sendMessage(
+     //NOTE: this ID will vary from client to client because
+     //currently the desktop share extension is not on Chrome or
+     //Firefox store yet. The ID may also update when the cache is cleared
+       'omgaahegahkjnlogadbaadmoomfoflan', {
+           // getVersion: true,
+           getStream: true,
+           sources: ['screen', 'window']
+       },
+       response => {
+           if (!response) {
+               const lastError = window.chrome.runtime.lastError;
+           }
+           console.log('Response from extension: ', response);
+
+           //These constraints are not necessary,
+           //they are being rebuilt inside startScreenShare function
+           //But I'm leaving them here for now anyways
+           constraints.audio = false;
+           constraints.video = {
+               mandatory: {
+                   chromeMediaSource: "desktop",
+                   chromeMediaSourceId: response.streamId,
+                   maxWidth: window.screen.width,
+                   maxHeight: window.screen.height,
+                   maxFrameRate: 3
+               },
+               optional: []
+           };
+           //userConfig.switchStream = true;
+
+           var streamConfig = {
+               "constraints": constraints
+           }
+           console.log("about to call start screen")
+           //client.Session.switchStream(client.Stream, streamConfig);
+           this.startScreenShare(response.streamId)
+       }
+   );
+//}
+}
+
+//Function passed to the menu button
+_screenShareControl() {
+  if (!this.state.isSharingScreen) {
+    this._shareScreen()
+  } else {
+    console.log("Implement end of screen share logic!!")
+  }
+  this.setState({
+    isSharingScreen: !this.state.isSharingScreen,
+  });
+}
 
   render() {
 
@@ -333,6 +396,7 @@ componentWillReceiveProps = (nextProps) => {
       <div onMouseMove={this._onMouseMove.bind(this)}>
       {this.props.localVideos.length > 0 ?
         <MeetToolbar
+          screenShareControl={this._screenShareControl.bind(this)}
           isHidden={this.state.isToolbarHidden}
           onMicrophoneMute={this._onLocalAudioMute.bind(this)}
           onCameraMute={this._onLocalVideoMute.bind(this)}
@@ -355,7 +419,7 @@ componentWillReceiveProps = (nextProps) => {
 
       <HorizontalWrapper isHidden={this.state.isVideoBarHidden}>
           {this.props.localVideos.map((connection) => {
-            console.log('LOCAL CONNECTION');
+            console.log('Main.js, rendering local horiz box:');
             console.log(connection);
 
             return (!this._isDominant(connection.id) && this.props.remoteVideos.length > 0) ? (
