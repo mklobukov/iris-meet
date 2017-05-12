@@ -338,7 +338,7 @@ _shareScreen() {
      //NOTE: this ID will vary from client to client because
      //currently the desktop share extension is not on Chrome or
      //Firefox store yet. The ID may also update when the cache is cleared
-       'omgaahegahkjnlogadbaadmoomfoflan', {
+       'ofekpehdpllklhgnipjhnoagibfdicjb', {
            // getVersion: true,
            getStream: true,
            sources: ['screen', 'window']
