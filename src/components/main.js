@@ -411,12 +411,6 @@ _shareScreen() {
 _screenShareControl() {
   if (!this.state.isSharingScreen) {
     this._shareScreen()
-    /*Idea:
-    If it is the dominant speaker that start screen share,
-    you must update state.connection because the old id
-    remains references in the main video and the result --
-    frozen frame.
-    */
   } else {
     this.endScreenshare()
     console.log("Implement end of screen share logic!!")
