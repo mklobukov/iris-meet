@@ -172,13 +172,11 @@ componentWillReceiveProps = (nextProps) => {
 
 _onReceivedNewId(data) {
   console.log("RECEIVED NEW ID")
-  console.log("IDs: ", data)
   console.log("Old id: ", data.oldID)
   console.log("New id: ", data.newID)
 
-  console.log("mainvideoconnection before dispatch: ", this.props.connection)
   this.props.VideoControl('remote', data.newID, this.props.localVideos, this.props.remoteVideos)
-  console.log("mainvideoconnection after dispatch: ", this.props.connection)
+
 }
 
 
@@ -378,7 +376,6 @@ _shareScreen() {
        response => {
            if (!response) {
                const lastError = window.chrome.runtime.lastError;
-               console.log("ERROR REMOVE THIS")
                console.log(lastError);
            }
            console.log('Response from extension: ', response);
