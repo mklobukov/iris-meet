@@ -377,6 +377,7 @@ _shareScreen() {
        response => {
            if (!response) {
                const lastError = window.chrome.runtime.lastError;
+               console.log("ERROR REMOVE THIS")
                console.log(lastError);
            }
            console.log('Response from extension: ', response);
@@ -402,7 +403,25 @@ _shareScreen() {
            //}
            console.log("about to call start screen")
            //client.Session.switchStream(client.Stream, streamConfig);
-           this.startScreenShare(response.streamId)
+
+           //Before sharing screen, it is also necessary to check if a user
+           //clicked "Cancel" button instead of "Share". Currently,
+           //this action removes the stream completely
+           let screenShareStarted = true
+
+           if (response.streamId !== "") {
+             this.startScreenShare(response.streamId)
+
+           }
+           else {
+             console.log("Invalid streamId --> not starting screen share")
+             console.log("User canceled extension")
+             screenShareStarted = false
+           }
+
+           this.setState({
+             isSharingScreen: screenShareStarted
+           });
        }
    );
 }
@@ -414,10 +433,10 @@ _screenShareControl() {
   } else {
     this.endScreenshare()
     console.log("Implement end of screen share logic!!")
+    this.setState({
+      isSharingScreen: false,
+    });
   }
-  this.setState({
-    isSharingScreen: !this.state.isSharingScreen,
-  });
 }
 
   render() {
