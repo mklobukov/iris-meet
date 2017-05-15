@@ -349,6 +349,7 @@ _onReceivedNewId(data) {
 
 _shareScreen() {
    var constraints = {};
+   let screenShareStarted = false //updated to true/false depending on extension response
    console.log("window chrome: ", window.chrome)
    const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb';
    //before trying to communicate with the extension, check if it exists
@@ -396,22 +397,10 @@ _shareScreen() {
                },
                optional: []
            };
-           //userConfig.switchStream = true;
-
-           //var streamConfig = {
-           //"constraints": constraints
-           //}
-           console.log("about to call start screen")
-           //client.Session.switchStream(client.Stream, streamConfig);
-
-           //Before sharing screen, it is also necessary to check if a user
-           //clicked "Cancel" button instead of "Share". Currently,
-           //this action removes the stream completely
-           let screenShareStarted = true
 
            if (response.streamId !== "") {
              this.startScreenShare(response.streamId)
-
+             screenShareStarted = true
            }
            else {
              console.log("Invalid streamId --> not starting screen share")
@@ -424,15 +413,22 @@ _shareScreen() {
            });
        }
    );
+   return screenShareStarted
 }
 
 //Function passed to the menu button
 _screenShareControl() {
+  let screenShareStarted = false
+
   if (!this.state.isSharingScreen) {
-    this._shareScreen()
+    screenShareStarted = this._shareScreen()
+    if (screenShareStarted !== this.state.isSharingScreen) {
+      this.setState({
+          isSharingScreen: screenShareStarted,
+      });
+    }
   } else {
     this.endScreenshare()
-    console.log("Implement end of screen share logic!!")
     this.setState({
       isSharingScreen: false,
     });
