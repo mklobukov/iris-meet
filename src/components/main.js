@@ -404,7 +404,7 @@ _shareScreen() {
            }
            else {
              console.log("Invalid streamId --> not starting screen share")
-             console.log("User canceled extension")
+             console.log("User canceled screen sharing prompt")
              screenShareStarted = false
            }
 
