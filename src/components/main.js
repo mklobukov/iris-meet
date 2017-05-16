@@ -74,6 +74,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
     this.startScreenShare = this.props.startScreenshare.bind(this);
     this.endScreenshare = this.props.endScreenshare.bind(this);
+    this.onReceivedNewId = this._onReceivedNewId.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -89,6 +90,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_SWITCH_STREAM, this.onReceivedNewId);
 
     //this.shareScreen()
     const requestedResolution = getQueryParameter('resolution');
@@ -136,6 +138,8 @@ componentWillReceiveProps = (nextProps) => {
   if (nextProps.accessToken !== this.props.accessToken) {
     this._userLoggedIn();
   }
+
+
 }
 
   componentWillUnmount() {
@@ -165,6 +169,16 @@ componentWillReceiveProps = (nextProps) => {
 
     }
   }
+
+_onReceivedNewId(data) {
+  console.log("RECEIVED NEW ID")
+  console.log("Old id: ", data.oldID)
+  console.log("New id: ", data.newID)
+
+  this.props.VideoControl('remote', data.newID, this.props.localVideos, this.props.remoteVideos)
+
+}
+
 
   _onParticipantLeft(participantInfo) {
     console.log('Remote participant left: ', participantInfo);
@@ -333,7 +347,23 @@ componentWillReceiveProps = (nextProps) => {
 
 _shareScreen() {
    var constraints = {};
+   let screenShareStarted = false //updated to true/false depending on extension response
    console.log("window chrome: ", window.chrome)
+   const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb';
+   //before trying to communicate with the extension, check if it exists
+   //window.chrome.management.get('ofekpehdpllklhgnipjhnoagibfdicjb', callback)
+   //console.log("Is extension installed ? ", window.chrome.app.getIsInstalled(extId))
+
+  //  /////EXPERIMENTATION WITH CHECKING FOR INSTALLATION
+  console.log("installed? ----", window.chrome.app.isInstalled)
+  // //  window.chrome.webstore.install(
+  // //   function() {console.log("SUCCESS")}, function() {console.log("FAIL")}  );
+  // console.log(" INSTALL : ", window.chrome.webstore.install() )
+  // window.chrome.webstore.install()
+  //
+  //
+  // ////////////////////////////
+
    window.chrome.runtime.sendMessage(
      //NOTE: this ID will vary from client to client because
      //currently the desktop share extension is not on Chrome or
@@ -364,33 +394,45 @@ _shareScreen() {
                },
                optional: []
            };
-           //userConfig.switchStream = true;
 
-           //var streamConfig = {
-           //"constraints": constraints
-           //}
-           console.log("about to call start screen")
-           //client.Session.switchStream(client.Stream, streamConfig);
-           this.startScreenShare(response.streamId)
+           if (response.streamId !== "") {
+             this.startScreenShare(response.streamId)
+             screenShareStarted = true
+           }
+           else {
+             console.log("Invalid streamId --> not starting screen share")
+             console.log("User canceled screen sharing prompt")
+             screenShareStarted = false
+           }
+
+           this.setState({
+             isSharingScreen: screenShareStarted
+           });
        }
    );
+   return screenShareStarted
 }
 
 //Function passed to the menu button
 _screenShareControl() {
+  let screenShareStarted = false
+
   if (!this.state.isSharingScreen) {
-    this._shareScreen()
+    screenShareStarted = this._shareScreen()
+    if (screenShareStarted !== this.state.isSharingScreen) {
+      this.setState({
+          isSharingScreen: screenShareStarted,
+      });
+    }
   } else {
     this.endScreenshare()
-    console.log("Implement end of screen share logic!!")
+    this.setState({
+      isSharingScreen: false,
+    });
   }
-  this.setState({
-    isSharingScreen: !this.state.isSharingScreen,
-  });
 }
 
   render() {
-
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
       {this.props.localVideos.length > 0 ?
@@ -404,7 +446,8 @@ _screenShareControl() {
         /> : null}
 
       <MainVideo>
-        {this.props.videoType === 'remote' ?
+        {
+          this.props.videoType === 'remote' ?
           <RemoteVideo
             video={this.props.connection}
           /> : null

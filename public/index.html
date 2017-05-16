@@ -4,8 +4,16 @@
     <meta charset="UTF-8">
     <title>Iris Meet</title>
     <link rel="stylesheet" href="fa/css/font-awesome.min.css">
+    <!-- Link to the desktop share extension. This element is required by Chrome -->
+    <link rel="chrome-webstore-item" href="https://chrome.google.com/webstore/detail/ofekpehdpllklhgnipjhnoagibfdicjb">
 </head>
 <body>
+      <!-- <button onclick="chrome.webstore.install()" id="install-button" z-index=-100 >Add to Chrome</button>
+    <script>
+      if (chrome.app.isInstalled) {
+        document.getElementById('install-button').style.display = 'none';
+      }
+    </script> -->
     <div id="target">Loading ...</div>
     <script src="iris-rtc-js-sdk.js"></script>
 </body>
