@@ -23,7 +23,7 @@ const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute,
               <a className="button">{extInstalled ?
             <i className="fa fa-desktop" aria-hidden="true" onClick={() => {screenShareControl(false)} }></i>
           :
-            <i className="fa fa-desktop" aria-hidden="true" id="install-button" onClick={() => {window.chrome.webstore.install(undefined, function(success) {console.log("INSTALLED!"); screenShareControl(true); }, function(fail) {console.log("NOT INSTALLED")} )} }></i>
+            <i className="fa fa-desktop" aria-hidden="true" id="install-button" onClick={() => {window.chrome.webstore.install(undefined, function(success) {console.log("INSTALLED!"); setTimeout(function() {screenShareControl(true); }, 2000); }, function(fail) {console.log("NOT INSTALLED")} )} }></i>
 
           }</a>
 

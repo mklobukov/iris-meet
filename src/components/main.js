@@ -91,7 +91,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     }, 10000);
 
     const this_constructor = this;
-    let screenShareExtInstalled = false
     this._isExtInstalled().then(function(response) {
       console.log("Found desktop share extension. Version ", response);
       this_constructor.props.changeExtensionStatus(true)
@@ -377,7 +376,6 @@ _onReceivedNewId(data) {
 _isExtInstalled() {
   //const extId = 'ninfhlnofdcigedlpjkgkfchccfikdnf'; //experimental
   const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb'; //from web store
-  var hasExtension = false;
 
   return new Promise(function(resolve, reject) {
     window.chrome.runtime.sendMessage(
@@ -446,8 +444,8 @@ _isExtInstalled() {
 
 
 _shareScreen() {
+  console.log("beginning of _shareScreen")
   const this_main = this;
-  let constraints = {};
   let screenShareStarted = false //updated to true/false depending on extension response
 
   const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb'; //from web store
@@ -471,24 +469,14 @@ _shareScreen() {
            else {
            console.log('Response from extension: ', response);
 
-           //These constraints are not necessary,
-           //they are being rebuilt inside startScreenShare function
-           //But I'm leaving them here for now anyways
-           constraints.audio = false;
-           constraints.video = {
-               mandatory: {
-                   chromeMediaSource: "desktop",
-                   chromeMediaSourceId: response.streamId,
-                   maxWidth: window.screen.width,
-                   maxHeight: window.screen.height,
-                   maxFrameRate: 3
-               },
-               optional: []
-           };
 
            if (response && response.streamId !== "") {
-             this_main.startScreenShare(response.streamId)
+             console.log("Extension responded with ID: ", response.streamId)
              screenShareStarted = true
+             this_main.startScreenShare(response.streamId)
+             this_main.setState({
+               isSharingScreen: screenShareStarted
+             });
            }
            else {
              console.log("Invalid streamId --> not starting screen share")
@@ -575,6 +563,7 @@ _shareScreen() {
 
 //Function passed to the menu button
 _screenShareControl(changeExtensionStatus) {
+  console.log("Launching screenShareControl")
   //changeExtensionStatus is a boolean parameter.
   //When the extension was just installed, _screenShareControl(true) is
   //called. In other cases, _screenShareControl(false)
@@ -585,16 +574,20 @@ _screenShareControl(changeExtensionStatus) {
     this.props.changeExtensionStatus(true)
   }
 
-  console.log("Screen Share control. Extension instsalled? -- ", this.props.screenShareExtInstalled)
+  console.log("Screen Share control. Extension installed? -- ", this.props.screenShareExtInstalled)
   let screenShareStarted = false
   if (!this.state.isSharingScreen) {
+    console.log("Entered if statement")
     screenShareStarted = this._shareScreen()
-    if (screenShareStarted !== this.state.isSharingScreen) {
-      this.setState({
-          isSharingScreen: screenShareStarted,
-      });
-    }
+    console.log("ShareScreen returned: ", screenShareStarted)
+    // if (screenShareStarted !== this.state.isSharingScreen) {
+    //   console.log("Setting this.state.isSharingScreen to ", screenShareStarted)
+    //   this.setState({
+    //       isSharingScreen: screenShareStarted,
+    //   });
+    // }
   } else {
+    console.log("Entered else")
     this.endScreenshare()
     this.setState({
       isSharingScreen: false,
