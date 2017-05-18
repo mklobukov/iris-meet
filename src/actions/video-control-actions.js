@@ -16,3 +16,10 @@ export const changeDominantSpeaker = (dominantSpeakerId) => ({
     dominantSpeakerId
   }
 })
+
+export const changeExtInstalledState = (extInstalled) => ({
+  type: VideoControlConstants.VIDEO_CONTROL_EXTENSION_STATUS,
+  data: {
+    extInstalled
+  }
+})

@@ -44,6 +44,18 @@ const VideoReducer = (state = {}, action) => {
         return state
       }
 
+    case VideoControlConstants.VIDEO_CONTROL_EXTENSION_STATUS:
+      if (action.data.extInstalled !== undefined) {
+        console.log("Updating extension status. Installed? -- ", action.data.extInstalled)
+        return Object.assign({}, state, {
+          screenShareExtInstalled: action.data.extInstalled
+        })
+      }
+      else {
+        console.log("Invalid extension status passed to Video Control Reducer. Returning previous state")
+        return state
+      }
+
     default:
       return state
   }

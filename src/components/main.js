@@ -1,3 +1,5 @@
+
+
 import React from 'react';
 import MainVideo from './main-video';
 import MeetToolbar from '../containers/meet-toolbar';
@@ -12,7 +14,7 @@ import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
 import './style.css';
-import { changeMainView, changeDominantSpeaker } from '../actions/video-control-actions';
+import { changeMainView, changeDominantSpeaker, changeExtInstalledState } from '../actions/video-control-actions';
 import { connect } from 'react-redux';
 import { loginUserAsync, leaveRoom } from '../actions/user-actions';
 
@@ -29,7 +31,8 @@ const mapStateToProps = (state) => {
     roomName: state.userReducer.roomName,
     accessToken: state.userReducer.accessToken,
     decodedToken: state.userReducer.decodedToken,
-    dominantSpeakerIndex: state.videoReducer.dominantSpeakerIndex
+    dominantSpeakerIndex: state.videoReducer.dominantSpeakerIndex,
+    screenShareExtInstalled: state.videoReducer.screenShareExtInstalled
   }
 }
 
@@ -47,6 +50,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     changeDominantSpeaker: (dominantSpeakerIndex) => {
       dispatch(changeDominantSpeaker(dominantSpeakerIndex))
+    },
+    changeExtensionStatus: (isExtInstalled) => {
+      dispatch(changeExtInstalledState(isExtInstalled))
     }
   }
 }
@@ -75,6 +81,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.startScreenShare = this.props.startScreenshare.bind(this);
     this.endScreenshare = this.props.endScreenshare.bind(this);
     this.onReceivedNewId = this._onReceivedNewId.bind(this);
+    this.extInstalled = this._isExtInstalled.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -82,6 +89,18 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
         isToolbarHidden: true,
       });
     }, 10000);
+
+    const this_constructor = this;
+    let screenShareExtInstalled = false
+    this._isExtInstalled().then(function(response) {
+      console.log("Found desktop share extension. Version ", response);
+      this_constructor.props.changeExtensionStatus(true)
+    }).catch(function(error) {
+      console.log("Could not identify desktop share extension with provided ID: ", error)
+      this_constructor.props.changeExtensionStatus(false)
+      })
+
+
   }
 
 
@@ -91,6 +110,16 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_SWITCH_STREAM, this.onReceivedNewId);
+
+    // let screenShareExtInstalled = false
+    // this._isExtInstalled().then(function(response) {
+    //   console.log("Found desktop share extension. Version ", response);
+    //   this.props.changeExtensionStatus(true)
+    // }).catch(function(error) {
+    //   console.log("Could not identify desktop share extension with provided ID: ", error)
+    //   this.props.changeExtensionStatus(false)
+    //   })
+
 
     //this.shareScreen()
     const requestedResolution = getQueryParameter('resolution');
@@ -345,39 +374,101 @@ _onReceivedNewId(data) {
   }
 
 
+_isExtInstalled() {
+  //const extId = 'ninfhlnofdcigedlpjkgkfchccfikdnf'; //experimental
+  const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb'; //from web store
+  var hasExtension = false;
+
+  return new Promise(function(resolve, reject) {
+    window.chrome.runtime.sendMessage(
+      extId, {
+        getVersion: true,
+        getStream: false,
+        sources: null
+      },
+      response => {
+        if (response && response.version) {
+          resolve(response.version)
+        }
+        else {
+          reject(extId)
+        }
+    })
+  })
+}
+
+// _isExtInstalled() {
+//   this._getExtVersion().then(function(result) {
+//     console.log("Found extension. Version ", result)
+//     return true
+//   }).catch(function(unknownId) {
+//     console.log("Extension with given ID not found: ", unknownId)
+//     return false
+//   })
+// }
+
+
+
+
+//
+// _isExtInstalled() {
+//   //const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb'; //from web store
+//   const extId = 'ninfhlnofdcigedlpjkgkfchccfikdnf'; //experimental
+//   var hasExtension = false;
+//
+//   if (!window.chrome.runtime) {
+//   //If there's no runtime API, it's guaranteed that there's no extension
+//   console.log("Chrome runtime API not found")
+//   return false
+//   } else {
+//     window.chrome.runtime.sendMessage(
+//       extId, {
+//         getVersion: true,
+//         getStream: false,
+//         sources: null
+//       },
+//       response => {
+//
+//           if (!response || !response.version) {
+//             //No communication -- can assume that the endpoint doesn't exist
+//             console.warn("Desktop sharing extension is not installed?: ", window.chrome.runtime.lastError);
+//             return false
+//           } else {
+//             console.log("Extension version is: " + response.version)
+//             return true
+//           }
+//       })
+//   }
+//   console.log("Test false")
+//   return false
+// }
+
+
+
 _shareScreen() {
-   var constraints = {};
-   let screenShareStarted = false //updated to true/false depending on extension response
-   console.log("window chrome: ", window.chrome)
-   const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb';
-   //before trying to communicate with the extension, check if it exists
-   //window.chrome.management.get('ofekpehdpllklhgnipjhnoagibfdicjb', callback)
-   //console.log("Is extension installed ? ", window.chrome.app.getIsInstalled(extId))
+  const this_main = this;
+  let constraints = {};
+  let screenShareStarted = false //updated to true/false depending on extension response
 
-  //  /////EXPERIMENTATION WITH CHECKING FOR INSTALLATION
-  console.log("installed? ----", window.chrome.app.isInstalled)
-  // //  window.chrome.webstore.install(
-  // //   function() {console.log("SUCCESS")}, function() {console.log("FAIL")}  );
-  // console.log(" INSTALL : ", window.chrome.webstore.install() )
-  // window.chrome.webstore.install()
-  //
-  //
-  // ////////////////////////////
+  const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb'; //from web store
+  //const extId = 'ninfhlnofdcigedlpjkgkfchccfikdnf'; //experimental
 
-   window.chrome.runtime.sendMessage(
-     //NOTE: this ID will vary from client to client because
-     //currently the desktop share extension is not on Chrome or
-     //Firefox store yet. The ID may also update when the cache is cleared
-       'ofekpehdpllklhgnipjhnoagibfdicjb', {
+  //There is no need to verify in this function if the extension is installed
+  //This check was already performed before calling _shareScreen
+  window.chrome.runtime.sendMessage(
+       extId, {
            // getVersion: true,
            getStream: true,
            sources: ['screen', 'window']
        },
        response => {
            if (!response) {
+               console.log("Error contacting the screen share extension: ")
                const lastError = window.chrome.runtime.lastError;
                console.log(lastError);
+               screenShareStarted = false
            }
+           else {
            console.log('Response from extension: ', response);
 
            //These constraints are not necessary,
@@ -395,8 +486,8 @@ _shareScreen() {
                optional: []
            };
 
-           if (response.streamId !== "") {
-             this.startScreenShare(response.streamId)
+           if (response && response.streamId !== "") {
+             this_main.startScreenShare(response.streamId)
              screenShareStarted = true
            }
            else {
@@ -404,19 +495,98 @@ _shareScreen() {
              console.log("User canceled screen sharing prompt")
              screenShareStarted = false
            }
-
-           this.setState({
-             isSharingScreen: screenShareStarted
-           });
        }
+     }
    );
    return screenShareStarted
 }
 
-//Function passed to the menu button
-_screenShareControl() {
-  let screenShareStarted = false
+//
+// _shareScreen() {
+//    var constraints = {};
+//    let screenShareStarted = false //updated to true/false depending on extension response
+//    console.log("window chrome: ", window.chrome)
+//    const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb';
+//    //before trying to communicate with the extension, check if it exists
+//    //window.chrome.management.get('ofekpehdpllklhgnipjhnoagibfdicjb', callback)
+//    //console.log("Is extension installed ? ", window.chrome.app.getIsInstalled(extId))
+//
+//   //  /////EXPERIMENTATION WITH CHECKING FOR INSTALLATION
+//   console.log("installed? ----", window.chrome.app.isInstalled)
+//   // //  window.chrome.webstore.install(
+//   // //   function() {console.log("SUCCESS")}, function() {console.log("FAIL")}  );
+//   // console.log(" INSTALL : ", window.chrome.webstore.install() )
+//   // window.chrome.webstore.install()
+//   //
+//   //
+//   // ////////////////////////////
+//
+//    window.chrome.runtime.sendMessage(
+//      //NOTE: this ID will vary from client to client because
+//      //currently the desktop share extension is not on Chrome or
+//      //Firefox store yet. The ID may also update when the cache is cleared
+//        'ofekpehdpllklhgnipjhnoagibfdicjb', {
+//            // getVersion: true,
+//            getStream: true,
+//            sources: ['screen', 'window']
+//        },
+//        response => {
+//            if (!response) {
+//                const lastError = window.chrome.runtime.lastError;
+//                console.log("Error: no response")
+//                console.log(lastError);
+//                return false
+//            }
+//            console.log('Response from extension: ', response);
+//
+//            //These constraints are not necessary,
+//            //they are being rebuilt inside startScreenShare function
+//            //But I'm leaving them here for now anyways
+//            constraints.audio = false;
+//            constraints.video = {
+//                mandatory: {
+//                    chromeMediaSource: "desktop",
+//                    chromeMediaSourceId: response.streamId,
+//                    maxWidth: window.screen.width,
+//                    maxHeight: window.screen.height,
+//                    maxFrameRate: 3
+//                },
+//                optional: []
+//            };
+//
+//            if (response.streamId !== "") {
+//              this.startScreenShare(response.streamId)
+//              screenShareStarted = true
+//            }
+//            else {
+//              console.log("Invalid streamId --> not starting screen share")
+//              console.log("User canceled screen sharing prompt")
+//              screenShareStarted = false
+//            }
+//
+//            this.setState({
+//              isSharingScreen: screenShareStarted
+//            });
+//        }
+//    );
+//    return screenShareStarted
+// }
 
+
+//Function passed to the menu button
+_screenShareControl(changeExtensionStatus) {
+  //changeExtensionStatus is a boolean parameter.
+  //When the extension was just installed, _screenShareControl(true) is
+  //called. In other cases, _screenShareControl(false)
+
+  if (changeExtensionStatus) {
+    //If extension was just installed, notify Redux store that
+    //the extension now exists
+    this.props.changeExtensionStatus(true)
+  }
+
+  console.log("Screen Share control. Extension instsalled? -- ", this.props.screenShareExtInstalled)
+  let screenShareStarted = false
   if (!this.state.isSharingScreen) {
     screenShareStarted = this._shareScreen()
     if (screenShareStarted !== this.state.isSharingScreen) {
@@ -433,6 +603,7 @@ _screenShareControl() {
 }
 
   render() {
+    console.log("INSTALLED OR NOT? ", this.props.screenShareExtInstalled)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
       {this.props.localVideos.length > 0 ?
@@ -443,6 +614,8 @@ _screenShareControl() {
           onCameraMute={this._onLocalVideoMute.bind(this)}
           onExpandHide={this._onExpandHide.bind(this)}
           onHangup={this._onHangup.bind(this)}
+          isExtInstalled={this._isExtInstalled.bind(this)}
+          extInstalled={this.props.screenShareExtInstalled}
         /> : null}
 
       <MainVideo>
@@ -520,3 +693,4 @@ _screenShareControl() {
     );
   }
   })));
+
