@@ -40,6 +40,10 @@ export default class MeetToolbar extends React.Component {
       });
     }
 
+    _extInstalled() {
+      return this.props.isExtInstalled();
+    }
+
     render () {
       return (
         <MeetToolbarComponent
@@ -52,6 +56,8 @@ export default class MeetToolbar extends React.Component {
           _onExpandHide={this._onExpandHide.bind(this)}
           barHidden={this.state.barHidden}
           _onHangup={this._onHangup.bind(this)}
+          _isExtInstalled={this._extInstalled.bind(this)}
+          extInstalled={this.props.extInstalled}
         />
       )
     }
