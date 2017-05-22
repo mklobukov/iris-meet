@@ -1,5 +1,3 @@
-
-
 import React from 'react'
 import PropTypes from 'prop-types'
 import './meet-toolbar.css'
@@ -54,4 +52,3 @@ MeetToolbarComponent.propTypes = {
 }
 
 export default MeetToolbarComponent
-

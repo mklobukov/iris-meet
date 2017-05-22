@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import MainVideo from './main-video';
 import MeetToolbar from '../containers/meet-toolbar';

@@ -13,6 +13,8 @@
     "iris-react-webrtc": "1.1.0",
     "keymirror": "^0.1.1",
     "lodash": "^3.6.0",
+    "material-ui": "0.18.1",
+    "react-tap-event-plugin": "2.0.1",
     "react": "15.5.4",
     "react-bootstrap": "^0.31.0",
     "react-dom": "15.5.4",
