@@ -17,9 +17,27 @@ import { connect } from 'react-redux';
 import { loginUserAsync, leaveRoom, isCreatingRoom } from '../actions/user-actions';
 import Dialog from 'material-ui/Dialog';
 import CircularProgress from 'material-ui/CircularProgress';
+import {GridList, GridTile} from 'material-ui/GridList';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
+
+const styles = {
+  root: {
+    display: 'flex',
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
+  },
+  gridList: {
+    display: 'flex',
+    flexWrap: 'nowrap',
+    overflowX: 'auto',
+  },
+  titleStyle: {
+    color: 'rgb(0, 188, 212)',
+  },
+};
+
 
 const mapStateToProps = (state) => {
   return {
@@ -106,32 +124,18 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
 
   componentWillMount() {
     //initialize spinner enabler to false
-    console.log("Initializing spinner to false")
+    console.log("Initializing spinner enabler to false")
     this.props.isCreatingRoom(false);
   }
 
 
   componentDidMount() {
-    console.log("MOUNTED: length = ", this.props.localVideos.length)
-    //initialize spinner enabling boolean to false
-    //this.props.isCreatingRoom(false);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_SWITCH_STREAM, this.onReceivedNewId);
 
-    // let screenShareExtInstalled = false
-    // this._isExtInstalled().then(function(response) {
-    //   console.log("Found desktop share extension. Version ", response);
-    //   this.props.changeExtensionStatus(true)
-    // }).catch(function(error) {
-    //   console.log("Could not identify desktop share extension with provided ID: ", error)
-    //   this.props.changeExtensionStatus(false)
-    //   })
-
-
-    //this.shareScreen()
     const requestedResolution = getQueryParameter('resolution');
     console.log(requestedResolution);
     console.log('roomName: ' + this.props.params.roomname);
@@ -492,6 +496,7 @@ _screenShareControl(changeExtensionStatus) {
   }
 }
 
+
   render() {
     console.log("Is user creating room? ", this.props.showSpinner)
     return (
@@ -586,6 +591,7 @@ _screenShareControl(changeExtensionStatus) {
             return null;
           })}
       </HorizontalWrapper>
+
       {this.state.showUser || this.state.showRoom ?
         <LoginPanel
           ref='loginpanel'
