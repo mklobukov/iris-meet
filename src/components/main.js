@@ -1,5 +1,3 @@
-
-
 import React from 'react';
 import MainVideo from './main-video';
 import MeetToolbar from '../containers/meet-toolbar';
@@ -597,6 +595,7 @@ _screenShareControl(changeExtensionStatus) {
 
   render() {
     console.log("INSTALLED OR NOT? ", this.props.screenShareExtInstalled)
+    console.log("local streams: ", this.props.localVideos)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
       {this.props.localVideos.length > 0 ?
@@ -686,4 +685,3 @@ _screenShareControl(changeExtensionStatus) {
     );
   }
   })));
-

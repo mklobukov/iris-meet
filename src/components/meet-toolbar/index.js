@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 import './meet-toolbar.css'
 
 
-
 const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute, microphoneMuted, _onCameraMute, cameraMuted, _onExpandHide, barHidden, _onHangup, _isExtInstalled, extInstalled }) => (
   <div id="header">
     <span id="toolbar" className={isHidden ? "toolbarHide" : "toolbarShow"}>
@@ -20,12 +19,15 @@ const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute,
         </span>
         : <i className="fa fa-camera" aria-hidden="true"></i>}</a>
       <a className="button"><i className="fa fa-comments" aria-hidden="true"></i></a>
-              <a className="button">{extInstalled ?
-            <i className="fa fa-desktop" aria-hidden="true" onClick={() => {screenShareControl(false)} }></i>
-          :
-            <i className="fa fa-desktop" aria-hidden="true" id="install-button" onClick={() => {window.chrome.webstore.install(undefined, function(success) {console.log("INSTALLED!"); setTimeout(function() {screenShareControl(true); }, 2000); }, function(fail) {console.log("NOT INSTALLED")} )} }></i>
 
-          }</a>
+
+      { extInstalled ?
+      <a className="button" onClick={() => {screenShareControl(false)} }>
+        <i className="fa fa-desktop" aria-hidden="true" id="screenShare"></i></a>
+      :
+      <a className="button" onClick={() => {window.chrome.webstore.install(undefined, function(success) {console.log("INSTALLED!"); setTimeout(function() { screenShareControl(true); }, 2000); }, function(fail) {console.log("Could not install the extension.", fail)} )} }>
+        <i className="fa fa-desktop" aria-hidden="true" id="install-button"></i></a>
+      }
 
       <a className="button" onClick={_onExpandHide.bind(this)}><i className={barHidden ? "fa fa-expand" : "fa fa-compress"} aria-hidden="true"></i></a>
       <a className="button"><i className="fa fa-cogs" aria-hidden="true"></i></a>
@@ -48,6 +50,5 @@ MeetToolbarComponent.propTypes = {
   _isExtInstalled: PropTypes.func.isRequired,
   extInstalled: PropTypes.bool.isRequired
 }
-
 
 export default MeetToolbarComponent

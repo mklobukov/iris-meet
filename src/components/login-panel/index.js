@@ -1,38 +1,55 @@
 import React from 'react'
 import PropTypes from 'prop-types'
+import TextField from 'material-ui/TextField';
+import Paper from 'material-ui/Paper';
+import RaisedButton from 'material-ui/RaisedButton';
 import './login-panel.css'
-import {
-  Button
-} from 'react-bootstrap';
+
+const stylePaper = {
+  height: 200,
+  width: 400,
+  margin: 20,
+  display: 'flex',
+  alignItems: 'center'
+};
+
+const styleButton = {
+  margin: 12,
+};
 
 const LoginPanelComponent = ({showUser, userNameText, _onUserNameTextChange, showRoom, roomNameText, _onRoomNameTextChange, onAction}) => (
-  <div id="login-panel">
-    <form className="form">
-      {showUser === true ? <div className="form-group">
-        <input
-          type="text"
-          className="form-control"
-          id="userName"
-          placeholder="User name"
-          value={userNameText}
-          onChange={_onUserNameTextChange}
+  <div id="main-login">
+    <Paper style={stylePaper} zDepth={1} rounded={false}>
+      <form id="login-panel" className="form">
+        {showUser === true ? <div className="form-group">
+          <TextField
+            type="text"
+            className="form-control"
+            id="userName"
+            hintText="Name"
+            value={userNameText}
+            onChange={_onUserNameTextChange}
+          />
+        </div> : null}
+        {showRoom === true ? <div className="form-group">
+          <TextField
+            type="text"
+            className="form-control"
+            id="roomName"
+            hintText="Room name"
+            value={roomNameText}
+            onChange={_onRoomNameTextChange.bind(this)}
+          />
+        </div> : null}
+        <RaisedButton
+          label="Accept"
+          primary={true}
+          style={styleButton}
+          type="submit"
+          onClick={onAction}
         />
-      </div> : null}
-      {showRoom === true ? <div className="form-group">
-        <input
-          type="text"
-          className="form-control"
-          id="roomName"
-          placeholder="Room name"
-          value={roomNameText}
-          onChange={_onRoomNameTextChange.bind(this)}
-        />
-      </div> : null}
-      <Button
-        type="submit"
-        onClick={onAction}
-      >Accept</Button>
-    </form>
+      </form>
+    </Paper>
   </div>
 );
 
