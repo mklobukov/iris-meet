@@ -18,6 +18,7 @@ import { loginUserAsync, leaveRoom, isCreatingRoom } from '../actions/user-actio
 import Dialog from 'material-ui/Dialog';
 import CircularProgress from 'material-ui/CircularProgress';
 import {GridList, GridTile} from 'material-ui/GridList';
+import Avatar from '../containers/avatar';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -498,6 +499,7 @@ _screenShareControl(changeExtensionStatus) {
 
 
   render() {
+    const this_main = this;
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         {this.props.showSpinner !== undefined ?
@@ -553,11 +555,12 @@ _screenShareControl(changeExtensionStatus) {
                 <LocalVideo key={connection.id} video={connection} />
               </HorizontalBox>
             )
-            : ( <BlackBox
+            : ( <Avatar
               key={connection.id}
               userName={this.props.userName}
               type='local'
               id={connection.id}
+              hash={connection.id}
               localVideos={this.props.localVideos}
               remoteVideos={this.props.remoteVideos}
               />  ) ;
@@ -577,14 +580,15 @@ _screenShareControl(changeExtensionStatus) {
                   <RemoteVideo key={connection.id} video={connection} />
                 </HorizontalBox>
               )
-              : ( <BlackBox
+              : ( <Avatar
                 key={connection.id}
                 userName={this.props.userName}
-                type='remote'
+                type='local'
                 id={connection.id}
+                hash={connection.id}
                 localVideos={this.props.localVideos}
                 remoteVideos={this.props.remoteVideos}
-                /> ) ;
+                />  ) ;
             }
 
             return null;
