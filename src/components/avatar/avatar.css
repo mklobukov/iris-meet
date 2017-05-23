@@ -22,12 +22,18 @@
 
 
 .testdiv {
+  position: relative;
+  vertical-align: top;
+  display: inline-block;
   background-color: gray;
-  width: 160px;
+  width: 140px;
   height: 120px;
+  border: 1px solid black;
+  border-radius: 3px;
 }
 
 .testim {
-  width: 160px;
+  width: 140px;
   height: 120px;
+  border-radius: 3px;
 }

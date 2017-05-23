@@ -6,10 +6,10 @@ import Identicon from 'identicon.js'
 
 
 let options = {
-  foreground: [255, 255, 255, 255],
-  background: [0, 0, 0, 255],
+//  foreground: [255, 255, 255, 255],
+  //background: [0, 0, 0, 255],
   margin: 0.1,
-  size: 128,
+  size: 512,
   format: 'svg'
 };
 
@@ -28,7 +28,8 @@ class Avatar extends React.Component {
   }
 
   render() {
-    let data = new Identicon(this.props.hash, this.options).toString();
+    console.log("What's up with options: ", options)
+    let data = new Identicon(this.props.hash, options).toString();
     return (
       <AvatarComponent
         data={data}
