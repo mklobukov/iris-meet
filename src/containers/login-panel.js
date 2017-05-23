@@ -1,5 +1,7 @@
 import React from 'react';
+import Dialog from 'material-ui/Dialog';
 import LoginPanelComponent from '../components/login-panel'
+import CircularProgress from 'material-ui/CircularProgress';
 
 export default class LoginPanel extends React.Component {
   constructor(props) {
@@ -32,16 +34,19 @@ export default class LoginPanel extends React.Component {
   }
 
   render () {
+    console.log("In login panel. Render Dialog? ---", this.props.isCreatingRoom)
     return(
-      <LoginPanelComponent
-          showUser={this.props.showUser}
-          userNameText={this.state.userNameText}
-          _onUserNameTextChange={this._onUserNameTextChange.bind(this)}
-          showRoom={this.props.showRoom}
-          roomNameText={this.state.roomNameText}
-          _onRoomNameTextChange={this._onRoomNameTextChange.bind(this)}
-          onAction={this.props.onAction}
-      />
+      <div>
+        <LoginPanelComponent
+            showUser={this.props.showUser}
+            userNameText={this.state.userNameText}
+            _onUserNameTextChange={this._onUserNameTextChange.bind(this)}
+            showRoom={this.props.showRoom}
+            roomNameText={this.state.roomNameText}
+            _onRoomNameTextChange={this._onRoomNameTextChange.bind(this)}
+            onAction={this.props.onAction}
+        />
+    </div>
     );
   }
 }
