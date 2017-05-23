@@ -39,6 +39,12 @@ const UserReducer = (state = {}, action) => {
           decodedToken: null
       }
 
+      case UserStoreConstants.IS_CREATING_ROOM:
+        console.log("Setting showSpinner to: ", action.data)
+        return Object.assign({}, state, {
+            showSpinner: action.data
+        })
+
       default:
         return state
   }

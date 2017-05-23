@@ -12,16 +12,25 @@ export const storeLoginData = (userName, routingId, roomName, accessToken, decod
     }
 })
 
+export const isCreatingRoom = (showSpinner) => ({
+    type: UserConstants.IS_CREATING_ROOM,
+    data: showSpinner
+})
+
 export function loginUserAsync (userName, routingId, roomName, authUrl, appKey) {
   return function(dispatch) {
+    console.log("enabling spinner from loginUserAsync")
+    dispatch(isCreatingRoom(true));
     let authApi = new AuthManager({'managementApiUrl': authUrl, 'appkey': appKey});
     return authApi.anonymousLoginAsync(userName).then(
       data => {
+          //move this:  dispatch(isCreatingRoom(false));
           dispatch(storeLoginData(userName, routingId, roomName,
                     data.Token, authApi.decodeToken(data.Token)))}
       )
       .catch(
         error => { console.log('ERROR LOGGING IN ' + error);
+        dispatch(isCreatingRoom(false));
         dispatch(storeLoginData(userName, routingId, roomName, null, null)) }
       );
     };

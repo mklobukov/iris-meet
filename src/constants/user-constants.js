@@ -6,6 +6,7 @@ const UserStoreConstants = {
   USER_LOGIN_FAILED_EVENT: null,
   USER_LEAVE_ROOM: null,
   USER_LEFT_ROOM_EVENT: null,
+  IS_CREATING_ROOM: null
 }
 
 export default KeyMirror(UserStoreConstants);

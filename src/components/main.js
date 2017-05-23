@@ -14,7 +14,9 @@ import { getRoomId } from '../api/RoomId';
 import './style.css';
 import { changeMainView, changeDominantSpeaker, changeExtInstalledState } from '../actions/video-control-actions';
 import { connect } from 'react-redux';
-import { loginUserAsync, leaveRoom } from '../actions/user-actions';
+import { loginUserAsync, leaveRoom, isCreatingRoom } from '../actions/user-actions';
+import Dialog from 'material-ui/Dialog';
+import CircularProgress from 'material-ui/CircularProgress';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -29,6 +31,7 @@ const mapStateToProps = (state) => {
     roomName: state.userReducer.roomName,
     accessToken: state.userReducer.accessToken,
     decodedToken: state.userReducer.decodedToken,
+    showSpinner: state.userReducer.showSpinner,
     dominantSpeakerIndex: state.videoReducer.dominantSpeakerIndex,
     screenShareExtInstalled: state.videoReducer.screenShareExtInstalled
   }
@@ -51,6 +54,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     changeExtensionStatus: (isExtInstalled) => {
       dispatch(changeExtInstalledState(isExtInstalled))
+    },
+    isCreatingRoom: (displayLoadingSpinner) => {
+      dispatch(isCreatingRoom(displayLoadingSpinner))
     }
   }
 }
@@ -96,12 +102,19 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       console.log("Could not identify desktop share extension with provided ID: ", error)
       this_constructor.props.changeExtensionStatus(false)
       })
+  }
 
-
+  componentWillMount() {
+    //initialize spinner enabler to false
+    console.log("Initializing spinner to false")
+    this.props.isCreatingRoom(false);
   }
 
 
   componentDidMount() {
+    console.log("MOUNTED: length = ", this.props.localVideos.length)
+    //initialize spinner enabling boolean to false
+    //this.props.isCreatingRoom(false);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
@@ -161,11 +174,16 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
 componentWillReceiveProps = (nextProps) => {
   //Initially, the accessToken is undefined.
   //It receives a value when the user is logged in
+
+  console.log("What's the value of showspinner? ---- ", this.props.showSpinner)
+  if (this.props.localVideos.length === 0 && nextProps.localVideos.length > 0) {
+    console.log("Local video loaded. Stop displaying the spinner")
+    this.props.isCreatingRoom(false);
+  }
+
   if (nextProps.accessToken !== this.props.accessToken) {
     this._userLoggedIn();
   }
-
-
 }
 
   componentWillUnmount() {
@@ -393,54 +411,6 @@ _isExtInstalled() {
   })
 }
 
-// _isExtInstalled() {
-//   this._getExtVersion().then(function(result) {
-//     console.log("Found extension. Version ", result)
-//     return true
-//   }).catch(function(unknownId) {
-//     console.log("Extension with given ID not found: ", unknownId)
-//     return false
-//   })
-// }
-
-
-
-
-//
-// _isExtInstalled() {
-//   //const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb'; //from web store
-//   const extId = 'ninfhlnofdcigedlpjkgkfchccfikdnf'; //experimental
-//   var hasExtension = false;
-//
-//   if (!window.chrome.runtime) {
-//   //If there's no runtime API, it's guaranteed that there's no extension
-//   console.log("Chrome runtime API not found")
-//   return false
-//   } else {
-//     window.chrome.runtime.sendMessage(
-//       extId, {
-//         getVersion: true,
-//         getStream: false,
-//         sources: null
-//       },
-//       response => {
-//
-//           if (!response || !response.version) {
-//             //No communication -- can assume that the endpoint doesn't exist
-//             console.warn("Desktop sharing extension is not installed?: ", window.chrome.runtime.lastError);
-//             return false
-//           } else {
-//             console.log("Extension version is: " + response.version)
-//             return true
-//           }
-//       })
-//   }
-//   console.log("Test false")
-//   return false
-// }
-
-
-
 _shareScreen() {
   console.log("beginning of _shareScreen")
   const this_main = this;
@@ -487,77 +457,6 @@ _shareScreen() {
    return screenShareStarted
 }
 
-//
-// _shareScreen() {
-//    var constraints = {};
-//    let screenShareStarted = false //updated to true/false depending on extension response
-//    console.log("window chrome: ", window.chrome)
-//    const extId = 'ofekpehdpllklhgnipjhnoagibfdicjb';
-//    //before trying to communicate with the extension, check if it exists
-//    //window.chrome.management.get('ofekpehdpllklhgnipjhnoagibfdicjb', callback)
-//    //console.log("Is extension installed ? ", window.chrome.app.getIsInstalled(extId))
-//
-//   //  /////EXPERIMENTATION WITH CHECKING FOR INSTALLATION
-//   console.log("installed? ----", window.chrome.app.isInstalled)
-//   // //  window.chrome.webstore.install(
-//   // //   function() {console.log("SUCCESS")}, function() {console.log("FAIL")}  );
-//   // console.log(" INSTALL : ", window.chrome.webstore.install() )
-//   // window.chrome.webstore.install()
-//   //
-//   //
-//   // ////////////////////////////
-//
-//    window.chrome.runtime.sendMessage(
-//      //NOTE: this ID will vary from client to client because
-//      //currently the desktop share extension is not on Chrome or
-//      //Firefox store yet. The ID may also update when the cache is cleared
-//        'ofekpehdpllklhgnipjhnoagibfdicjb', {
-//            // getVersion: true,
-//            getStream: true,
-//            sources: ['screen', 'window']
-//        },
-//        response => {
-//            if (!response) {
-//                const lastError = window.chrome.runtime.lastError;
-//                console.log("Error: no response")
-//                console.log(lastError);
-//                return false
-//            }
-//            console.log('Response from extension: ', response);
-//
-//            //These constraints are not necessary,
-//            //they are being rebuilt inside startScreenShare function
-//            //But I'm leaving them here for now anyways
-//            constraints.audio = false;
-//            constraints.video = {
-//                mandatory: {
-//                    chromeMediaSource: "desktop",
-//                    chromeMediaSourceId: response.streamId,
-//                    maxWidth: window.screen.width,
-//                    maxHeight: window.screen.height,
-//                    maxFrameRate: 3
-//                },
-//                optional: []
-//            };
-//
-//            if (response.streamId !== "") {
-//              this.startScreenShare(response.streamId)
-//              screenShareStarted = true
-//            }
-//            else {
-//              console.log("Invalid streamId --> not starting screen share")
-//              console.log("User canceled screen sharing prompt")
-//              screenShareStarted = false
-//            }
-//
-//            this.setState({
-//              isSharingScreen: screenShareStarted
-//            });
-//        }
-//    );
-//    return screenShareStarted
-// }
-
 
 //Function passed to the menu button
 _screenShareControl(changeExtensionStatus) {
@@ -594,10 +493,23 @@ _screenShareControl(changeExtensionStatus) {
 }
 
   render() {
-    console.log("INSTALLED OR NOT? ", this.props.screenShareExtInstalled)
-    console.log("local streams: ", this.props.localVideos)
+    console.log("Is user creating room? ", this.props.showSpinner)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
+        {this.props.showSpinner !== undefined ?
+        <Dialog
+          title="Loading..."
+          titleStyle={{textAlign: "center"}}
+          modal={false}
+          open={this.props.showSpinner}
+          style={{textAlign: "center"}}
+          >
+          <CircularProgress
+            size={80}
+            thickness={7}
+          />
+        </Dialog>
+        : null }
       {this.props.localVideos.length > 0 ?
         <MeetToolbar
           screenShareControl={this._screenShareControl.bind(this)}
@@ -677,6 +589,7 @@ _screenShareControl(changeExtensionStatus) {
       {this.state.showUser || this.state.showRoom ?
         <LoginPanel
           ref='loginpanel'
+          showSpinner={this.props.showSpinner}
           showRoom={this.state.showRoom}
           showUser={this.state.showUser}
           onAction={this._onLoginPanelComplete.bind(this)}
