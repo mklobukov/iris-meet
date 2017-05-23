@@ -498,7 +498,6 @@ _screenShareControl(changeExtensionStatus) {
 
 
   render() {
-    console.log("Is user creating room? ", this.props.showSpinner)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         {this.props.showSpinner !== undefined ?

@@ -19,7 +19,6 @@ export const isCreatingRoom = (showSpinner) => ({
 
 export function loginUserAsync (userName, routingId, roomName, authUrl, appKey) {
   return function(dispatch) {
-    console.log("enabling spinner from loginUserAsync")
     dispatch(isCreatingRoom(true));
     let authApi = new AuthManager({'managementApiUrl': authUrl, 'appkey': appKey});
     return authApi.anonymousLoginAsync(userName).then(
