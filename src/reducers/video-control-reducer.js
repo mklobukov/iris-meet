@@ -56,6 +56,18 @@ const VideoReducer = (state = {}, action) => {
         return state
       }
 
+    case VideoControlConstants.FEATURE_IN_DEV_NOTIFICATION:
+      if (action.data.displayBool !== undefined) {
+        console.log("Show feature in dev notification? ", action.data.displayBool)
+        return Object.assign({}, state, {
+          displayFeatureInDev: action.data.displayBool
+        })
+      }
+      else {
+        console.log("Invalid feature-in-dev notification passed to Video Control Reducer. Returning previous state")
+        return state
+      }
+
     default:
       return state
   }

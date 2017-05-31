@@ -12,7 +12,7 @@ import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
 import './style.css';
-import { changeMainView, changeDominantSpeaker, changeExtInstalledState } from '../actions/video-control-actions';
+import { changeMainView, changeDominantSpeaker, changeExtInstalledState, displayFeatureInDev } from '../actions/video-control-actions';
 import { connect } from 'react-redux';
 import { loginUserAsync, leaveRoom, isCreatingRoom } from '../actions/user-actions';
 import Dialog from 'material-ui/Dialog';
@@ -22,6 +22,7 @@ import Avatar from '../containers/avatar';
 import IconButton from 'material-ui/IconButton';
 import sss from 'material-ui/svg-icons/toggle/star-border';
 import StarBorder from 'material-ui/svg-icons/hardware/headset-mic';
+import Snackbar from 'material-ui/Snackbar';
 
 
 const authUrl = Config.authUrl;
@@ -53,9 +54,9 @@ const styles = {
   },
   gridTile: {
     display: 'flex',
-    maxWidth: '250px',
-    flex: 1,
-    flexShrink: 0
+    width: '250px',
+    // flex: 1,
+    // flexShrink: 0
   },
 
   remoteVideo: {
@@ -83,7 +84,8 @@ const mapStateToProps = (state) => {
     decodedToken: state.userReducer.decodedToken,
     showSpinner: state.userReducer.showSpinner,
     dominantSpeakerIndex: state.videoReducer.dominantSpeakerIndex,
-    screenShareExtInstalled: state.videoReducer.screenShareExtInstalled
+    screenShareExtInstalled: state.videoReducer.screenShareExtInstalled,
+    displayFeatureInDev: state.videoReducer.displayFeatureInDev
   }
 }
 
@@ -107,6 +109,9 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     isCreatingRoom: (displayLoadingSpinner) => {
       dispatch(isCreatingRoom(displayLoadingSpinner))
+    },
+    featureInDevNotify: (display) => {
+      dispatch(displayFeatureInDev(display))
     }
   }
 }
@@ -125,7 +130,8 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       isVideoMuted: false,
       isVideoBarHidden: false,
       isToolbarHidden: false,
-      isSharingScreen: false
+      isSharingScreen: false,
+      showFeatureInDev: false,
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -136,6 +142,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.endScreenshare = this.props.endScreenshare.bind(this);
     this.onReceivedNewId = this._onReceivedNewId.bind(this);
     this.extInstalled = this._isExtInstalled.bind(this);
+    this.unimplementedButtonToggle = this.unimplementedButtonToggle.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -382,6 +389,12 @@ _onReceivedNewId(data) {
     });
   }
 
+  unimplementedButtonToggle() {
+    this.setState({
+      showFeatureInDev: !this.state.showFeatureInDev,
+    });
+  }
+
   _onExpandHide() {
     this.setState({
       isVideoBarHidden: !this.state.isVideoBarHidden,
@@ -531,8 +544,16 @@ _screenShareControl(changeExtensionStatus) {
 
   render() {
     const this_main = this;
+    console.log("SHOW IN DEV: ", this.state.showFeatureInDev)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
+        <Snackbar
+          open={this.state.showFeatureInDev}
+          message="This feature is currently in development"
+          autoHideDuration={4000}
+          onRequestClose={this.unimplementedButtonToggle}
+        />
+
         {this.props.showSpinner !== undefined ?
         <Dialog
           title="Loading..."
@@ -558,6 +579,7 @@ _screenShareControl(changeExtensionStatus) {
             onHangup={this._onHangup.bind(this)}
             isExtInstalled={this._isExtInstalled.bind(this)}
             extInstalled={this.props.screenShareExtInstalled}
+            showInDev={this.unimplementedButtonToggle.bind(this)}
           /> : null}
 
 
@@ -626,6 +648,7 @@ _screenShareControl(changeExtensionStatus) {
                     <GridTile
                       cols={1}
                       key={connection.id}
+                      style={styles.gridTile}
                       title={'Remote video'}
                       actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
                       titleStyle={styles.titleStyle}

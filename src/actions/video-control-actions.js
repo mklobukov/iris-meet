@@ -23,3 +23,10 @@ export const changeExtInstalledState = (extInstalled) => ({
     extInstalled
   }
 })
+
+export const displayFeatureInDev = (displayBool) => ({
+  type: VideoControlConstants.FEATURE_IN_DEV_NOTIFICATION,
+  data: {
+    displayBool
+  }
+})
