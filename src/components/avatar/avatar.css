@@ -1,9 +1,12 @@
-.avatar {
+/*THIS IS NOT EVEN USED ANYWHERE!! */
+
+/*.avatar {
   //float: right;
+  display: flex;
   margin-left: 5px;
   margin-right: 5px;
   display: inline-block;
-  background-color: #000000; /*wheat;*/
+  background-color: #000000;
   position: relative;
   width: auto;
   //max-height: 120px;
@@ -12,28 +15,59 @@
   text-align: center;
   vertical-align: top;
   border-radius: 3px;
-}
-
+}*/
+/*
 .black-box:hover {
   box-shadow: inset 0 0 5px #111111, 0 0 10px #111111, inset 0 0 80px #006d91;
   border: 1px solid #000000;
   background-color: #82b9d6;
-}
+}*/
 
+/*.testdiv {
+  display: flex;
+  flex: 1;
+  position: relative;
+  vertical-align: top;
+  background-color: gray;
+  width: 100%;
+  max-width: 250px;
+  height: 180px;
+  text-align: center;
+} */
 
-.testdiv {
+/*WORKING CSS */
+/*.testdiv {
   position: relative;
   vertical-align: top;
   display: inline-block;
   background-color: gray;
-  width: 140px;
-  height: 120px;
-  border: 1px solid black;
-  border-radius: 3px;
+  width: 100%;
+  max-width: 250px;
+  height: 180px;
+  text-align: center;
+}*/
+
+.testdiv {
+  display: flex;
+  flex: 1;
+  /*flex: 1;
+  flex-shrink: 0;*/
+  max-width: 250px;
+  width: auto;
 }
 
 .testim {
-  width: 140px;
-  height: 120px;
-  border-radius: 3px;
+  display: flex;
+  /*flex: 1;*/
+  width: 100%;
+  /*width: 250px;*/
+  /*width: auto;*/
+  max-width: 250px;
+  height: 180px;
+  transition: all 0.1s ease;
+  opacity: 1;
+}
+
+.testim:hover  {
+  opacity: 0.8;
 }

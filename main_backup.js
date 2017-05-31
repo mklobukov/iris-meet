@@ -27,40 +27,29 @@ import StarBorder from 'material-ui/svg-icons/hardware/headset-mic';
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
 
-
 const styles = {
+  allVideos: {
+    display: 'inline-flex',
+    height: '125px'
+  },
   root: {
     display: 'flex',
-    // flexWrap: 'wrap',
-    //djustifyContent: 'space-around',
-
-  },
-  root2: {
-    display: 'flex',
-    flex: 1
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
   },
   gridList: {
     display: 'flex',
     flexWrap: 'nowrap',
-    overflowX: 'auto', //good
-    // height: '100%'
-  },
-  gridLocal: {
-    //cellHeight: 100%;
+    overflowX: 'auto',
+    padding: 4,
+    cellHeight: '125px'
   },
   titleStyle: {
     color: 'rgb(0, 188, 212)',
+    fontSize: '11px'
   },
   gridTile: {
-    display: 'flex',
-    maxWidth: '250px',
-    flex: 1,
-    flexShrink: 0
-  },
-
-  remoteVideo: {
-    display: 'flex',
-    width: 'auto',
+    height: '100% !important'
   }
 };
 
@@ -547,131 +536,87 @@ _screenShareControl(changeExtensionStatus) {
           />
         </Dialog>
         : null }
+      {this.props.localVideos.length > 0 ?
+        <MeetToolbar
+          screenShareControl={this._screenShareControl.bind(this)}
+          isHidden={this.state.isToolbarHidden}
+          onMicrophoneMute={this._onLocalAudioMute.bind(this)}
+          onCameraMute={this._onLocalVideoMute.bind(this)}
+          onExpandHide={this._onExpandHide.bind(this)}
+          onHangup={this._onHangup.bind(this)}
+          isExtInstalled={this._isExtInstalled.bind(this)}
+          extInstalled={this.props.screenShareExtInstalled}
+        /> : null}
 
-        {this.props.localVideos.length > 0 ?
-          <MeetToolbar
-            screenShareControl={this._screenShareControl.bind(this)}
-            isHidden={this.state.isToolbarHidden}
-            onMicrophoneMute={this._onLocalAudioMute.bind(this)}
-            onCameraMute={this._onLocalVideoMute.bind(this)}
-            onExpandHide={this._onExpandHide.bind(this)}
-            onHangup={this._onHangup.bind(this)}
-            isExtInstalled={this._isExtInstalled.bind(this)}
-            extInstalled={this.props.screenShareExtInstalled}
-          /> : null}
+      <MainVideo>
+        {
+          this.props.videoType === 'remote' ?
+          <RemoteVideo
+            video={this.props.connection}
+          /> : null
+        }
+        {this.props.videoType === 'local' ?
+          <LocalVideo
+            video={this.props.localVideos[0]}
+          /> : null
+        }
+      </MainVideo>
 
 
-        <div id="main_container">
-          <section className={"main_video"}>
-            <MainVideo>
-              {
-                this.props.videoType === 'remote' ?
-                <RemoteVideo
-                  video={this.props.connection}
-                /> : null
-              }
-              {this.props.videoType === 'local' ?
-                <LocalVideo
-                  video={this.props.localVideos[0]}
-                /> : null
-              }
-            </MainVideo>
-          </section>
 
-          <section className={"footer"}>
-            <div className={"localVideo footer-item"}>
-              <div style={styles.root2}>
-                <GridTile
-                  style={styles.tile}
-                  key={'localVideo'}
-                  title={'You'}
-                  actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
-                  titleStyle={styles.titleStyle}
-                  titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
+
+      <HorizontalWrapper isHidden={this.state.isVideoBarHidden}>
+          {this.props.localVideos.map((connection) => {
+            return (this.props.remoteVideos.length > 0 ) ? (
+              <HorizontalBox
+                key={connection.id}
+                type='local'
+                id={connection.id}
+                localVideos={this.props.localVideos}
+                remoteVideos={this.props.remoteVideos}
+              >
+                <LocalVideo key={connection.id} video={connection} />
+              </HorizontalBox>
+            )
+            : ( <Avatar
+              key={connection.id}
+              userName={this.props.userName}
+              type='local'
+              id={connection.id}
+              hash={connection.id}
+              localVideos={this.props.localVideos}
+              remoteVideos={this.props.remoteVideos}
+              />  ) ;
+          })}
+          {this.props.remoteVideos.map((connection) => {
+            if (connection) {
+              const displayHorizontalBox = !this._isDominant(connection.id) && this.props.remoteVideos.length > 1 ;
+              console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
+              return displayHorizontalBox ? (
+                <HorizontalBox
+                  key={connection.id}
+                  type='remote'
+                  id={connection.id}
+                  localVideos={this.props.localVideos}
+                  remoteVideos={this.props.remoteVideos}
                 >
-                {this.props.localVideos.map((connection) => {
-                  return (this.props.remoteVideos.length > 0 ) ? (
-                    <HorizontalBox
-                      key={connection.id}
-                      type='remote'
-                      id={connection.id}
-                      localVideos={this.props.localVideos}
-                      remoteVideos={this.props.remoteVideos}
-                    >
-                      <LocalVideo key={connection.id} video={connection} />
-                    </HorizontalBox>
+                  <RemoteVideo key={connection.id} video={connection} />
+                </HorizontalBox>
+              )
+              : ( <Avatar
+                key={connection.id}
+                userName={this.props.userName}
+                type='local'
+                id={connection.id}
+                hash={connection.id}
+                localVideos={this.props.localVideos}
+                remoteVideos={this.props.remoteVideos}
+                />  ) ;
+            }
 
-                  )
-                  : ( <Avatar
-                    key={connection.id}
-                    userName={this.props.userName}
-                    type='local'
-                    id={connection.id}
-                    hash={connection.id}
-                    localVideos={this.props.localVideos}
-                    remoteVideos={this.props.remoteVideos}
-                    />  ) ;
-                })}
-                </GridTile>
-            </div>
-          </div>
-
-          <div className={"remoteVideos footer-item"}>
-            <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
-              {this.props.remoteVideos.map((connection) => {
-                if (connection) {
-                  const displayHorizontalBox = !this._isDominant(connection.id) && this.props.remoteVideos.length > 1 ;
-                  console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
-                  return displayHorizontalBox ? (
-                    <GridTile
-                      cols={1}
-                      key={connection.id}
-                      title={'Remote video'}
-                      actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
-                      titleStyle={styles.titleStyle}
-                      titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
-                    >
-                    <HorizontalBox
-                      key={connection.id}
-                      type='remote'
-                      id={connection.id}
-                      localVideos={this.props.localVideos}
-                      remoteVideos={this.props.remoteVideos}
-                    >
-                      <RemoteVideo key={connection.id} video={connection} />
-                    </HorizontalBox>
-                    </GridTile>
-                  )
-
-                : (
-                  <GridTile
-                    cols={2.5}
-                    style={styles.gridTile}
-                    key={connection.id}
-                    title={'Remote video'}
-                    actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
-                    titleStyle={styles.titleStyle}
-                    titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
-                  > <Avatar
-                    key={connection.id}
-                    userName={this.props.userName}
-                    type='local'
-                    id={connection.id}
-                    hash={connection.id}
-                    localVideos={this.props.localVideos}
-                    remoteVideos={this.props.remoteVideos}
-                    />
-                </GridTile>
-                )
-                }
-
-                return null;
-              })}
-            </GridList>
-          </div>
-
-          </section>
-        </div>
+            return <div>{"Waiting for remote participants..."}</div>;
+          })}
+      </HorizontalWrapper>
 
       {this.state.showUser || this.state.showRoom ?
         <LoginPanel
