@@ -46,12 +46,12 @@ const styles = {
     flexWrap: 'nowrap',
     overflowX: 'auto', //good
     overflowY: 'hidden',
-    height: '135px',
+    height: '137px',
     marginBottom: '10px',
     // height: '100%'
   },
-  gridLocal: {
-    //cellHeight: 100%;
+  localTile: {
+    border: '2px solid white',
   },
   titleStyle: {
     color: 'rgb(0, 188, 212)',
@@ -61,10 +61,11 @@ const styles = {
   gridTile: {
     display: 'flex',
     width: '160px',
-    marginLeft: '2px',
+    marginRight: '2px',
     height: '120px',
     flex: 1,
     marginBottom: '3px',
+    border: '2px solid white',
     // flexShrink: 0
   },
 
@@ -561,6 +562,7 @@ _screenShareControl(changeExtensionStatus) {
           message="This feature is currently in development"
           autoHideDuration={4000}
           onRequestClose={this.unimplementedButtonToggle}
+          style={{textAlign: "center", color: 'rgb(0, 188, 212)'}}
         />
 
         {this.props.showSpinner !== undefined ?
@@ -611,7 +613,7 @@ _screenShareControl(changeExtensionStatus) {
             <div className={"localVideo footer-item"}>
               <div style={styles.root2}>
                 <GridTile
-                  style={styles.tile}
+                  style={styles.localTile}
                   key={'localVideo'}
                   title={'Me'}
                   actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
