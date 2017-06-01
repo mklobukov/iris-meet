@@ -32,6 +32,7 @@ const appKey = Config.appKey;
 const styles = {
   root: {
     display: 'flex',
+    // height: '130px',
     // flexWrap: 'wrap',
     //djustifyContent: 'space-around',
 
@@ -44,6 +45,9 @@ const styles = {
     display: 'flex',
     flexWrap: 'nowrap',
     overflowX: 'auto', //good
+    overflowY: 'hidden',
+    height: '135px',
+    marginBottom: '10px',
     // height: '100%'
   },
   gridLocal: {
@@ -51,11 +55,16 @@ const styles = {
   },
   titleStyle: {
     color: 'rgb(0, 188, 212)',
+    fontSize: '12px',
+    marginBottom: '-3px',
   },
   gridTile: {
     display: 'flex',
-    width: '250px',
-    // flex: 1,
+    width: '160px',
+    marginLeft: '2px',
+    height: '120px',
+    flex: 1,
+    marginBottom: '3px',
     // flexShrink: 0
   },
 
@@ -583,22 +592,20 @@ _screenShareControl(changeExtensionStatus) {
           /> : null}
 
 
-        <div id="main_container">
-          <section className={"main_video"}>
-            <MainVideo>
+
+            <MainVideo className={"main_video"}>
               {
-                this.props.videoType === 'remote' ?
+                this.props.videoType === 'remote' && true ?
                 <RemoteVideo
                   video={this.props.connection}
                 /> : null
               }
-              {this.props.videoType === 'local' ?
+              {this.props.videoType === 'local' && true ?
                 <LocalVideo
                   video={this.props.localVideos[0]}
                 /> : null
               }
             </MainVideo>
-          </section>
 
           <section className={"footer"}>
             <div className={"localVideo footer-item"}>
@@ -606,7 +613,7 @@ _screenShareControl(changeExtensionStatus) {
                 <GridTile
                   style={styles.tile}
                   key={'localVideo'}
-                  title={'You'}
+                  title={'Me'}
                   actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
                   titleStyle={styles.titleStyle}
                   titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
@@ -647,6 +654,7 @@ _screenShareControl(changeExtensionStatus) {
                   return displayHorizontalBox ? (
                     <GridTile
                       cols={1}
+                      rows={0.5}
                       key={connection.id}
                       style={styles.gridTile}
                       title={'Remote video'}
@@ -669,6 +677,7 @@ _screenShareControl(changeExtensionStatus) {
                 : (
                   <GridTile
                     cols={2.5}
+                    rows={0.5}
                     style={styles.gridTile}
                     key={connection.id}
                     title={'Remote video'}
@@ -694,7 +703,7 @@ _screenShareControl(changeExtensionStatus) {
           </div>
 
           </section>
-        </div>
+
 
       {this.state.showUser || this.state.showRoom ?
         <LoginPanel
