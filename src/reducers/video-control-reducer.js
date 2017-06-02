@@ -5,6 +5,11 @@ const VideoReducer = (state = {}, action) => {
   switch(action.type) {
     case VideoControlConstants.VIDEO_CONTROL_CHANGE_MAIN_VIEW:
       if (action.data && action.data.videoType && action.data.videoId) {
+        let switchDominantSpeaker = true
+        if (action.data.triggeredOnClick && (action.data.videoIndex !== action.data.domId)) {
+          switchDominantSpeaker = false
+        }
+
         let mainConnection = 0
         if (action.data.videoType === 'local') {
             mainConnection = action.data.localVideos.find((connection) => {
@@ -23,7 +28,8 @@ const VideoReducer = (state = {}, action) => {
           return Object.assign({}, state, {
                videoType: action.data.videoType,
                videoIndex: action.data.videoIndex,
-               connection: mainConnection
+               connection: mainConnection,
+               enableDomSwitch: switchDominantSpeaker,
              })
           }
        else {

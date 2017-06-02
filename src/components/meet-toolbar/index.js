@@ -2,8 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './meet-toolbar.css'
 
-
-const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute, microphoneMuted, _onCameraMute, cameraMuted, _onExpandHide, barHidden, _onHangup, _isExtInstalled, extInstalled }) => (
+const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute, microphoneMuted, _onCameraMute, cameraMuted, _onExpandHide, barHidden, _onHangup, _isExtInstalled, extInstalled, _showInDev, domSpeakerSwitchEnabled, _enableDom }) => (
   <div id="header">
     <span id="toolbar" className={isHidden ? "toolbarHide" : "toolbarShow"}>
       <a className="button" onClick={_onMicrophoneMute.bind(this)}>{microphoneMuted ?
@@ -18,7 +17,7 @@ const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute,
           <i className="fa fa-ban fa-stack-2x text-danger" aria-hidden="true"></i>
         </span>
         : <i className="fa fa-camera" aria-hidden="true"></i>}</a>
-      <a className="button"><i className="fa fa-comments" aria-hidden="true"></i></a>
+      <a className="button" onClick={_showInDev.bind(this)}><i className="fa fa-comments" aria-hidden="true"></i></a>
 
 
       { extInstalled ?
@@ -29,9 +28,11 @@ const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute,
         <i className="fa fa-desktop" aria-hidden="true" id="install-button"></i></a>
       }
 
-      <a className="button" onClick={_onExpandHide.bind(this)}><i className={barHidden ? "fa fa-expand" : "fa fa-compress"} aria-hidden="true"></i></a>
-      <a className="button"><i className="fa fa-cogs" aria-hidden="true"></i></a>
+      <a className="button" onClick={() => {_showInDev(); _onExpandHide.bind(this);}}><i className={barHidden ? "fa fa-expand" : "fa fa-compress"} aria-hidden="true"></i></a>
+      <a className="button" onClick={_showInDev.bind(this)}><i className="fa fa-cogs" aria-hidden="true"></i></a>
       <a className="button" onClick={_onHangup.bind(this)}><i className="fa fa-phone text-danger" aria-hidden="true"></i></a>
+      <a className="button" onClick={() => {_enableDom}} style={domSpeakerSwitchEnabled ? {display: 'none' } : null }><i className="fa fa-exchange"></i></a>
+
     </span>
   </div>
 )
@@ -48,7 +49,10 @@ MeetToolbarComponent.propTypes = {
   barHidden: PropTypes.bool.isRequired,
   _onHangup: PropTypes.func.isRequired,
   _isExtInstalled: PropTypes.func.isRequired,
-  extInstalled: PropTypes.bool.isRequired
+  extInstalled: PropTypes.bool.isRequired,
+  _showInDev: PropTypes.func.isRequired,
+  domSpeakerSwitchEnabled: PropTypes.bool.isRequired,
+  _enableDom: PropTypes.func.isRequired,
 }
 
 export default MeetToolbarComponent

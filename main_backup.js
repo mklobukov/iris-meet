@@ -22,64 +22,34 @@ import Avatar from '../containers/avatar';
 import IconButton from 'material-ui/IconButton';
 import sss from 'material-ui/svg-icons/toggle/star-border';
 import StarBorder from 'material-ui/svg-icons/hardware/headset-mic';
-import Snackbar from 'material-ui/Snackbar';
 
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
 
-
 const styles = {
+  allVideos: {
+    display: 'inline-flex',
+    height: '125px'
+  },
   root: {
     display: 'flex',
-    flexShrink: 0,
-    // height: '130px',
-    // flexWrap: 'wrap',
-    //djustifyContent: 'space-around',
-
-  },
-  root2: {
-    display: 'flex',
-    flex: 1
+    flexWrap: 'wrap',
+    justifyContent: 'space-around',
   },
   gridList: {
-    // paddingLeft: '1px',
-    // display: 'flex',
-    minWidth: '162px',
+    display: 'flex',
     flexWrap: 'nowrap',
-    overflowX: 'auto', //good
-    overflowY: 'hidden',
-    height: '137px',
-    marginBottom: '10px',
-    // minWidth: '360px',
-    justifyContent: 'flex-start',
-    flexShrink: 0,
-    // height: '100%'
-  },
-  localTile: {
-    border: '2px solid white',
+    overflowX: 'auto',
+    padding: 4,
+    cellHeight: '125px'
   },
   titleStyle: {
     color: 'rgb(0, 188, 212)',
-    fontSize: '12px',
-    marginBottom: '-3px',
-    minWidth: '160px'
+    fontSize: '11px'
   },
   gridTile: {
-    width: '160px',
-    minWidth: '160px',
-    marginLeft: '0px',
-    marginRight: '2px',
-    height: '120px',
-    marginBottom: '3px',
-    border: '2px solid white',
-    flexShrink: 0,
-    // flexShrink: 0,
-  },
-
-  remoteVideo: {
-    display: 'flex',
-    width: 'auto',
+    height: '100% !important'
   }
 };
 
@@ -102,15 +72,14 @@ const mapStateToProps = (state) => {
     decodedToken: state.userReducer.decodedToken,
     showSpinner: state.userReducer.showSpinner,
     dominantSpeakerIndex: state.videoReducer.dominantSpeakerIndex,
-    screenShareExtInstalled: state.videoReducer.screenShareExtInstalled,
-    enableDomSwitch: state.videoReducer.enableDomSwitch,
+    screenShareExtInstalled: state.videoReducer.screenShareExtInstalled
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    VideoControl: (videoType, videoIndex, domId, triggeredOnClick, localVideos, remoteVideos) => {
-      dispatch(changeMainView(videoType, videoIndex, domId, triggeredOnClick,
+    VideoControl: (videoType, videoIndex, localVideos, remoteVideos) => {
+      dispatch(changeMainView(videoType, videoIndex,
                                         localVideos, remoteVideos ))
     },
     loginUserAsync: (userName, routingId, roomName, authUrl, appKey) => {
@@ -127,7 +96,7 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     },
     isCreatingRoom: (displayLoadingSpinner) => {
       dispatch(isCreatingRoom(displayLoadingSpinner))
-    },
+    }
   }
 }
 
@@ -145,8 +114,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       isVideoMuted: false,
       isVideoBarHidden: false,
       isToolbarHidden: false,
-      isSharingScreen: false,
-      showFeatureInDev: false,
+      isSharingScreen: false
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -157,8 +125,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.endScreenshare = this.props.endScreenshare.bind(this);
     this.onReceivedNewId = this._onReceivedNewId.bind(this);
     this.extInstalled = this._isExtInstalled.bind(this);
-    this.unimplementedButtonToggle = this.unimplementedButtonToggle.bind(this);
-    this.enableDomSwitching = this._enableDominantSwitching.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -233,33 +199,12 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
 componentWillReceiveProps = (nextProps) => {
   //Initially, the accessToken is undefined.
   //It receives a value when the user is logged in
-  console.log("Will receive props! Current props: ")
-  console.log(this.props)
-  console.log("Next props: ")
-  console.log(nextProps)
 
   console.log("What's the value of showspinner? ---- ", this.props.showSpinner)
   if (this.props.localVideos.length === 0 && nextProps.localVideos.length > 0) {
     console.log("Local video loaded. Stop displaying the spinner")
     this.props.isCreatingRoom(false);
   }
-
-  // if (this.props.connection && nextProps.connection && (this.props.connection.id !== nextProps.connection.id)) {
-  //   console.log("current ID: ", this.props.connection.id)
-  //   console.log("new ID: ", nextProps.connection.id)
-  //   if (nextProps.connection.id !== this.props.dominantSpeakerIndex) {
-  //     console.log("Disable switching")
-  //     this.setState({
-  //       enableDomSwitch: false,
-  //     });
-  //   }
-  //   else { //if switching to dom speaker's video
-  //     console.log("Enable switching")
-  //     this.setState({
-  //       enableDomSwitch: true,
-  //     }) ;
-  //   }
-  // }
 
   if (nextProps.accessToken !== this.props.accessToken) {
     this._userLoggedIn();
@@ -282,14 +227,14 @@ componentWillReceiveProps = (nextProps) => {
   _onLocalVideo(videoInfo) {
     console.log('NUMBER OF LOCAL VIDEOS: ' + this.props.localVideos.length);
     if (this.props.localVideos.length > 0) {
-      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
     }
   }
 
   _onRemoteVideo(videoInfo) {
     console.log('NUMBER OF REMOTE VIDEOS: ' + this.props.remoteVideos.length);
     if (this.props.remoteVideos.length === 1) {
-      this.props.VideoControl('remote', this.props.remoteVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+      this.props.VideoControl('remote', this.props.remoteVideos[0].id, this.props.localVideos, this.props.remoteVideos)
 
     }
   }
@@ -299,7 +244,7 @@ _onReceivedNewId(data) {
   console.log("Old id: ", data.oldID)
   console.log("New id: ", data.newID)
 
-  this.props.VideoControl('remote', data.newID, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+  this.props.VideoControl('remote', data.newID, this.props.localVideos, this.props.remoteVideos)
 
 }
 
@@ -311,7 +256,7 @@ _onReceivedNewId(data) {
       if (this.props.localVideos.length > 0) {
         // no participants so go back to local video
         console.log('Remote participant back to local');
-        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
       }
     }
 
@@ -320,7 +265,7 @@ _onReceivedNewId(data) {
       if (this.props.localVideos.length > 0) {
         // if the participant who left was on main screen replace it with local
         // video
-        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
       }
     }
   }
@@ -345,7 +290,7 @@ _onReceivedNewId(data) {
       //entering this if statement implies that the dominant speaker is remote
       //no further checks are necessary
       this.props.changeDominantSpeaker(matchedConnection.id)
-      this.props.VideoControl('remote', matchedConnection.id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+      this.props.VideoControl('remote', matchedConnection.id, this.props.localVideos, this.props.remoteVideos)
 
     } else if (this.props.localVideos.length > 0) {
       console.log("Local speaker is dominant: ", this.props.localVideos[0])
@@ -426,12 +371,6 @@ _onReceivedNewId(data) {
     });
   }
 
-  unimplementedButtonToggle() {
-    this.setState({
-      showFeatureInDev: !this.state.showFeatureInDev,
-    });
-  }
-
   _onExpandHide() {
     this.setState({
       isVideoBarHidden: !this.state.isVideoBarHidden,
@@ -472,17 +411,6 @@ _onReceivedNewId(data) {
   _isDominant(index) {
     //console.log(index === this.props.dominantSpeakerIndex)
     return index === this.props.dominantSpeakerIndex;
-  }
-
-  _enableDominantSwitching() {
-    console.log("Enabling dom switching, hiding last button from toolbar")
-    //switch to dominant speaker's video
-    //if dominant is local, switch to local. Else, switch to remote
-    if (this.props.localVideos[0].id === this.props.dominantSpeakerIndex) {
-      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos )
-    } else {
-      this.props.VideoControl('remote', this.props.dominantSpeakerIndex, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
-    }
   }
 
 
@@ -592,17 +520,8 @@ _screenShareControl(changeExtensionStatus) {
 
   render() {
     const this_main = this;
-    console.log("Enabledomswitch: ", this.props.enableDomSwitch)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
-        <Snackbar
-          open={this.state.showFeatureInDev}
-          message="This feature is currently in development"
-          autoHideDuration={4000}
-          onRequestClose={this.unimplementedButtonToggle}
-          style={{textAlign: "center", color: 'rgb(0, 188, 212)', opacity: 0.85,}}
-        />
-
         {this.props.showSpinner !== undefined ?
         <Dialog
           title="Loading..."
@@ -617,138 +536,87 @@ _screenShareControl(changeExtensionStatus) {
           />
         </Dialog>
         : null }
+      {this.props.localVideos.length > 0 ?
+        <MeetToolbar
+          screenShareControl={this._screenShareControl.bind(this)}
+          isHidden={this.state.isToolbarHidden}
+          onMicrophoneMute={this._onLocalAudioMute.bind(this)}
+          onCameraMute={this._onLocalVideoMute.bind(this)}
+          onExpandHide={this._onExpandHide.bind(this)}
+          onHangup={this._onHangup.bind(this)}
+          isExtInstalled={this._isExtInstalled.bind(this)}
+          extInstalled={this.props.screenShareExtInstalled}
+        /> : null}
 
-        {this.props.localVideos.length > 0 ?
-          <MeetToolbar
-            screenShareControl={this._screenShareControl.bind(this)}
-            isHidden={this.state.isToolbarHidden}
-            onMicrophoneMute={this._onLocalAudioMute.bind(this)}
-            onCameraMute={this._onLocalVideoMute.bind(this)}
-            onExpandHide={this._onExpandHide.bind(this)}
-            onHangup={this._onHangup.bind(this)}
-            isExtInstalled={this._isExtInstalled.bind(this)}
-            extInstalled={this.props.screenShareExtInstalled}
-            showInDev={this.unimplementedButtonToggle.bind(this)}
-            domSpeakerSwitchEnabled={this.props.enableDomSwitch}
-            enableDomSwitchFunc={this.enableDomSwitching}
-          /> : null}
+      <MainVideo>
+        {
+          this.props.videoType === 'remote' ?
+          <RemoteVideo
+            video={this.props.connection}
+          /> : null
+        }
+        {this.props.videoType === 'local' ?
+          <LocalVideo
+            video={this.props.localVideos[0]}
+          /> : null
+        }
+      </MainVideo>
 
 
 
-            <MainVideo className={"main_video"}>
-              {
-                this.props.videoType === 'remote' && true ?
-                <RemoteVideo
-                  video={this.props.connection}
-                /> : null
-              }
-              {this.props.videoType === 'local' && true ?
-                <LocalVideo
-                  video={this.props.localVideos[0]}
-                /> : null
-              }
-            </MainVideo>
 
-          <section className={"footer"}>
-            <div className={"localVideo footer-item"}>
-              <div style={styles.root2}>
-                <GridTile
-                  style={this.props.localVideos.length > 0 ? styles.localTile : null}
-                  key={'localVideo'}
-                  className={'gridTileClass'}
-                  title={'Me'}
-                  actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
-                  titleStyle={styles.titleStyle}
-                  titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
+      <HorizontalWrapper isHidden={this.state.isVideoBarHidden}>
+          {this.props.localVideos.map((connection) => {
+            return (this.props.remoteVideos.length > 0 ) ? (
+              <HorizontalBox
+                key={connection.id}
+                type='local'
+                id={connection.id}
+                localVideos={this.props.localVideos}
+                remoteVideos={this.props.remoteVideos}
+              >
+                <LocalVideo key={connection.id} video={connection} />
+              </HorizontalBox>
+            )
+            : ( <Avatar
+              key={connection.id}
+              userName={this.props.userName}
+              type='local'
+              id={connection.id}
+              hash={connection.id}
+              localVideos={this.props.localVideos}
+              remoteVideos={this.props.remoteVideos}
+              />  ) ;
+          })}
+          {this.props.remoteVideos.map((connection) => {
+            if (connection) {
+              const displayHorizontalBox = !this._isDominant(connection.id) && this.props.remoteVideos.length > 1 ;
+              console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
+              return displayHorizontalBox ? (
+                <HorizontalBox
+                  key={connection.id}
+                  type='remote'
+                  id={connection.id}
+                  localVideos={this.props.localVideos}
+                  remoteVideos={this.props.remoteVideos}
                 >
-                {this.props.localVideos.map((connection) => {
-                  return (this.props.remoteVideos.length > 0 ) ? (
-                    <HorizontalBox
-                      key={connection.id}
-                      type='remote'
-                      id={connection.id}
-                      domId={this.props.dominantSpeakerIndex}
-                      localVideos={this.props.localVideos}
-                      remoteVideos={this.props.remoteVideos}
-                    >
-                      <LocalVideo key={connection.id} video={connection} />
-                    </HorizontalBox>
+                  <RemoteVideo key={connection.id} video={connection} />
+                </HorizontalBox>
+              )
+              : ( <Avatar
+                key={connection.id}
+                userName={this.props.userName}
+                type='local'
+                id={connection.id}
+                hash={connection.id}
+                localVideos={this.props.localVideos}
+                remoteVideos={this.props.remoteVideos}
+                />  ) ;
+            }
 
-                  )
-                  : ( <Avatar
-                    key={connection.id}
-                    userName={this.props.userName}
-                    type='local'
-                    id={connection.id}
-                    hash={connection.id}
-                    localVideos={this.props.localVideos}
-                    remoteVideos={this.props.remoteVideos}
-                    />  ) ;
-                })}
-                </GridTile>
-            </div>
-          </div>
-
-          <div className={"remoteVideos footer-item"}>
-            <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
-              {this.props.remoteVideos.map((connection) => {
-                if (connection) {
-                  const displayHorizontalBox = (!this._isDominant(connection.id) && this.props.remoteVideos.length > 1) || !this.props.enableDomSwitch;
-                  console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
-                  return displayHorizontalBox ? (
-                    <GridTile
-                      cols={1.15}
-                      rows={0.5}
-                      key={connection.id}
-                      style={styles.gridTile}
-                      title={'Remote video'}
-                      actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
-                      titleStyle={styles.titleStyle}
-                      titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
-                    >
-                    <HorizontalBox
-                      key={connection.id}
-                      type='remote'
-                      id={connection.id}
-                      domId={this.props.dominantSpeakerIndex}
-                      localVideos={this.props.localVideos}
-                      remoteVideos={this.props.remoteVideos}
-                    >
-                      <RemoteVideo key={connection.id} video={connection} />
-                    </HorizontalBox>
-                    </GridTile>
-                  )
-
-                : (
-                  <GridTile
-                    cols={1.15}
-                    rows={0.5}
-                    style={styles.gridTile}
-                    key={connection.id}
-                    title={'Remote video'}
-                    actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
-                    titleStyle={styles.titleStyle}
-                    titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
-                  > <Avatar
-                    key={connection.id}
-                    userName={this.props.userName}
-                    type='local'
-                    id={connection.id}
-                    hash={connection.id}
-                    localVideos={this.props.localVideos}
-                    remoteVideos={this.props.remoteVideos}
-                    />
-                </GridTile>
-                )
-                }
-
-                return null;
-              })}
-            </GridList>
-          </div>
-
-          </section>
-
+            return <div>{"Waiting for remote participants..."}</div>;
+          })}
+      </HorizontalWrapper>
 
       {this.state.showUser || this.state.showRoom ?
         <LoginPanel

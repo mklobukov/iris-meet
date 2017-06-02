@@ -1,10 +1,12 @@
 import VideoControlConstants from '../constants/video-control-constants';
 
-export const changeMainView = (videoType, videoId, localVideos, remoteVideos) => ({
+export const changeMainView = (videoType, videoId, domId, triggeredOnClick, localVideos, remoteVideos) => ({
     type: VideoControlConstants.VIDEO_CONTROL_CHANGE_MAIN_VIEW,
     data: {
       videoType,
       videoId,
+      domId,
+      triggeredOnClick,
       localVideos,
       remoteVideos
     }
