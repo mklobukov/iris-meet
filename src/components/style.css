@@ -113,19 +113,20 @@ background-color: gray;
   width: 100%;
 }
 
+.gridTileClass {
+
+}
+.gridTileClass:hover {
+  border: 2px solid black;
+}
+
 .remoteVideos {
-  /*display: flex; /*this removes the bar right below*/*/
-  /*margin-left: 10px;*/
   height: 140px;
-  /*display: flex;
-  justify-content: flex-start;*/
   background-color: transparent;
-  flex-wrap: nowrap;
   overflow-x: hidden;
   overflow-y: hidden;
-  align-items: center;
   margin-top: 0px;
-  margin-left: 4px;
+  margin-left: 8px;
 }
 
 ::-webkit-scrollbar {

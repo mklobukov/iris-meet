@@ -32,6 +32,7 @@ const appKey = Config.appKey;
 const styles = {
   root: {
     display: 'flex',
+    flexShrink: 0,
     // height: '130px',
     // flexWrap: 'wrap',
     //djustifyContent: 'space-around',
@@ -42,12 +43,17 @@ const styles = {
     flex: 1
   },
   gridList: {
-    display: 'flex',
+    // paddingLeft: '1px',
+    // display: 'flex',
+    minWidth: '162px',
     flexWrap: 'nowrap',
     overflowX: 'auto', //good
     overflowY: 'hidden',
     height: '137px',
     marginBottom: '10px',
+    // minWidth: '360px',
+    justifyContent: 'flex-start',
+    flexShrink: 0,
     // height: '100%'
   },
   localTile: {
@@ -57,16 +63,18 @@ const styles = {
     color: 'rgb(0, 188, 212)',
     fontSize: '12px',
     marginBottom: '-3px',
+    minWidth: '160px'
   },
   gridTile: {
-    display: 'flex',
     width: '160px',
+    minWidth: '160px',
+    marginLeft: '0px',
     marginRight: '2px',
     height: '120px',
-    flex: 1,
     marginBottom: '3px',
     border: '2px solid white',
-    // flexShrink: 0
+    flexShrink: 0,
+    // flexShrink: 0,
   },
 
   remoteVideo: {
@@ -554,7 +562,6 @@ _screenShareControl(changeExtensionStatus) {
 
   render() {
     const this_main = this;
-    console.log("SHOW IN DEV: ", this.state.showFeatureInDev)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         <Snackbar
@@ -562,7 +569,7 @@ _screenShareControl(changeExtensionStatus) {
           message="This feature is currently in development"
           autoHideDuration={4000}
           onRequestClose={this.unimplementedButtonToggle}
-          style={{textAlign: "center", color: 'rgb(0, 188, 212)'}}
+          style={{textAlign: "center", color: 'rgb(0, 188, 212)', opacity: 0.85,}}
         />
 
         {this.props.showSpinner !== undefined ?
@@ -613,8 +620,9 @@ _screenShareControl(changeExtensionStatus) {
             <div className={"localVideo footer-item"}>
               <div style={styles.root2}>
                 <GridTile
-                  style={styles.localTile}
+                  style={this.props.localVideos.length > 0 ? styles.localTile : null}
                   key={'localVideo'}
+                  className={'gridTileClass'}
                   title={'Me'}
                   actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
                   titleStyle={styles.titleStyle}
@@ -655,7 +663,7 @@ _screenShareControl(changeExtensionStatus) {
                   console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
                   return displayHorizontalBox ? (
                     <GridTile
-                      cols={1}
+                      cols={1.15}
                       rows={0.5}
                       key={connection.id}
                       style={styles.gridTile}
@@ -678,7 +686,7 @@ _screenShareControl(changeExtensionStatus) {
 
                 : (
                   <GridTile
-                    cols={2.5}
+                    cols={1.15}
                     rows={0.5}
                     style={styles.gridTile}
                     key={connection.id}

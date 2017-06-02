@@ -48,19 +48,20 @@
 }*/
 
 .testdiv {
-  display: flex;
-  flex: 1;
+  /*display: flex;*/
+  /*flex: 1;*/
   /*flex: 1;
   flex-shrink: 0;*/
   width: 160px;
-  width: auto;
+  /*width: auto;*/
   /*border: 2px solid white;*/
 }
 
 .testim {
-  display: flex;
+  /*display: flex;*/
   /*flex: 1;*/
   width: 160px;
+  min-width: 160px;
   /*width: 250px;*/
   /*width: auto;*/
   max-width: 160px;
