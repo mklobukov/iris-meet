@@ -629,7 +629,7 @@ _screenShareControl(changeExtensionStatus) {
             isExtInstalled={this._isExtInstalled.bind(this)}
             extInstalled={this.props.screenShareExtInstalled}
             showInDev={this.unimplementedButtonToggle.bind(this)}
-            domSpeakerSwitchEnabled={this.props.enableDomSwitch}
+            domSpeakerSwitchEnabled={this.props.enableDomSwitch !== undefined ? this.props.enableDomSwitch : true}
             enableDomSwitchFunc={this.enableDomSwitching.bind(this)}
           /> : null}
 
