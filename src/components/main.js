@@ -12,7 +12,7 @@ import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
 import './style.css';
-import { changeMainView, changeDominantSpeaker, changeExtInstalledState, displayFeatureInDev } from '../actions/video-control-actions';
+import { changeMainView, changeDominantSpeaker, changeExtInstalledState } from '../actions/video-control-actions';
 import { connect } from 'react-redux';
 import { loginUserAsync, leaveRoom, isCreatingRoom } from '../actions/user-actions';
 import Dialog from 'material-ui/Dialog';
@@ -103,14 +103,14 @@ const mapStateToProps = (state) => {
     showSpinner: state.userReducer.showSpinner,
     dominantSpeakerIndex: state.videoReducer.dominantSpeakerIndex,
     screenShareExtInstalled: state.videoReducer.screenShareExtInstalled,
-    displayFeatureInDev: state.videoReducer.displayFeatureInDev
+    enableDomSwitch: state.videoReducer.enableDomSwitch,
   }
 }
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    VideoControl: (videoType, videoIndex, localVideos, remoteVideos) => {
-      dispatch(changeMainView(videoType, videoIndex,
+    VideoControl: (videoType, videoIndex, domId, triggeredOnClick, localVideos, remoteVideos) => {
+      dispatch(changeMainView(videoType, videoIndex, domId, triggeredOnClick,
                                         localVideos, remoteVideos ))
     },
     loginUserAsync: (userName, routingId, roomName, authUrl, appKey) => {
@@ -128,9 +128,6 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     isCreatingRoom: (displayLoadingSpinner) => {
       dispatch(isCreatingRoom(displayLoadingSpinner))
     },
-    featureInDevNotify: (display) => {
-      dispatch(displayFeatureInDev(display))
-    }
   }
 }
 
@@ -161,6 +158,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.onReceivedNewId = this._onReceivedNewId.bind(this);
     this.extInstalled = this._isExtInstalled.bind(this);
     this.unimplementedButtonToggle = this.unimplementedButtonToggle.bind(this);
+    this.enableDomSwitching = this._enableDominantSwitching.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -235,12 +233,33 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
 componentWillReceiveProps = (nextProps) => {
   //Initially, the accessToken is undefined.
   //It receives a value when the user is logged in
+  console.log("Will receive props! Current props: ")
+  console.log(this.props)
+  console.log("Next props: ")
+  console.log(nextProps)
 
   console.log("What's the value of showspinner? ---- ", this.props.showSpinner)
   if (this.props.localVideos.length === 0 && nextProps.localVideos.length > 0) {
     console.log("Local video loaded. Stop displaying the spinner")
     this.props.isCreatingRoom(false);
   }
+
+  // if (this.props.connection && nextProps.connection && (this.props.connection.id !== nextProps.connection.id)) {
+  //   console.log("current ID: ", this.props.connection.id)
+  //   console.log("new ID: ", nextProps.connection.id)
+  //   if (nextProps.connection.id !== this.props.dominantSpeakerIndex) {
+  //     console.log("Disable switching")
+  //     this.setState({
+  //       enableDomSwitch: false,
+  //     });
+  //   }
+  //   else { //if switching to dom speaker's video
+  //     console.log("Enable switching")
+  //     this.setState({
+  //       enableDomSwitch: true,
+  //     }) ;
+  //   }
+  // }
 
   if (nextProps.accessToken !== this.props.accessToken) {
     this._userLoggedIn();
@@ -263,14 +282,14 @@ componentWillReceiveProps = (nextProps) => {
   _onLocalVideo(videoInfo) {
     console.log('NUMBER OF LOCAL VIDEOS: ' + this.props.localVideos.length);
     if (this.props.localVideos.length > 0) {
-      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
+      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
     }
   }
 
   _onRemoteVideo(videoInfo) {
     console.log('NUMBER OF REMOTE VIDEOS: ' + this.props.remoteVideos.length);
     if (this.props.remoteVideos.length === 1) {
-      this.props.VideoControl('remote', this.props.remoteVideos[0].id, this.props.localVideos, this.props.remoteVideos)
+      this.props.VideoControl('remote', this.props.remoteVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
 
     }
   }
@@ -280,7 +299,7 @@ _onReceivedNewId(data) {
   console.log("Old id: ", data.oldID)
   console.log("New id: ", data.newID)
 
-  this.props.VideoControl('remote', data.newID, this.props.localVideos, this.props.remoteVideos)
+  this.props.VideoControl('remote', data.newID, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
 
 }
 
@@ -292,7 +311,7 @@ _onReceivedNewId(data) {
       if (this.props.localVideos.length > 0) {
         // no participants so go back to local video
         console.log('Remote participant back to local');
-        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
+        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
       }
     }
 
@@ -301,7 +320,7 @@ _onReceivedNewId(data) {
       if (this.props.localVideos.length > 0) {
         // if the participant who left was on main screen replace it with local
         // video
-        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.localVideos, this.props.remoteVideos)
+        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
       }
     }
   }
@@ -326,7 +345,7 @@ _onReceivedNewId(data) {
       //entering this if statement implies that the dominant speaker is remote
       //no further checks are necessary
       this.props.changeDominantSpeaker(matchedConnection.id)
-      this.props.VideoControl('remote', matchedConnection.id, this.props.localVideos, this.props.remoteVideos)
+      this.props.VideoControl('remote', matchedConnection.id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
 
     } else if (this.props.localVideos.length > 0) {
       console.log("Local speaker is dominant: ", this.props.localVideos[0])
@@ -455,6 +474,17 @@ _onReceivedNewId(data) {
     return index === this.props.dominantSpeakerIndex;
   }
 
+  _enableDominantSwitching() {
+    console.log("Enabling dom switching, hiding last button from toolbar")
+    //switch to dominant speaker's video
+    //if dominant is local, switch to local. Else, switch to remote
+    if (this.props.localVideos[0].id === this.props.dominantSpeakerIndex) {
+      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos )
+    } else {
+      this.props.VideoControl('remote', this.props.dominantSpeakerIndex, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+    }
+  }
+
 
 _isExtInstalled() {
   //const extId = 'ninfhlnofdcigedlpjkgkfchccfikdnf'; //experimental
@@ -562,6 +592,7 @@ _screenShareControl(changeExtensionStatus) {
 
   render() {
     const this_main = this;
+    console.log("Enabledomswitch: ", this.props.enableDomSwitch)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         <Snackbar
@@ -598,6 +629,8 @@ _screenShareControl(changeExtensionStatus) {
             isExtInstalled={this._isExtInstalled.bind(this)}
             extInstalled={this.props.screenShareExtInstalled}
             showInDev={this.unimplementedButtonToggle.bind(this)}
+            domSpeakerSwitchEnabled={this.props.enableDomSwitch}
+            enableDomSwitchFunc={this.enableDomSwitching}
           /> : null}
 
 
@@ -634,6 +667,7 @@ _screenShareControl(changeExtensionStatus) {
                       key={connection.id}
                       type='remote'
                       id={connection.id}
+                      domId={this.props.dominantSpeakerIndex}
                       localVideos={this.props.localVideos}
                       remoteVideos={this.props.remoteVideos}
                     >
@@ -659,7 +693,7 @@ _screenShareControl(changeExtensionStatus) {
             <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
               {this.props.remoteVideos.map((connection) => {
                 if (connection) {
-                  const displayHorizontalBox = !this._isDominant(connection.id) && this.props.remoteVideos.length > 1 ;
+                  const displayHorizontalBox = (!this._isDominant(connection.id) && this.props.remoteVideos.length > 1) || !this.props.enableDomSwitch;
                   console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
                   return displayHorizontalBox ? (
                     <GridTile
@@ -676,6 +710,7 @@ _screenShareControl(changeExtensionStatus) {
                       key={connection.id}
                       type='remote'
                       id={connection.id}
+                      domId={this.props.dominantSpeakerIndex}
                       localVideos={this.props.localVideos}
                       remoteVideos={this.props.remoteVideos}
                     >
