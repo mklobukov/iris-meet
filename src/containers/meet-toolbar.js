@@ -60,7 +60,7 @@ export default class MeetToolbar extends React.Component {
           extInstalled={this.props.extInstalled}
           _showInDev={this.props.showInDev}
           domSpeakerSwitchEnabled={this.props.domSpeakerSwitchEnabled}
-          _enableDom={this.props.enableDomSwitchFunc}
+          _enableDom={this.props.enableDomSwitchFunc.bind(this)}
         />
       )
     }
