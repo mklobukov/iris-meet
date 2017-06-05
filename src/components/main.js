@@ -145,6 +145,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       isToolbarHidden: false,
       isSharingScreen: false,
       showFeatureInDev: false,
+      showDomSpeakerSnackbar: false,
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -241,6 +242,11 @@ componentWillReceiveProps = (nextProps) => {
     this.props.isCreatingRoom(false);
   }
 
+  if (this.props.enableDomSwitch === true && nextProps.enableDomSwitch === false) {
+    this.setState({
+      showDomSpeakerSnackbar: true
+    })
+  }
   // if (this.props.connection && nextProps.connection && (this.props.connection.id !== nextProps.connection.id)) {
   //   console.log("current ID: ", this.props.connection.id)
   //   console.log("new ID: ", nextProps.connection.id)
@@ -587,6 +593,11 @@ _screenShareControl(changeExtensionStatus) {
   }
 }
 
+_dontDisplaySnackbar() {
+  this.setState({
+    showDomSpeakerSnackbar: false
+  });
+}
 
   render() {
     const this_main = this;
@@ -601,10 +612,10 @@ _screenShareControl(changeExtensionStatus) {
           style={{textAlign: "center", color: 'rgb(0, 188, 212)', opacity: 0.85,}}
         />
         <Snackbar
-          open={this.props.enableDomSwitch === false}
+          open={this.props.enableDomSwitch === false && this.state.showDomSpeakerSnackbar}
           message="Dominant speaker switching disabled. Click on the rightmost toolbar icon to enable."
           autoHideDuration={6000}
-          onRequestClose={console.log("Close dom speaker notification snackbar")}
+          onRequestClose={this._dontDisplaySnackbar.bind(this)}
           style={{textAlign: "center", color: 'rgb(0, 188, 212)', opacity: 0.85,}}
         />
 
