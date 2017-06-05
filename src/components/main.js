@@ -476,9 +476,9 @@ _onReceivedNewId(data) {
     //switch to dominant speaker's video
     //if dominant is local, switch to local. Else, switch to remote
     if (this.props.localVideos[0].id === this.props.dominantSpeakerIndex) {
-      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
+      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, true)
     } else {
-      this.props.VideoControl('remote', this.props.dominantSpeakerIndex, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
+      this.props.VideoControl('remote', this.props.dominantSpeakerIndex, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, true)
     }
   }
 
