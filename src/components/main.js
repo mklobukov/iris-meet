@@ -430,6 +430,7 @@ _onReceivedNewId(data) {
   }
 
   _onExpandHide() {
+    console.log("onexpandhide")
     this.setState({
       isVideoBarHidden: !this.state.isVideoBarHidden,
     });
@@ -653,7 +654,7 @@ _screenShareControl(changeExtensionStatus) {
               }
             </MainVideo>
 
-          <section className={"footer"} style={ this.state.isVideoBarHidden ? {visibility: "hidden"} : {visibility: "visible"}}>
+          <section className={this.state.isVideoBarHidden ? "footer hideFooter" : "footer showFooter"} >
             <div className={"localVideo footer-item"}>
               <div style={styles.root2}>
                 <GridTile
