@@ -24,10 +24,8 @@ import sss from 'material-ui/svg-icons/toggle/star-border';
 import StarBorder from 'material-ui/svg-icons/hardware/headset-mic';
 import Snackbar from 'material-ui/Snackbar';
 
-
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
-
 
 const styles = {
   root: {
@@ -238,7 +236,6 @@ componentWillReceiveProps = (nextProps) => {
   console.log("Next props: ")
   console.log(nextProps)
 
-  console.log("What's the value of showspinner? ---- ", this.props.showSpinner)
   if (this.props.localVideos.length === 0 && nextProps.localVideos.length > 0) {
     console.log("Local video loaded. Stop displaying the spinner")
     this.props.isCreatingRoom(false);
@@ -657,6 +654,7 @@ _screenShareControl(changeExtensionStatus) {
                   key={'localVideo'}
                   className={'gridTileClass'}
                   title={'Me'}
+                  containerElement={'HorizontalBox'}
                   actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
                   titleStyle={styles.titleStyle}
                   titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
