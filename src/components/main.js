@@ -279,14 +279,14 @@ componentWillReceiveProps = (nextProps) => {
   _onLocalVideo(videoInfo) {
     console.log('NUMBER OF LOCAL VIDEOS: ' + this.props.localVideos.length);
     if (this.props.localVideos.length > 0) {
-      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
     }
   }
 
   _onRemoteVideo(videoInfo) {
     console.log('NUMBER OF REMOTE VIDEOS: ' + this.props.remoteVideos.length);
     if (this.props.remoteVideos.length === 1) {
-      this.props.VideoControl('remote', this.props.remoteVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+      this.props.VideoControl('remote', this.props.remoteVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
 
     }
   }
@@ -296,7 +296,7 @@ _onReceivedNewId(data) {
   console.log("Old id: ", data.oldID)
   console.log("New id: ", data.newID)
 
-  this.props.VideoControl('remote', data.newID, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+  this.props.VideoControl('remote', data.newID, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
 
 }
 
@@ -308,7 +308,7 @@ _onReceivedNewId(data) {
       if (this.props.localVideos.length > 0) {
         // no participants so go back to local video
         console.log('Remote participant back to local');
-        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
       }
     }
 
@@ -317,7 +317,7 @@ _onReceivedNewId(data) {
       if (this.props.localVideos.length > 0) {
         // if the participant who left was on main screen replace it with local
         // video
-        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
       }
     }
   }
@@ -342,7 +342,7 @@ _onReceivedNewId(data) {
       //entering this if statement implies that the dominant speaker is remote
       //no further checks are necessary
       this.props.changeDominantSpeaker(matchedConnection.id)
-      this.props.VideoControl('remote', matchedConnection.id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+      this.props.VideoControl('remote', matchedConnection.id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
 
     } else if (this.props.localVideos.length > 0) {
       console.log("Local speaker is dominant: ", this.props.localVideos[0])
@@ -476,9 +476,9 @@ _onReceivedNewId(data) {
     //switch to dominant speaker's video
     //if dominant is local, switch to local. Else, switch to remote
     if (this.props.localVideos[0].id === this.props.dominantSpeakerIndex) {
-      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos )
+      this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
     } else {
-      this.props.VideoControl('remote', this.props.dominantSpeakerIndex, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos)
+      this.props.VideoControl('remote', this.props.dominantSpeakerIndex, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
     }
   }
 
@@ -668,6 +668,7 @@ _screenShareControl(changeExtensionStatus) {
                       domId={this.props.dominantSpeakerIndex}
                       localVideos={this.props.localVideos}
                       remoteVideos={this.props.remoteVideos}
+                      switchingEnabled={this.props.enableDomSwitch}
                     >
                       <LocalVideo key={connection.id} video={connection} />
                     </HorizontalBox>
@@ -681,6 +682,7 @@ _screenShareControl(changeExtensionStatus) {
                     hash={connection.id}
                     localVideos={this.props.localVideos}
                     remoteVideos={this.props.remoteVideos}
+                    switchingEnabled={this.props.enableDomSwitch}
                     />  ) ;
                 })}
                 </GridTile>
@@ -711,6 +713,7 @@ _screenShareControl(changeExtensionStatus) {
                       domId={this.props.dominantSpeakerIndex}
                       localVideos={this.props.localVideos}
                       remoteVideos={this.props.remoteVideos}
+                      switchingEnabled={this.props.enableDomSwitch}
                     >
                       <RemoteVideo key={connection.id} video={connection} />
                     </HorizontalBox>
@@ -735,6 +738,7 @@ _screenShareControl(changeExtensionStatus) {
                     hash={connection.id}
                     localVideos={this.props.localVideos}
                     remoteVideos={this.props.remoteVideos}
+                    switchingEnabled={this.props.enableDomSwitch}
                     />
                 </GridTile>
                 )
