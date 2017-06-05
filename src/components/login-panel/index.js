@@ -42,7 +42,7 @@ const LoginPanelComponent = ({showUser, userNameText, _onUserNameTextChange, sho
           />
         </div> : null}
         <RaisedButton
-          label="Accept"
+          label="Enter"
           primary={true}
           style={styleButton}
           type="submit"
