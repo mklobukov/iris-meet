@@ -13,7 +13,7 @@ const VideoReducer = (state = {}, action) => {
 
 
         //find the new video connection if switching is enabled
-        if (action.data.switchingEnabled || action.data.switchingEnabled === undefined) {
+        if (action.data.switchingEnabled || action.data.switchingEnabled === undefined || action.data.triggeredOnClick) {
           console.log("Searching for the video to put on main screen...")
           if (action.data.videoType === 'local') {
               mainConnection = action.data.localVideos.find((connection) => {

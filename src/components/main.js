@@ -653,7 +653,7 @@ _screenShareControl(changeExtensionStatus) {
               }
             </MainVideo>
 
-          <section className={"footer"}>
+          <section className={"footer"} style={ this.state.isVideoBarHidden ? {visibility: "hidden"} : {visibility: "visible"}}>
             <div className={"localVideo footer-item"}>
               <div style={styles.root2}>
                 <GridTile
