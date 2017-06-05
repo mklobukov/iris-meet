@@ -107,9 +107,9 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch, ownProps) => {
   return {
-    VideoControl: (videoType, videoIndex, domId, triggeredOnClick, localVideos, remoteVideos) => {
+    VideoControl: (videoType, videoIndex, domId, triggeredOnClick, localVideos, remoteVideos, switchingEnabled) => {
       dispatch(changeMainView(videoType, videoIndex, domId, triggeredOnClick,
-                                        localVideos, remoteVideos ))
+                                        localVideos, remoteVideos, switchingEnabled ))
     },
     loginUserAsync: (userName, routingId, roomName, authUrl, appKey) => {
       dispatch(loginUserAsync(userName, routingId, roomName, authUrl, appKey))
