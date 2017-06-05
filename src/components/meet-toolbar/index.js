@@ -31,7 +31,7 @@ const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute,
       <a className="button" onClick={() => {_showInDev(); _onExpandHide.bind(this);}}><i className={barHidden ? "fa fa-expand" : "fa fa-compress"} aria-hidden="true"></i></a>
       <a className="button" onClick={_showInDev.bind(this)}><i className="fa fa-cogs" aria-hidden="true"></i></a>
       <a className="button" onClick={_onHangup.bind(this)}><i className="fa fa-phone text-danger" aria-hidden="true"></i></a>
-      <a className="button" onClick={_enableDom.bind(this)} style={domSpeakerSwitchEnabled ? {display: 'none' } : null }><i className="fa fa-users"></i></a>
+      <a className="button" onClick={_enableDom.bind(this)} style={domSpeakerSwitchEnabled ? {display: 'none' } : null }><i className="fa fa-exchange"></i></a>
 
     </span>
   </div>

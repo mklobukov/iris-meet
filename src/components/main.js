@@ -599,6 +599,13 @@ _screenShareControl(changeExtensionStatus) {
           onRequestClose={this.unimplementedButtonToggle}
           style={{textAlign: "center", color: 'rgb(0, 188, 212)', opacity: 0.85,}}
         />
+        <Snackbar
+          open={this.props.enableDomSwitch === false}
+          message="Dominant speaker switching disabled. Click on the rightmost toolbar icon to enable."
+          autoHideDuration={6000}
+          onRequestClose={console.log("Close dom speaker notification snackbar")}
+          style={{textAlign: "center", color: 'rgb(0, 188, 212)', opacity: 0.85,}}
+        />
 
         {this.props.showSpinner !== undefined ?
         <Dialog
