@@ -712,7 +712,7 @@ _dontDisplaySnackbar() {
             <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
               {this.props.remoteVideos.map((connection) => {
                 if (connection) {
-                  const displayHorizontalBox = (!this._isDominant(connection.id) && this.props.remoteVideos.length > 1) || !this.props.enableDomSwitch;
+                  let displayHorizontalBox = (!this._isDominant(connection.id) && this.props.remoteVideos.length > 1) || !this.props.enableDomSwitch;
                   console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
                   return displayHorizontalBox ? (
                     <GridTile
