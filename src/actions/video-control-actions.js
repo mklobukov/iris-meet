@@ -1,6 +1,6 @@
 import VideoControlConstants from '../constants/video-control-constants';
 
-export const changeMainView = (videoType, videoId, domId, triggeredOnClick, localVideos, remoteVideos) => ({
+export const changeMainView = (videoType, videoId, domId, triggeredOnClick, localVideos, remoteVideos, switchingEnabled) => ({
     type: VideoControlConstants.VIDEO_CONTROL_CHANGE_MAIN_VIEW,
     data: {
       videoType,
@@ -8,7 +8,8 @@ export const changeMainView = (videoType, videoId, domId, triggeredOnClick, loca
       domId,
       triggeredOnClick,
       localVideos,
-      remoteVideos
+      remoteVideos,
+      switchingEnabled
     }
 })
 
