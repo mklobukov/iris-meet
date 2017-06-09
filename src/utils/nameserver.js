@@ -1,7 +1,3 @@
-import Fetch from 'isomorphic-fetch';
-
-nameServerUrl = "localhost:12345/app/" //this may need to be put in diff file
-
 export class NameServer {
   constructor(config) {
     this.config = config;
@@ -41,7 +37,7 @@ export class NameServer {
     const requestHeader = new Headers();
     requestHeader.append('Content-Type', 'application/json');
     requestHeader.append('X-App-Key', this.config.appkey);
-    return fetch(this.config.nameServerUrl + "/app/" + this.config.className + "/userid/" + userJid + "/", {
+    return fetch(this.config.nameServerUrl + "/app/" + this.config.classname + "/userid/" + userJid + "/", {
       method: 'GET',
       headers: requestHeader,
       body: '',
@@ -54,7 +50,7 @@ export class NameServer {
     const requestHeader = new Headers();
     requestHeader.append('Content-Type', 'application/json');
     requestHeader.append('X-App-Key', this.config.appkey);
-    return fetch(this.config.nameServerUrl + "/app/" + this.config.className + "/userid/" + userJid + "/", {
+    return fetch(this.config.nameServerUrl + "/app/" + this.config.classname + "/userid/" + userJid + "/", {
       method: 'PUT',
       headers: requestHeader,
       body: JSON.stringify({

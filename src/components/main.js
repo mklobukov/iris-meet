@@ -23,6 +23,7 @@ import IconButton from 'material-ui/IconButton';
 import sss from 'material-ui/svg-icons/toggle/star-border';
 import StarBorder from 'material-ui/svg-icons/hardware/headset-mic';
 import Snackbar from 'material-ui/Snackbar';
+import NameServer from '../utils/nameserver';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -374,18 +375,38 @@ _onReceivedNewId(data) {
       .then((response) => {
         console.log(response);
         const roomId = response.room_id;
-        this.props.initializeWebRTC(this.props.userName, this.props.routingId,
-          this.props.roomName,
-          roomId,
-          this.props.decodedToken.payload['domain'].toLowerCase(),
-          {
-            eventManagerUrl: Config.eventManagerUrl,
-            notificationServer: Config.notificationServer },
-            this.props.accessToken,
-            '640',
-            true,
-            true
-          );
+        //
+        //
+        // this.props.initializeWebRTC(this.props.userName, this.props.routingId,
+        //   this.props.roomName,
+        //   roomId,
+        //   this.props.decodedToken.payload['domain'].toLowerCase(),
+        //   {
+        //     eventManagerUrl: Config.eventManagerUrl,
+        //     notificationServer: Config.notificationServer },
+        //     this.props.accessToken,
+        //     '640',
+        //     true,
+        //     true
+        //   );
+
+          let config = {
+            userName: this.props.userName,
+            roomId: roomId,
+            roomName: this.props.roomName,
+            domain: this.props.decodedToken.payload['domain'].toLowerCase(),
+            token: this.props.accessToken,
+            routingId: this.props.routingId,
+            resolution: '640',
+            hosts: {
+              eventManagerUrl: Config.eventManagerUrl,
+              notificationServer: Config.notificationServer
+            },
+            videoCodec: 'h264'
+          }
+          this.props.initializeWebRTC(config)
+
+
       })
     });
   }
@@ -597,6 +618,17 @@ _dontDisplaySnackbar() {
   this.setState({
     showDomSpeakerSnackbar: false
   });
+}
+
+_getUserName(userJid) {
+  let ns = new NameServer({'nameServerUrl' : 'localhost:12345', 'classname' : 'iris-test', 'appkey' : 'test-appkey'});
+  return ns.getUserByJid(userJid).then(
+    data => {
+      alert("GOT THE USER : " + data) }
+    )
+    .catch(
+      error => {console.log("ERROR IN GETTING USERNAME " + error); }
+    );
 }
 
   render() {
