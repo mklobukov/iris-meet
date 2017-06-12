@@ -23,7 +23,7 @@ import IconButton from 'material-ui/IconButton';
 import sss from 'material-ui/svg-icons/toggle/star-border';
 import StarBorder from 'material-ui/svg-icons/hardware/headset-mic';
 import Snackbar from 'material-ui/Snackbar';
-import NameServer from '../utils/nameserver';
+import { NameServer } from '../utils/nameserver';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -147,6 +147,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       isSharingScreen: false,
       showFeatureInDev: false,
       showDomSpeakerSnackbar: false,
+      myJidStoredInIDS: false,
+      myName: "",
+      remoteNames: [],
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -181,6 +184,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     //initialize spinner enabler to false
     console.log("Initializing spinner enabler to false")
     this.props.isCreatingRoom(false);
+
   }
 
 
@@ -228,6 +232,12 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       console.log(this.props.params.roomname)
       this.props.loginUserAsync(userName, routingId, this.props.params.roomname, authUrl, appKey)
     }
+    console.log("this.props: ", this.props)
+    console.log("this.props.params: ", this.props.params)
+    // this._setUserName("marksId", this.props.params.roomname, userName)
+    this.setState({
+      myName: userName ? userName : "Me",
+    })
   }
 
 componentWillReceiveProps = (nextProps) => {
@@ -246,6 +256,15 @@ componentWillReceiveProps = (nextProps) => {
   if (this.props.enableDomSwitch === true && nextProps.enableDomSwitch === false) {
     this.setState({
       showDomSpeakerSnackbar: true
+    })
+  }
+
+  if (!this.state.myJidStoredInIDS && this.props.myJid == null && nextProps.myJid != null) {
+    this.setState({
+      myJidStoredInIDS: true,
+    }, () => {
+      console.log("Setting username with jid: ", this.props.myJid)
+      this._setUserName(this.props.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
     })
   }
   // if (this.props.connection && nextProps.connection && (this.props.connection.id !== nextProps.connection.id)) {
@@ -291,11 +310,16 @@ componentWillReceiveProps = (nextProps) => {
   }
 
   _onRemoteVideo(videoInfo) {
-    console.log('NUMBER OF REMOTE VIDEOS: ' + this.props.remoteVideos.length);
-    if (this.props.remoteVideos.length === 1) {
+    let numRemoteVideos = this.props.remoteVideos.length;
+    console.log('NUMBER OF REMOTE VIDEOS: ' + numRemoteVideos);
+    if (numRemoteVideos === 1) {
       this.props.VideoControl('remote', this.props.remoteVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
-
     }
+    //a new participant entered the room. Update my local array of users with their name and jid
+    console.log("Video info: ", videoInfo)
+    console.log("remote videos: ", this.props.remoteVideos)
+    console.log("last video: ", this.props.remoteVideos[numRemoteVideos-1].participantJid)
+    this._getUserName(this.props.remoteVideos[numRemoteVideos-1].participantJid, this.props.params.roomname )
   }
 
 _onReceivedNewId(data) {
@@ -397,7 +421,7 @@ _onReceivedNewId(data) {
             domain: this.props.decodedToken.payload['domain'].toLowerCase(),
             token: this.props.accessToken,
             routingId: this.props.routingId,
-            resolution: '640',
+            resolution: 'hd',
             hosts: {
               eventManagerUrl: Config.eventManagerUrl,
               notificationServer: Config.notificationServer
@@ -433,6 +457,9 @@ _onReceivedNewId(data) {
     const userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
     const roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
     localStorage.setItem('irisMeet.userName', userName);
+
+    //now that we have both username and roomname, update entry in the IDS
+
     const hostname = window.location.origin;
     window.location.assign(hostname + '/' + roomName);
   }
@@ -620,11 +647,32 @@ _dontDisplaySnackbar() {
   });
 }
 
-_getUserName(userJid) {
-  let ns = new NameServer({'nameServerUrl' : 'localhost:12345', 'classname' : 'iris-test', 'appkey' : 'test-appkey'});
-  return ns.getUserByJid(userJid).then(
+_getUserName(userJid, roomname) {
+  let ns = new NameServer({'nameServerUrl' : 'http://localhost:8080', 'classname' : roomname, 'appkey' : 'test-appkey'});
+  return ns.getUserByJid(userJid, roomname).then(
     data => {
-      alert("GOT THE USER : " + data) }
+      console.log("Successfully got the user name from IDS: ", data)
+      console.log("Remote names before push: ", this.state.remoteNames)
+      let names = this.state.remoteNames;
+      console.log("Here's what data looks like: ", data)
+      console.log("zero: ", data[0])
+      names.push({userName: data[0].username, userJid: data[0].userJid});
+      this.setState({
+        remoteNames: names
+      })
+      console.log("Remote names after push: ", this.state.remoteNames)
+      }
+    )
+    .catch(
+      error => {console.log("ERROR IN GETTING USERNAME " + error); }
+    );
+}
+
+_setUserName(userJid, roomname, username) {
+  let ns = new NameServer({'nameServerUrl' : 'http://localhost:8080', 'classname' : roomname, 'appkey' : 'test-appkey'});
+  return ns.addOrUpdateUser(userJid, roomname, username).then(
+    data => {
+      console.log("Successfully added a new user to IDS: ", data) }
     )
     .catch(
       error => {console.log("ERROR IN GETTING USERNAME " + error); }
@@ -632,8 +680,15 @@ _getUserName(userJid) {
 }
 
   render() {
+  //   if (this.props.remoteVideos.length > 0) {
+  //   this._getUserName(this.props.remoteVideos[0].id, "UserInfo")
+  // }
     const this_main = this;
+    console.log("My jid", this.props.myJid)
+    console.log("Remote videos main: ", this.props.remoteVideos)
+    console.log("Local videos main: ", this.props.localVideos)
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
+    console.log("Remote names: ", this.state.remoteNames)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         <Snackbar
@@ -704,7 +759,7 @@ _getUserName(userJid) {
                   style={this.props.localVideos.length > 0 ? styles.localTile : null}
                   key={'localVideo'}
                   className={'gridTileClass'}
-                  title={'Me'}
+                  title={this.state.myName}
                   containerElement={'HorizontalBox'}
                   actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
                   titleStyle={styles.titleStyle}
