@@ -321,7 +321,8 @@ componentWillReceiveProps = (nextProps) => {
     console.log("last video: ", this.props.remoteVideos[numRemoteVideos-1].participantJid)
     //prepare the jid string by removing the roomId part
     let jid = this.props.remoteVideos[numRemoteVideos-1].participantJid
-    jid = jid.substring(jid.indexOf("/") + 1, jid.length)
+    //jid = jid.substring(jid.indexOf("/") + 1, jid.length)
+    jid = this._truncateJid(jid)
     console.log("COMPARE: ", jid)
     this._getUserName(jid, this.props.params.roomname )
   }
@@ -334,7 +335,6 @@ _onReceivedNewId(data) {
   this.props.VideoControl('remote', data.newID, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
 
 }
-
 
   _onParticipantLeft(participantInfo) {
     console.log('Remote participant left: ', participantInfo);
@@ -677,6 +677,19 @@ _getUserName(userJid, roomname) {
     );
 }
 
+_findUserName(namesArray, jid) {
+  jid = jid.replace(/\//g, '_')
+  let userObject = namesArray.filter(function(obj) {
+    return obj.userJid === jid
+  })
+  return userObject[0] ? userObject[0].userName : null
+}
+
+_truncateJid(jid) {
+  //remote the roomID part of the jid, and return just the user part
+  return jid.substring(jid.indexOf("/") + 1, jid.length)
+}
+
 _setUserName(userJid, roomname, username) {
   let ns = new NameServer({'nameServerUrl' : 'http://localhost:8080', 'classname' : roomname});
   return ns.addOrUpdateUser(userJid, roomname, username).then(
@@ -804,6 +817,8 @@ _setUserName(userJid, roomname, username) {
           <div className={"remoteVideos footer-item"}>
             <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
               {this.props.remoteVideos.map((connection) => {
+                let name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
+                console.log("Look at this name: ", name)
                 if (connection) {
                   let displayHorizontalBox = (!this._isDominant(connection.id) && this.props.remoteVideos.length > 1) || !this.props.enableDomSwitch;
                   console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
@@ -813,7 +828,7 @@ _setUserName(userJid, roomname, username) {
                       rows={0.5}
                       key={connection.id}
                       style={styles.gridTile}
-                      title={'Remote video'}
+                      title={name ? name : "Unknown User"}
                       actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
                       titleStyle={styles.titleStyle}
                       titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
