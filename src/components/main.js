@@ -319,7 +319,11 @@ componentWillReceiveProps = (nextProps) => {
     console.log("Video info: ", videoInfo)
     console.log("remote videos: ", this.props.remoteVideos)
     console.log("last video: ", this.props.remoteVideos[numRemoteVideos-1].participantJid)
-    this._getUserName(this.props.remoteVideos[numRemoteVideos-1].participantJid, this.props.params.roomname )
+    //prepare the jid string by removing the roomId part
+    let jid = this.props.remoteVideos[numRemoteVideos-1].participantJid
+    jid = jid.substring(jid.indexOf("/") + 1, jid.length)
+    console.log("COMPARE: ", jid)
+    this._getUserName(jid, this.props.params.roomname )
   }
 
 _onReceivedNewId(data) {
@@ -648,28 +652,33 @@ _dontDisplaySnackbar() {
 }
 
 _getUserName(userJid, roomname) {
-  let ns = new NameServer({'nameServerUrl' : 'http://localhost:8080', 'classname' : roomname, 'appkey' : 'test-appkey'});
+  let ns = new NameServer({'nameServerUrl' : 'http://localhost:8080', 'classname' : roomname});
   return ns.getUserByJid(userJid, roomname).then(
     data => {
-      console.log("Successfully got the user name from IDS: ", data)
-      console.log("Remote names before push: ", this.state.remoteNames)
-      let names = this.state.remoteNames;
-      console.log("Here's what data looks like: ", data)
-      console.log("zero: ", data[0])
-      names.push({userName: data[0].username, userJid: data[0].userJid});
-      this.setState({
-        remoteNames: names
-      })
-      console.log("Remote names after push: ", this.state.remoteNames)
+      console.log("Here's data: ", data)
+      console.log("Rem vid: ", this.props.remoteVideos)
+      if (data[0] && data[0].username && data[0].userJid && data[0].roomname) {
+        console.log("Successfully got the user name from IDS: ", data)
+        console.log("Remote names before push: ", this.state.remoteNames)
+        let names = this.state.remoteNames;
+        console.log("DATA test: ", data)
+        let newName = data[0] && data[0].username ? data[0].username : "Unknown User"
+        let newJid = data[0] && data[0].userJid ? data[0].userJid : "undefinedJid"
+        let thisRoom = data[0] && data[0].roomname ? data[0].roomname : "Unknown room"
+        names.push({userName: newName, userJid: newJid, roomName: thisRoom});
+        this.setState({
+          remoteNames: names
+        })
+        console.log("Remote names after push: ", this.state.remoteNames)
       }
-    )
+    })
     .catch(
       error => {console.log("ERROR IN GETTING USERNAME " + error); }
     );
 }
 
 _setUserName(userJid, roomname, username) {
-  let ns = new NameServer({'nameServerUrl' : 'http://localhost:8080', 'classname' : roomname, 'appkey' : 'test-appkey'});
+  let ns = new NameServer({'nameServerUrl' : 'http://localhost:8080', 'classname' : roomname});
   return ns.addOrUpdateUser(userJid, roomname, username).then(
     data => {
       console.log("Successfully added a new user to IDS: ", data) }
@@ -680,9 +689,6 @@ _setUserName(userJid, roomname, username) {
 }
 
   render() {
-  //   if (this.props.remoteVideos.length > 0) {
-  //   this._getUserName(this.props.remoteVideos[0].id, "UserInfo")
-  // }
     const this_main = this;
     console.log("My jid", this.props.myJid)
     console.log("Remote videos main: ", this.props.remoteVideos)

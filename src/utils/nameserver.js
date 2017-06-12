@@ -19,6 +19,8 @@ export class NameServer {
   // }
   _parseJSON(response) {
     return response.text().then(function(text) {
+      console.log("TEXT test: ", text)
+      console.log(text == {})
       return text ? JSON.parse(text) : {}
     })
   }
@@ -40,20 +42,6 @@ export class NameServer {
     .then(this._parseJSON)
   }
 
-  // getUserByJid(userJid, roomname) {
-  //   console.log("Inside get user by jid")
-  //   const requestHeader = new Headers();
-  //   requestHeader.append('Content-Type', 'application/json');
-  //   //remove slash from the jid and replace it with underscore. Request won't work with
-  //   //an extra forward slash in the url
-  //   const jid = userJid.replace(/\//g, '_')
-  //   return fetch(this.config.nameServerUrl + "/app/" + roomname + "/userid/" + jid + "/", {
-  //     method: 'GET',
-  //     headers: requestHeader,
-  //   })
-  //   .then(this._checkStatus)
-  //   .then(this._parseJSON)
-  // }
   getUserByJid(userJid, roomname) {
     console.log("Inside get user by jid")
     const requestHeader = new Headers();
@@ -61,13 +49,28 @@ export class NameServer {
     //remove slash from the jid and replace it with underscore. Request won't work with
     //an extra forward slash in the url
     const jid = userJid.replace(/\//g, '_')
-    return fetch(this.config.nameServerUrl + "/app/" + "room10" + "/userid/" + "bernieId" + "/", {
+    console.log(jid)
+    return fetch(this.config.nameServerUrl + "/app/" + roomname + "/userid/" + jid, {
       method: 'GET',
       headers: requestHeader,
     })
     .then(this._checkStatus)
     .then(this._parseJSON)
   }
+  // getUserByJid(userJid, roomname) {
+  //   console.log("Inside get user by jid")
+  //   const requestHeader = new Headers();
+  //   requestHeader.append('Content-Type', 'application/json');
+  //   //remove slash from the jid and replace it with underscore. Request won't work with
+  //   //an extra forward slash in the url
+  //   const jid = userJid.replace(/\//g, '_')
+  //   return fetch(this.config.nameServerUrl + "/app/" + "room10" + "/userid/" + "bernieId" + "/", {
+  //     method: 'GET',
+  //     headers: requestHeader,
+  //   })
+  //   .then(this._checkStatus)
+  //   .then(this._parseJSON)
+  // }
 
   addOrUpdateUser(userJid, roomname, name) {
     console.log("add or update user")
@@ -85,7 +88,8 @@ export class NameServer {
           },
           "object" : {
             "username" : name,
-            "userJid" : userJid,
+            "roomname" : roomname,
+            "userJid" : jid,
           }
         }),
       })
