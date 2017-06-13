@@ -43,12 +43,12 @@ export class NameServer {
   }
 
   getUserByJid(userJid, roomname) {
-    console.log("Inside get user by jid")
+    console.log("Inside get user by jid. Replacing / with _ in the jid")
     const requestHeader = new Headers();
     requestHeader.append('Content-Type', 'application/json');
     //remove slash from the jid and replace it with underscore. Request won't work with
     //an extra forward slash in the url
-    const jid = userJid.replace(/\//g, '_')
+    let jid = userJid.replace(/\//g, '_')
     console.log(jid)
     return fetch(this.config.nameServerUrl + "/app/" + roomname + "/userid/" + jid, {
       method: 'GET',
