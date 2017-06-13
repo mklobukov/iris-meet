@@ -260,13 +260,22 @@ componentWillReceiveProps = (nextProps) => {
     })
   }
 
-  if (!this.state.myJidStoredInIDS && this.props.myJid == null && nextProps.myJid != null) {
-    this.setState({
-      myJidStoredInIDS: true,
-    }, () => {
-      console.log("Setting username with jid: ", this.props.myJid)
-      this._setUserName(this.props.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
-    })
+  // if (!this.state.myJidStoredInIDS && this.props.myJid == null && nextProps.myJid != null) {
+  //   this.setState({
+  //     myJidStoredInIDS: true,
+  //   }, () => {
+  //     console.log("Setting username with jid: ", this.props.myJid)
+  //     this._setUserName(this.props.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
+  //   })
+  // }
+
+  if (this.props.myJid !== nextProps.myJid) {
+    console.log("Update IDS with my new jid\n")
+    this._setUserName(nextProps.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
+  }
+
+  if(this.props.remoteVideos.length !== nextProps.remoteVideos.length) {
+    this._updateRemoteNames(this.props.params.roomname)
   }
 
   // if (this.props.connection && nextProps.connection && (this.props.connection.id !== nextProps.connection.id)) {
@@ -319,9 +328,10 @@ componentWillReceiveProps = (nextProps) => {
     }
     //a new participant entered the room. Update my local array of users with their name and jid
     //prepare the jid string by removing the roomId part
-    let jid = this.props.remoteVideos[numRemoteVideos-1].participantJid
-    jid = this._truncateJid(jid)
-    this._getUserName(jid, this.props.params.roomname )
+    //??
+    // let jid = this.props.remoteVideos[numRemoteVideos-1].participantJid
+    // jid = this._truncateJid(jid)
+    // this._getUserName(jid, this.props.params.roomname )
   }
 
 _onReceivedNewId(data) {
@@ -660,11 +670,14 @@ _getUserName(userJid, roomname) {
         console.log("Successfully got the user name from IDS: ", data)
         console.log("Remote names before push: ", this.state.remoteNames)
         let names = this.state.remoteNames;
-        console.log("DATA test: ", data)
         let newName = data[0] && data[0].username ? data[0].username : "Unknown User"
         let newJid = data[0] && data[0].userJid ? data[0].userJid : "undefinedJid"
         let thisRoom = data[0] && data[0].roomname ? data[0].roomname : "Unknown room"
-        names.push({userName: newName, userJid: newJid, roomName: thisRoom});
+        let newNameObject = {userName: newName,
+                             userJid: newJid,
+                             roomName: thisRoom};
+         console.log("Adding a new name to the list of remote names", newNameObject)
+        names.push(newNameObject);
         this.setState({
           remoteNames: names
         })
@@ -682,11 +695,14 @@ _getUserName(userJid, roomname) {
 _findUserName(namesArray, jid) {
   jid = jid.replace(/\//g, '_')
   console.log("Looking for jid : ", jid)
-  console.log("in arran: ", namesArray)
+  console.log("in array: ")
+  console.log(namesArray)
+  console.log("First element is: ", namesArray[0])
   let userObject = namesArray.filter(function(obj) {
     return obj.userJid === jid
   })
   console.log("This is the found object: ", userObject)
+
   return userObject[0] ? userObject[0].userName : null
 }
 
@@ -704,6 +720,23 @@ _setUserName(userJid, roomname, username) {
     .catch(
       error => {console.log("ERROR IN GETTING USERNAME " + error); }
     );
+}
+
+_updateRemoteNames(roomname) {
+  let ns = new NameServer({'nameServerUrl' : nameServerUrl, 'classname' : roomname})
+  return ns.getAllUsers(roomname).then(
+    data => {
+      console.log("All users data: ", data)
+      this.setState({
+        remoteNames: data.map(function(a) {return {userName: a.username,
+                                                   userJid: a.userJid,
+                                                   roomName: a.roomname}
+                                          }),
+      })
+    }
+  ).catch(
+    error => {console.log("Error getting all the names in the room: ", error); }
+  );
 }
 
   render() {
@@ -822,7 +855,6 @@ _setUserName(userJid, roomname, username) {
           <div className={"remoteVideos footer-item"}>
             <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
               {this.props.remoteVideos.map((connection) => {
-                console.log("looking through remote names...: ", this.state.remoteNames)
                 let name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
                 console.log("Look at this name: ", name)
                 if (connection) {

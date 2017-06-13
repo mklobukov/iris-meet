@@ -26,17 +26,15 @@ export class NameServer {
   }
 
 
-  getAllUsers() {
+  getAllUsers(roomname) {
     console.log("INSIDE GET ALL USERS")
     const requestHeader = new Headers();
     requestHeader.append('Content-Type', 'application/json');
-    requestHeader.append("Access-Control-Allow-Origin", "*")
     //do I need any authentication inside? Probably.
     //probably iris-meet needs to be where the jwt is coming from , not name-server
-    return fetch(this.config.nameServerUrl + "/app/" + this.config.classname + "/userid/", {
+    return fetch(this.config.nameServerUrl + "/app/" + roomname + "/userid/*", {
       method: 'GET',
       headers: requestHeader,
-      body: '',
     })
     .then(this._checkStatus)
     .then(this._parseJSON)
