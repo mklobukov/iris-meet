@@ -19,8 +19,6 @@ export class NameServer {
   // }
   _parseJSON(response) {
     return response.text().then(function(text) {
-      console.log("TEXT test: ", text)
-      console.log(text == {})
       return text ? JSON.parse(text) : {}
     })
   }

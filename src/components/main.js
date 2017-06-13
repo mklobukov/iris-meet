@@ -185,7 +185,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     //initialize spinner enabler to false
     console.log("Initializing spinner enabler to false")
     this.props.isCreatingRoom(false);
-
+    this._updateRemoteNames(this.props.params.roomname)
   }
 
 
@@ -270,11 +270,11 @@ componentWillReceiveProps = (nextProps) => {
   // }
 
   if (this.props.myJid !== nextProps.myJid) {
-    console.log("Update IDS with my new jid\n")
     this._setUserName(nextProps.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
   }
 
-  if(this.props.remoteVideos.length !== nextProps.remoteVideos.length) {
+  if(this.props.remoteVideos.length < nextProps.remoteVideos.length) {
+    //only update remote names if more videos came in
     this._updateRemoteNames(this.props.params.roomname)
   }
 
@@ -311,6 +311,7 @@ componentWillReceiveProps = (nextProps) => {
     }, () => {
       this.props.leaveRoom();
     });
+    this._deleteRoomData(this.props.params.roomname)
   }
 
   _onLocalVideo(videoInfo) {
@@ -708,10 +709,11 @@ _setUserName(userJid, roomname, username) {
   let ns = new NameServer({'nameServerUrl' : nameServerUrl, 'classname' : roomname});
   return ns.addOrUpdateUser(userJid, roomname, username).then(
     data => {
-      console.log("Successfully added a new user to IDS: ", data) }
+      console.log("Successfully added a new user to IDS: ", data)
+      this._updateRemoteNames(this.props.params.roomname) }
     )
     .catch(
-      error => {console.log("ERROR IN GETTING USERNAME " + error); }
+      error => {console.log("Error sending my user name to IDS: " + error); }
     );
 }
 
@@ -732,11 +734,14 @@ _updateRemoteNames(roomname) {
   );
 }
 
+_deleteRoomData(roomname) {
+  console.log("Implement this function after making modifications to the IDS")
+  console.log("Clear all user data from a given room when everyone leaves")
+}
+
   render() {
     const this_main = this;
     console.log("My jid", this.props.myJid)
-    console.log("Remote videos main: ", this.props.remoteVideos)
-    console.log("Local videos main: ", this.props.localVideos)
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
     console.log("Remote names main: ", this.state.remoteNames)
     return (
@@ -848,9 +853,14 @@ _updateRemoteNames(roomname) {
           <div className={"remoteVideos footer-item"}>
             <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
               {this.props.remoteVideos.map((connection) => {
-                let name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
-                console.log("Look at this name: ", name)
                 if (connection) {
+                  let name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
+                  let counter = 0
+                  while (!name && counter < 3) {
+                    console.log("Couldn't get the name. Trying again. Tries left: ", 3-counter)
+                    name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
+                    counter++;
+                  }
                   let displayHorizontalBox = (!this._isDominant(connection.id) && this.props.remoteVideos.length > 1) || !this.props.enableDomSwitch;
                   console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
                   return displayHorizontalBox ? (
