@@ -664,24 +664,17 @@ _getUserName(userJid, roomname) {
   let ns = new NameServer({'nameServerUrl' : nameServerUrl, 'classname' : roomname});
   return ns.getUserByJid(userJid, roomname).then(
     data => {
-      console.log("Here's data: ", data)
-      console.log("Rem vid: ", this.props.remoteVideos)
       if (data[0] && data[0].username && data[0].userJid && data[0].roomname) {
         console.log("Successfully got the user name from IDS: ", data)
         console.log("Remote names before push: ", this.state.remoteNames)
         let names = this.state.remoteNames;
-        let newName = data[0] && data[0].username ? data[0].username : "Unknown User"
-        let newJid = data[0] && data[0].userJid ? data[0].userJid : "undefinedJid"
-        let thisRoom = data[0] && data[0].roomname ? data[0].roomname : "Unknown room"
-        let newNameObject = {userName: newName,
-                             userJid: newJid,
-                             roomName: thisRoom};
-         console.log("Adding a new name to the list of remote names", newNameObject)
+        let newNameObject = {userName: data[0].username,
+                             userJid: data[0].userJid,
+                             roomName: data[0].roomname};
         names.push(newNameObject);
         this.setState({
           remoteNames: names
         })
-        console.log("Remote names after push: ", this.state.remoteNames)
       }
       else {
         throw ("Empty or invalid data received from name server. Room: " + roomname + ", userJid: ", + userJid)
