@@ -27,6 +27,7 @@ import { NameServer } from '../utils/nameserver';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
+const nameServerUrl = 'http://localhost:8080'; //replace with Config.nameServerUrl eventually
 
 const styles = {
   root: {
@@ -267,6 +268,14 @@ componentWillReceiveProps = (nextProps) => {
       this._setUserName(this.props.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
     })
   }
+
+  if (this.props.remoteVideos && (nextProps.remoteVideos.length > this.props.remoteVideos.length)) {
+    let numRemoteVideos = nextProps.remoteVideos.length
+    let jid = nextProps.remoteVideos[numRemoteVideos-1].participantJid
+    //jid = jid.substring(jid.indexOf("/") + 1, jid.length)
+    jid = this._truncateJid(jid)
+    this._getUserName(jid, this.props.params.roomname )
+  }
   // if (this.props.connection && nextProps.connection && (this.props.connection.id !== nextProps.connection.id)) {
   //   console.log("current ID: ", this.props.connection.id)
   //   console.log("new ID: ", nextProps.connection.id)
@@ -316,15 +325,15 @@ componentWillReceiveProps = (nextProps) => {
       this.props.VideoControl('remote', this.props.remoteVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
     }
     //a new participant entered the room. Update my local array of users with their name and jid
-    console.log("Video info: ", videoInfo)
-    console.log("remote videos: ", this.props.remoteVideos)
-    console.log("last video: ", this.props.remoteVideos[numRemoteVideos-1].participantJid)
-    //prepare the jid string by removing the roomId part
-    let jid = this.props.remoteVideos[numRemoteVideos-1].participantJid
-    //jid = jid.substring(jid.indexOf("/") + 1, jid.length)
-    jid = this._truncateJid(jid)
-    console.log("COMPARE: ", jid)
-    this._getUserName(jid, this.props.params.roomname )
+    // console.log("Video info: ", videoInfo)
+    // console.log("remote videos: ", this.props.remoteVideos)
+    // console.log("last video: ", this.props.remoteVideos[numRemoteVideos-1].participantJid)
+    // //prepare the jid string by removing the roomId part
+    // let jid = this.props.remoteVideos[numRemoteVideos-1].participantJid
+    // //jid = jid.substring(jid.indexOf("/") + 1, jid.length)
+    // jid = this._truncateJid(jid)
+    // console.log("COMPARE: ", jid)
+    // this._getUserName(jid, this.props.params.roomname )
   }
 
 _onReceivedNewId(data) {
@@ -652,7 +661,9 @@ _dontDisplaySnackbar() {
 }
 
 _getUserName(userJid, roomname) {
-  let ns = new NameServer({'nameServerUrl' : 'http://localhost:8080', 'classname' : roomname});
+  console.log("Calling getUserName with arguments: ")
+  console.log(userJid, roomname)
+  let ns = new NameServer({'nameServerUrl' : nameServerUrl, 'classname' : roomname});
   return ns.getUserByJid(userJid, roomname).then(
     data => {
       console.log("Here's data: ", data)
@@ -671,17 +682,23 @@ _getUserName(userJid, roomname) {
         })
         console.log("Remote names after push: ", this.state.remoteNames)
       }
+      else {
+        throw ("Empty or invalid data received from name server. Room: " + roomname + ", userJid: ", + userJid)
+      }
     })
     .catch(
-      error => {console.log("ERROR IN GETTING USERNAME " + error); }
+      error => {console.log("ERROR GETTING USERNAME:  " + error); }
     );
 }
 
 _findUserName(namesArray, jid) {
   jid = jid.replace(/\//g, '_')
+  console.log("Looking for jid : ", jid)
+  console.log("in arran: ", namesArray)
   let userObject = namesArray.filter(function(obj) {
     return obj.userJid === jid
   })
+  console.log("This is the found object: ", userObject)
   return userObject[0] ? userObject[0].userName : null
 }
 
@@ -691,7 +708,7 @@ _truncateJid(jid) {
 }
 
 _setUserName(userJid, roomname, username) {
-  let ns = new NameServer({'nameServerUrl' : 'http://localhost:8080', 'classname' : roomname});
+  let ns = new NameServer({'nameServerUrl' : nameServerUrl, 'classname' : roomname});
   return ns.addOrUpdateUser(userJid, roomname, username).then(
     data => {
       console.log("Successfully added a new user to IDS: ", data) }
@@ -817,6 +834,7 @@ _setUserName(userJid, roomname, username) {
           <div className={"remoteVideos footer-item"}>
             <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
               {this.props.remoteVideos.map((connection) => {
+                console.log("looking through remote names...: ", this.state.remoteNames)
                 let name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
                 console.log("Look at this name: ", name)
                 if (connection) {
@@ -853,7 +871,7 @@ _setUserName(userJid, roomname, username) {
                     rows={0.5}
                     style={styles.gridTile}
                     key={connection.id}
-                    title={'Remote video'}
+                    title={name ? name : "Unknown User"}
                     actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
                     titleStyle={styles.titleStyle}
                     titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
