@@ -573,7 +573,6 @@ _isExtInstalled() {
 }
 
 _shareScreen() {
-  console.log("beginning of _shareScreen")
   const this_main = this;
   let screenShareStarted = false //updated to true/false depending on extension response
 
@@ -606,6 +605,7 @@ _shareScreen() {
              this_main.setState({
                isSharingScreen: screenShareStarted
              });
+             screenShareStarted = true
            }
            else {
              console.log("Invalid streamId --> not starting screen share")
@@ -625,17 +625,14 @@ _screenShareControl(changeExtensionStatus) {
   //changeExtensionStatus is a boolean parameter.
   //When the extension was just installed, _screenShareControl(true) is
   //called. In other cases, _screenShareControl(false)
-
   if (changeExtensionStatus) {
     //If extension was just installed, notify Redux store that
     //the extension now exists
     this.props.changeExtensionStatus(true)
   }
-
   console.log("Screen Share control. Extension installed? -- ", this.props.screenShareExtInstalled)
   let screenShareStarted = false
   if (!this.state.isSharingScreen) {
-    console.log("Entered if statement")
     screenShareStarted = this._shareScreen()
     console.log("ShareScreen returned: ", screenShareStarted)
     // if (screenShareStarted !== this.state.isSharingScreen) {
@@ -645,7 +642,7 @@ _screenShareControl(changeExtensionStatus) {
     //   });
     // }
   } else {
-    console.log("Entered else")
+    //already sharing screen, so end screen share
     this.endScreenshare()
     this.setState({
       isSharingScreen: false,
