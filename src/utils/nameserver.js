@@ -81,6 +81,7 @@ export class NameServer {
       body: JSON.stringify({
           "query" : {
             "userJid" : jid,
+            "username" : name,
           },
           "object" : {
             "username" : name,

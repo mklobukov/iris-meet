@@ -270,6 +270,7 @@ componentWillReceiveProps = (nextProps) => {
   // }
 
   if (this.props.myJid !== nextProps.myJid) {
+    console.log("Observed change in my jid: Updating user name")
     this._setUserName(nextProps.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
   }
 
@@ -634,6 +635,8 @@ _screenShareControl(changeExtensionStatus) {
   let screenShareStarted = false
   if (!this.state.isSharingScreen) {
     screenShareStarted = this._shareScreen()
+    //??
+    this.props.VideoControl('remote', this.props.dominantSpeakerIndex, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, true)
     console.log("ShareScreen returned: ", screenShareStarted)
     // if (screenShareStarted !== this.state.isSharingScreen) {
     //   console.log("Setting this.state.isSharingScreen to ", screenShareStarted)
@@ -688,12 +691,16 @@ _findUserName(namesArray, jid) {
   console.log("Looking for jid : ", jid)
   console.log("in array: ")
   console.log(namesArray)
-  console.log("First element is: ", namesArray[0])
   let userObject = namesArray.filter(function(obj) {
     return obj.userJid === jid
   })
-  console.log("This is the found object: ", userObject)
-
+  //it is possible that more than one object with a given jid are found.
+  //Ignore all results past the first one, this won't be an issue with actual
+  //calls (unless the user opens the same room several times in different browsers/incognito
+  //with different user names, which is unlikely)
+  if (userObject.length !== 0) {
+    console.log("Object valid. Name is : ", userObject[0].userName)
+  }
   return userObject[0] ? userObject[0].userName : null
 }
 
@@ -741,6 +748,7 @@ _deleteRoomData(roomname) {
     console.log("My jid", this.props.myJid)
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
     console.log("Remote names main: ", this.state.remoteNames)
+    console.log("Remote videos main: ", this.props.remoteVideos)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         <Snackbar
