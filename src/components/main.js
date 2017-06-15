@@ -148,7 +148,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       isSharingScreen: false,
       showFeatureInDev: false,
       showDomSpeakerSnackbar: false,
-      myJidStoredInIDS: false,
       myName: "",
       remoteNames: [],
     }
@@ -260,26 +259,19 @@ componentWillReceiveProps = (nextProps) => {
     })
   }
 
-  // if (!this.state.myJidStoredInIDS && this.props.myJid == null && nextProps.myJid != null) {
-  //   this.setState({
-  //     myJidStoredInIDS: true,
-  //   }, () => {
-  //     console.log("Setting username with jid: ", this.props.myJid)
-  //     this._setUserName(this.props.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
-  //   })
+  //Golang name server:
+  // if (this.props.myJid !== nextProps.myJid) {
+  //   console.log("Observed change in my jid: Updating user name")
+  //   if (nextProps.myJid) {
+  //     this._setUserName(nextProps.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
+  //   }
   // }
 
-  if (this.props.myJid !== nextProps.myJid) {
-    console.log("Observed change in my jid: Updating user name")
-    if (nextProps.myJid) {
-      this._setUserName(nextProps.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
-    }
-  }
-
-  if(this.props.remoteVideos.length < nextProps.remoteVideos.length) {
-    //only update remote names if more videos came in
-    this._updateRemoteNames(this.props.params.roomname)
-  }
+  //Golang name server:
+  // if(this.props.remoteVideos.length < nextProps.remoteVideos.length) {
+  //   //only update remote names if more videos came in
+  //   this._updateRemoteNames(this.props.params.roomname)
+  // }
 
   // if (this.props.connection && nextProps.connection && (this.props.connection.id !== nextProps.connection.id)) {
   //   console.log("current ID: ", this.props.connection.id)
@@ -755,7 +747,6 @@ _deleteRoomData(roomname) {
   render() {
     console.log("print window: ", window)
     const this_main = this;
-    console.log("My jid", this.props.myJid)
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
     console.log("Remote names main: ", this.state.remoteNames)
     console.log("Remote videos main: ", this.props.remoteVideos)
