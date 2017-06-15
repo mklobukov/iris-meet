@@ -45,6 +45,7 @@ export default class LoginPanel extends React.Component {
             roomNameText={this.state.roomNameText}
             _onRoomNameTextChange={this._onRoomNameTextChange.bind(this)}
             onAction={this.props.onAction}
+            displayDialer={this.props.displayDialer}
         />
     </div>
     );

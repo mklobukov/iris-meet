@@ -23,7 +23,7 @@ import IconButton from 'material-ui/IconButton';
 import sss from 'material-ui/svg-icons/toggle/star-border';
 import StarBorder from 'material-ui/svg-icons/hardware/headset-mic';
 import Snackbar from 'material-ui/Snackbar';
-import { NameServer } from '../utils/nameserver';
+import { NameServer } from '../api/nameserver';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -271,7 +271,9 @@ componentWillReceiveProps = (nextProps) => {
 
   if (this.props.myJid !== nextProps.myJid) {
     console.log("Observed change in my jid: Updating user name")
-    this._setUserName(nextProps.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
+    if (nextProps.myJid) {
+      this._setUserName(nextProps.myJid, this.props.params.roomname, localStorage.getItem('irisMeet.userName'));
+    }
   }
 
   if(this.props.remoteVideos.length < nextProps.remoteVideos.length) {
@@ -375,6 +377,7 @@ _onReceivedNewId(data) {
     const dom = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"));
     const matchedConnection = this.props.remoteVideos.find((connection) => {
       let participantId = connection.participantJid;
+      //first index in the next line may need to be 0 after the SDK update 6/15/2017
       participantId = participantId.substring(participantId.indexOf("/")+1, participantId.indexOf("@iris-meet.comcast.com"))
       const endPoint = participantId.substring(participantId.lastIndexOf("/")+1)
       console.log("endpoint and dom: " + endPoint + ", " + dom)
@@ -455,6 +458,12 @@ _onReceivedNewId(data) {
     console.log('Login failure: ');
     console.log(error);
   }
+
+_displayDialer() {
+  //redirect to the dialer page
+  const hostname = window.location.origin;
+  window.location.assign(hostname + '/dialerapp/dialer');
+}
 
   _onLoginPanelComplete(e) {
     e.preventDefault();
@@ -744,6 +753,7 @@ _deleteRoomData(roomname) {
 }
 
   render() {
+    console.log("print window: ", window)
     const this_main = this;
     console.log("My jid", this.props.myJid)
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
@@ -795,8 +805,6 @@ _deleteRoomData(roomname) {
             domSpeakerSwitchEnabled={this.props.enableDomSwitch !== undefined ? this.props.enableDomSwitch : true}
             enableDomSwitchFunc={this.enableDomSwitching.bind(this)}
           /> : null}
-
-
 
             <MainVideo className={"main_video"}>
               {
@@ -921,9 +929,7 @@ _deleteRoomData(roomname) {
               })}
             </GridList>
           </div>
-
-          </section>
-
+        </section>
 
       {this.state.showUser || this.state.showRoom ?
         <LoginPanel
@@ -932,6 +938,7 @@ _deleteRoomData(roomname) {
           showRoom={this.state.showRoom}
           showUser={this.state.showUser}
           onAction={this._onLoginPanelComplete.bind(this)}
+          displayDialer={this._displayDialer.bind(this)}
         /> : null}
       </div>
     );

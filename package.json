@@ -11,7 +11,7 @@
     "font-awesome": "^4.3.0",
     "identicon.js": "^2.2.1",
     "iris-auth-js-sdk": "1.0.8",
-    "iris-react-webrtc": "1.1.4",
+    "iris-react-webrtc": "1.1.6",
     "keymirror": "^0.1.1",
     "lodash": "^3.6.0",
     "material-ui": "0.18.1",
@@ -24,7 +24,8 @@
     "redux": "^3.6.0",
     "redux-thunk": "^2.2.0",
     "whatwg-fetch": "^2.0.3",
-    "identicon.js": "2.2.1"
+    "identicon.js": "2.2.1",
+    "uuid": "^3.0.1"
   },
   "devDependencies": {
     "react-scripts": "0.9.5"

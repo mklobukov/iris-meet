@@ -7,9 +7,27 @@ import './login-panel.css'
 
 const stylePaper = {
   height: 200,
-  width: 400,
-  margin: 20,
+  width: 'auto',
+  margin: 0,
   display: 'flex',
+  alignItems: 'center'
+};
+
+const enterRoomPaper = {
+  height: 200,
+  width: 300,
+  margin: 0,
+  display: 'flex',
+  alignItems: 'center'
+};
+
+const dialerPaper = {
+  height: 200,
+  width: 300,
+  margin: 0,
+  display: 'flex',
+  flexDirection: 'column',
+  justifyContent: 'center',
   alignItems: 'center'
 };
 
@@ -17,38 +35,54 @@ const styleButton = {
   margin: 12,
 };
 
-const LoginPanelComponent = ({showUser, userNameText, _onUserNameTextChange, showRoom, roomNameText, _onRoomNameTextChange, onAction}) => (
+const styleText = {
+
+}
+
+const LoginPanelComponent = ({showUser, userNameText, _onUserNameTextChange, showRoom, roomNameText, _onRoomNameTextChange, onAction, displayDialer}) => (
   <div id="main-login">
     <Paper style={stylePaper} zDepth={1} rounded={false}>
-      <form id="login-panel" className="form">
-        {showUser === true ? <div className="form-group">
-          <TextField
-            type="text"
-            className="form-control"
-            id="userName"
-            hintText="Name"
-            value={userNameText}
-            onChange={_onUserNameTextChange}
+      <Paper style={enterRoomPaper} zDepth={1} rounded={false}>
+        <form id="login-panel" className="form">
+          {showUser === true ? <div className="form-group">
+            <TextField
+              type="text"
+              className="form-control"
+              id="userName"
+              hintText="Name"
+              value={userNameText}
+              onChange={_onUserNameTextChange}
+            />
+          </div> : null}
+          {showRoom === true ? <div className="form-group">
+            <TextField
+              type="text"
+              className="form-control"
+              id="roomName"
+              hintText="Enter room name"
+              value={roomNameText}
+              onChange={_onRoomNameTextChange.bind(this)}
+            />
+          </div> : null}
+          <RaisedButton
+            label="Enter"
+            primary={true}
+            style={styleButton}
+            type="submit"
+            onClick={onAction}
           />
-        </div> : null}
-        {showRoom === true ? <div className="form-group">
-          <TextField
-            type="text"
-            className="form-control"
-            id="roomName"
-            hintText="Room name"
-            value={roomNameText}
-            onChange={_onRoomNameTextChange.bind(this)}
+        </form>
+      </Paper>
+
+      <Paper style={dialerPaper} zDepth={1} rounded={false}>
+          <RaisedButton
+            label="Open Dialer"
+            primary={true}
+            style={styleButton}
+            type="submit"
+            onClick={displayDialer}
           />
-        </div> : null}
-        <RaisedButton
-          label="Enter"
-          primary={true}
-          style={styleButton}
-          type="submit"
-          onClick={onAction}
-        />
-      </form>
+      </Paper>
     </Paper>
   </div>
 );

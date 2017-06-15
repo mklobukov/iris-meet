@@ -10,6 +10,7 @@ import { Provider } from 'react-redux';
 import reducersCombined from './reducers';
 import thunk from 'redux-thunk';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
+import Example from './components/dialer/Example';
 
 let store = createStore(
   reducersCombined,
@@ -24,6 +25,7 @@ render(
           <IndexRoute component={Main} />
           //<Route path='/' component={Main} />
           <Route path='/:roomname' component={Main} />
+          <Route path='dialerapp/dialer' component={Example} />
         </Route>
       </Router>
     </Provider>
