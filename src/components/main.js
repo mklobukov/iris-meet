@@ -162,6 +162,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.extInstalled = this._isExtInstalled.bind(this);
     this.unimplementedButtonToggle = this.unimplementedButtonToggle.bind(this);
     this.enableDomSwitching = this._enableDominantSwitching.bind(this);
+    this.onParticipantVideoMuted = this._onParticipantVideoMuted.bind(this);
+    this.onParticipantAudioMuted = this._onParticipantAudioMuted.bind(this);
+    this.onUserProfileChange = this._onUserProfileChange.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -194,6 +197,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_SWITCH_STREAM, this.onReceivedNewId);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_VIDEO_MUTED, this.onParticipantVideoMuted);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_AUDIO_MUTED, this.onParticipantAudioMuted);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_USER_PROFILE_CHANGE, this.onUserProfileChange);
 
     const requestedResolution = getQueryParameter('resolution');
     console.log(requestedResolution);
@@ -390,6 +396,18 @@ _onReceivedNewId(data) {
       //the most recent remote dominant speaker
       this.props.changeDominantSpeaker(this.props.localVideos[0].id)
     }
+  }
+
+  _onParticipantVideoMuted(jid, muted){
+    console.log("_onParticipantVideoMuted jid " + jid + " muted "+muted);
+  }
+
+  _onParticipantAudioMuted(jid, muted){
+    console.log("_onParticipantVideoMuted jid " + jid + " muted "+muted);
+  }
+
+  _onUserProfileChange(jid, profileJson){
+    console.log('_onUserProfileChange' + jid + ' profileJson ' + JSON.stringify(profileJson));
   }
 
   _userLoggedIn() {
