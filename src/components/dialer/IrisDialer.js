@@ -3,7 +3,7 @@ import DialPad from './DialPad';
 import DisplayNumber from './DisplayNumber';
 import StatusText from './StatusText';
 import RemoteAudio from './RemoteAudio'
-import './style.css';
+import './css/style.css';
 
 import config from './config.json';
 

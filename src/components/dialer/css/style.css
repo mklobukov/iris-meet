@@ -1,6 +1,6 @@
 @import url(https://fonts.googleapis.com/css?family=Lato:400,400italic,700);
 
-.App {
+.App-main {
   text-align: center;
 }
 
@@ -33,7 +33,7 @@
 
 .button {
   height: 1.5em;
-  background-color: orange;
+  background-color: cyan;
   border: white 1px solid;
   font-size: 2em;
   cursor: default;

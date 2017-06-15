@@ -24,7 +24,7 @@ class Example extends Component{
 
   render() {
     return (
-      <div className="App">
+      <div className="App-main">
         <h2 className="">Iris Dialer App</h2>
         <IrisDialer config={{
             "irisToken":this.state.irisToken,
