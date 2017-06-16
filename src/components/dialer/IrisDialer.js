@@ -4,6 +4,7 @@ import DisplayNumber from './DisplayNumber';
 import StatusText from './StatusText';
 import RemoteAudio from './RemoteAudio'
 import './css/style.css';
+import Paper from 'material-ui/Paper';
 
 import config from './config.json';
 
@@ -57,6 +58,8 @@ class IrisDialer extends Component {
     this.onDeleteDigit = this.onDeleteDigit.bind(this);
     this.onNumberChange = this.onNumberChange.bind(this);
   }
+
+
 
   render() {
     console.log(this.props);

@@ -1,12 +1,21 @@
 import React, {Component} from 'react';
 import IrisDialer from './IrisDialer';
 import { AuthManager } from 'iris-auth-js-sdk';
+import Paper from 'material-ui/Paper';
 
 import config from './config.json';
 var uuidV1 = require('uuid/v1');
 
 var IrisAuthManager = window.IrisAuthManager;
 var IrisEventManager = window.IrisEventManager;
+
+const paperStyle = {
+  "width" : "320px",
+  "justifyContent" : "center",
+  "paddingBottom" : "20px",
+  "paddingTop" : "10px",
+}
+
 
 class Example extends Component{
 
@@ -24,8 +33,9 @@ class Example extends Component{
 
   render() {
     return (
+      <Paper style={paperStyle}>
       <div className="App-main">
-        <h2 className="">Iris Dialer App</h2>
+        <h2>Iris Dialer App</h2>
         <IrisDialer config={{
             "irisToken":this.state.irisToken,
             "routingId":this.state.routingId,
@@ -33,6 +43,7 @@ class Example extends Component{
             "cname":this.state.cname
           }}/>
       </div>
+      </Paper>
     );
   }
 

@@ -7,7 +7,7 @@ class StatusText extends Component {
 
   render(){
     return(
-      <div className="">
+      <div>
         {this.props.statusText} {this.props.number}
       </div>
     );

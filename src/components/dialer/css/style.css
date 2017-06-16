@@ -26,9 +26,16 @@
 }
 
 
-
+/*
 .button {
   height: 12em;
+}*/
+
+.container {
+  padding-right: 15px;
+  padding-left: 15px;
+  margin-right: auto;
+  margin-left: auto;
 }
 
 .button {
@@ -47,6 +54,28 @@
   user-select: none;
 }
 
+.btn {
+    display: inline-block;
+    padding: 6px 12px;
+    margin-bottom: 0;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.42857143;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    -ms-touch-action: manipulation;
+    touch-action: manipulation;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+}
+
 .button:active {
   background-color: red;
 }
@@ -61,6 +90,7 @@ button:focus, button:active, button:hover, label:focus, .btn:active,
 .dropdown-menu li a {
   padding: 3px 10px;
 }
+
 
 .dig {
   width: 49px;
