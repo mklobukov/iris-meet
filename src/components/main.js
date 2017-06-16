@@ -408,6 +408,11 @@ _onReceivedNewId(data) {
 
   _onUserProfileChange(jid, profileJson){
     console.log('_onUserProfileChange' + jid + ' profileJson ' + JSON.stringify(profileJson));
+    // this function is called when:
+    //   1) remote participant is first detected upon joining the room
+    //   2) remote participant changes name
+    // when either of these events occurs, update the remoteNames state
+    // Lookup of names by jid in the horizontal box part can remain the same
   }
 
   _userLoggedIn() {
