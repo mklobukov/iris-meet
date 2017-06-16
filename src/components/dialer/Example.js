@@ -33,8 +33,8 @@ class Example extends Component{
 
   render() {
     return (
-      <Paper style={paperStyle}>
       <div className="App-main">
+      <Paper style={paperStyle}>
         <h2>Iris Dialer App</h2>
         <IrisDialer config={{
             "irisToken":this.state.irisToken,
@@ -42,8 +42,8 @@ class Example extends Component{
             "fromTN":this.state.fromTN,
             "cname":this.state.cname
           }}/>
-      </div>
       </Paper>
+    </div>
     );
   }
 

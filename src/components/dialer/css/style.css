@@ -2,6 +2,10 @@
 
 .App-main {
   text-align: center;
+  /*position: fixed;
+  left: 40%;*/
+  display: table;
+  margin: 0 auto;
 }
 
 .App-logo {
