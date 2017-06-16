@@ -403,11 +403,11 @@ _onReceivedNewId(data) {
   }
 
   _onParticipantAudioMuted(jid, muted){
-    console.log("_onParticipantVideoMuted jid " + jid + " muted "+muted);
+    console.log("_onParticipantAudioMuted jid " + jid + " muted "+muted);
   }
 
   _onUserProfileChange(jid, profileJson){
-    console.log('_onUserProfileChange' + jid + ' profileJson ' + JSON.stringify(profileJson));
+    console.log('_onUserProfileChange ' + jid + ' profileJson ' + JSON.stringify(profileJson));
     // this function is called when:
     //   1) remote participant is first detected upon joining the room
     //   2) remote participant changes name
