@@ -187,7 +187,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     //initialize spinner enabler to false
     console.log("Initializing spinner enabler to false")
     this.props.isCreatingRoom(false);
-    this._updateRemoteNames(this.props.params.roomname)
   }
 
 
@@ -406,13 +405,22 @@ _onReceivedNewId(data) {
     console.log("_onParticipantAudioMuted jid " + jid + " muted "+muted);
   }
 
-  _onUserProfileChange(jid, profileJson){
-    console.log('_onUserProfileChange main.js ', jid, ' profileJson ', profileJson);
+  _onUserProfileChange(profile){
+    console.log('_onUserProfileChange main.js ', profile.jid, ' profileJson ', profile.name);
+    console.log(profile.name)
     // this function is called when:
     //   1) remote participant is first detected upon joining the room
     //   2) remote participant changes name
     // when either of these events occurs, update the remoteNames state
     // Lookup of names by jid in the horizontal box part can remain the same
+
+    let names = this.state.remoteNames;
+    let newNameObject = {userName: profile.name, userJid: this._truncateJid(profile.jid)};
+    names.push(newNameObject);
+    this.setState({
+      remoteNames: names
+    })
+
   }
 
   _userLoggedIn() {
