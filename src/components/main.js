@@ -501,6 +501,7 @@ _displayDialer() {
     window.location.assign(hostname + '/' + roomName);
   }
 
+
   _onLocalAudioMute(isMuted) {
     this.props.onAudioMute();
   }

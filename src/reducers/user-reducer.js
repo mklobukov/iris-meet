@@ -21,7 +21,7 @@ const UserReducer = (state = {}, action) => {
             return {
               userName: action.data.userName,
               routingId: action.data.routingId,
-              roomName: action.data.roomName,
+              roomName: action.data.roomName.toLowerCase(),
               accessToken: action.data.accessToken,
               decodedToken: action.data.decodedToken
             }
