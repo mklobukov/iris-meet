@@ -45,7 +45,7 @@ const styles = {
   gridList: {
     // paddingLeft: '1px',
     // display: 'flex',
-    minWidth: '162px',
+    minWidth: '300px',
     flexWrap: 'nowrap',
     overflowX: 'auto', //good
     overflowY: 'hidden',
@@ -327,12 +327,6 @@ componentWillReceiveProps = (nextProps) => {
     if (numRemoteVideos === 1) {
       this.props.VideoControl('remote', this.props.remoteVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
     }
-    //a new participant entered the room. Update my local array of users with their name and jid
-    //prepare the jid string by removing the roomId part
-    //??
-    // let jid = this.props.remoteVideos[numRemoteVideos-1].participantJid
-    // jid = this._truncateJid(jid)
-    // this._getUserName(jid, this.props.params.roomname )
   }
 
 _onReceivedNewId(data) {
@@ -547,7 +541,6 @@ _displayDialer() {
   }
 
   _onExpandHide() {
-    console.log("onexpandhide")
     this.setState({
       isVideoBarHidden: !this.state.isVideoBarHidden,
     });
@@ -847,12 +840,12 @@ _deleteRoomData(roomname) {
 
             <MainVideo className={"main_video"}>
               {
-                this.props.videoType === 'remote' && true ?
+                this.props.videoType === 'remote' && false ?
                 <RemoteVideo
                   video={this.props.connection}
                 /> : null
               }
-              {this.props.videoType === 'local' && true ?
+              {this.props.videoType === 'local' && false ?
                 <LocalVideo
                   video={this.props.localVideos[0]}
                 /> : null
