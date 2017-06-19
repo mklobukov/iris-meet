@@ -150,6 +150,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       showDomSpeakerSnackbar: false,
       myName: "",
       remoteNames: [],
+      resolution: "hd",
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -201,7 +202,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_USER_PROFILE_CHANGE, this.onUserProfileChange);
 
     const requestedResolution = getQueryParameter('resolution');
-    console.log(requestedResolution);
+    console.log("Resolution: ", requestedResolution);
     console.log('roomName: ' + this.props.params.roomname);
     let showRoom = false;
     let showUser = false;
@@ -439,8 +440,12 @@ _onReceivedNewId(data) {
       showRoom: false,
       showUser: false,
     }, () => {
-      let requestedResolution = getQueryParameter('resolution');
-      console.log(requestedResolution);
+      console.log("RESOLUTION FROM STATE: ", this.state.resolution)
+      console.log("refs: ", this.refs.loginpanel ? this.refs.loginpanel.resolution : null)
+
+      //let requestedResolution = getQueryParameter('resolution');
+      let requestedResolution = localStorage.getItem('irisMeet.resolution')
+      console.log("requested resolution: ", requestedResolution);
       if (!validResolution(requestedResolution)) {
         console.log('Requested resolution is not valid.  Switching to default hd.');
         requestedResolution = 'hd';
@@ -457,7 +462,7 @@ _onReceivedNewId(data) {
             domain: this.props.decodedToken.payload['domain'].toLowerCase(),
             token: this.props.accessToken,
             routingId: this.props.routingId,
-            resolution: 'hd',
+            resolution: requestedResolution,
             hosts: {
               eventManagerUrl: Config.eventManagerUrl,
               notificationServer: Config.notificationServer
@@ -496,6 +501,7 @@ _displayDialer() {
       });
       localStorage.setItem('irisMeet.routingId', routingId);
     }
+
     const userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
     const roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
     localStorage.setItem('irisMeet.userName', userName);
@@ -503,9 +509,10 @@ _displayDialer() {
     //now that we have both username and roomname, update entry in the IDS
 
     const hostname = window.location.origin;
-    window.location.assign(hostname + '/' + roomName);
-  }
+    localStorage.setItem('irisMeet.resolution', this.refs.loginpanel.resolution)
 
+    window.location.assign(hostname + '/' + roomName)
+  }
 
   _onLocalAudioMute(isMuted) {
     this.props.onAudioMute();
@@ -772,6 +779,13 @@ _deleteRoomData(roomname) {
   console.log("Clear all user data from a given room when everyone leaves")
 }
 
+_onResolutionChoice(res) {
+  this.setState({resolution: res}, () => {
+    console.log("CHOSEN RESOLUTION: ", this.state.resolution)
+    localStorage.setItem('irisMeet.resolution', this.state.resolution);
+   })
+}
+
   render() {
     const this_main = this;
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
@@ -951,6 +965,7 @@ _deleteRoomData(roomname) {
           showUser={this.state.showUser}
           onAction={this._onLoginPanelComplete.bind(this)}
           displayDialer={this._displayDialer.bind(this)}
+          onResolutionChoice={this._onResolutionChoice.bind(this)}
         /> : null}
       </div>
     );

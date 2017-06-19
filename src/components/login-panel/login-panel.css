@@ -18,3 +18,10 @@
   align-items: center;
   border-right: 1px solid #F5F5F5;
 }
+
+#inputs {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: flex-end;
+}

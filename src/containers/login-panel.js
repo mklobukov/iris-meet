@@ -10,6 +10,7 @@ export default class LoginPanel extends React.Component {
     this.state = {
       userNameText: '',
       roomNameText: '',
+      resolution: 'hd',
     }
   }
 
@@ -25,12 +26,22 @@ export default class LoginPanel extends React.Component {
     });
   }
 
+  _handleResolutionChoice = (event, index, value) => {
+    this.setState({resolution: value})
+    this.props.onResolutionChoice(value)
+  }
+
+
   get userName() {
     return this.state.userNameText;
   }
 
   get roomName() {
     return this.state.roomNameText;
+  }
+
+  get resolution() {
+    return this.state.resolution;
   }
 
   render () {
@@ -46,6 +57,8 @@ export default class LoginPanel extends React.Component {
             _onRoomNameTextChange={this._onRoomNameTextChange.bind(this)}
             onAction={this.props.onAction}
             displayDialer={this.props.displayDialer}
+            _onResolutionChoice={this._handleResolutionChoice}
+            resolutionChoice={this.state.resolution}
         />
     </div>
     );
