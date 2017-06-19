@@ -443,26 +443,12 @@ _onReceivedNewId(data) {
       console.log(requestedResolution);
       if (!validResolution(requestedResolution)) {
         console.log('Requested resolution is not valid.  Switching to default hd.');
-        requestedResolution = '640';
+        requestedResolution = 'hd';
       }
       getRoomId(this.props.roomName, this.props.accessToken)
       .then((response) => {
         console.log(response);
         const roomId = response.room_id;
-        //
-        //
-        // this.props.initializeWebRTC(this.props.userName, this.props.routingId,
-        //   this.props.roomName,
-        //   roomId,
-        //   this.props.decodedToken.payload['domain'].toLowerCase(),
-        //   {
-        //     eventManagerUrl: Config.eventManagerUrl,
-        //     notificationServer: Config.notificationServer },
-        //     this.props.accessToken,
-        //     '640',
-        //     true,
-        //     true
-        //   );
 
           let config = {
             userName: this.props.userName,
