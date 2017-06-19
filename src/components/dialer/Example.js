@@ -3,8 +3,10 @@ import IrisDialer from './IrisDialer';
 import { AuthManager } from 'iris-auth-js-sdk';
 import Paper from 'material-ui/Paper';
 
-import config from './config.json';
+import Config from '../../../config.json';
+const config = Config.dialer;
 var uuidV1 = require('uuid/v1');
+
 
 var IrisAuthManager = window.IrisAuthManager;
 var IrisEventManager = window.IrisEventManager;

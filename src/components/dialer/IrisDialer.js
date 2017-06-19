@@ -6,7 +6,8 @@ import RemoteAudio from './RemoteAudio'
 import './css/style.css';
 import Paper from 'material-ui/Paper';
 
-import config from './config.json';
+import Config from '../../../config.json';
+const config = Config.dialer;
 
 require('iris-js-sdk');
 
@@ -60,14 +61,13 @@ class IrisDialer extends Component {
   }
 
 
-
+  // <DisplayNumber number={this.state.number}
+  //   onNumberChange={this.onNumberChange}/>
   render() {
     console.log(this.props);
     return (
       <div className="iris-dialer-app">
         <div className="container">
-          <DisplayNumber number={this.state.number}
-            onNumberChange={this.onNumberChange}/>
           <DialPad number={this.state.number}
             onDialDigit={this.onDialDigit}
             onDeleteDigit={this.onDeleteDigit}
