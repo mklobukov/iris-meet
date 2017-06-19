@@ -62,7 +62,7 @@ const styles = {
   titleStyle: {
     color: 'rgb(0, 188, 212)',
     fontSize: '12px',
-    marginBottom: '-3px',
+    marginBottom: '0px',
     minWidth: '160px'
   },
   gridTile: {
