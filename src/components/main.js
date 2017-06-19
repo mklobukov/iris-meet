@@ -906,13 +906,7 @@ _deleteRoomData(roomname) {
             <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
               {this.props.remoteVideos.map((connection) => {
                 if (connection) {
-                  let name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
-                  let counter = 0
-                  while (!name && counter < 3) {
-                    console.log("Couldn't get the name. Trying again. Tries left: ", 3-counter)
-                    name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
-                    counter++;
-                  }
+                  //UNCOMMENT THIS!! let name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
                   let displayHorizontalBox = (!this._isDominant(connection.id) && this.props.remoteVideos.length > 1) || !this.props.enableDomSwitch;
                   console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
                   return displayHorizontalBox ? (
@@ -946,7 +940,7 @@ _deleteRoomData(roomname) {
                     rows={0.5}
                     style={styles.gridTile}
                     key={connection.id}
-                    title={name ? name : "Unknown User"}
+                    title={name ? name : "Remote Video"}
                     actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
                     titleStyle={styles.titleStyle}
                     titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
