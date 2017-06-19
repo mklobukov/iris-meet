@@ -61,13 +61,14 @@ class IrisDialer extends Component {
   }
 
 
-  // <DisplayNumber number={this.state.number}
-  //   onNumberChange={this.onNumberChange}/>
+
   render() {
     console.log(this.props);
     return (
       <div className="iris-dialer-app">
         <div className="container">
+           <DisplayNumber number={this.state.number}
+             onNumberChange={this.onNumberChange}/>
           <DialPad number={this.state.number}
             onDialDigit={this.onDialDigit}
             onDeleteDigit={this.onDeleteDigit}
@@ -127,10 +128,10 @@ class IrisDialer extends Component {
     this.setState({number : event.target.value, statusText:"Dialing"});
 
 
-    if (this.state.number.indexOf("+1") === -1) {
-      this.setState({number : "+1" + this.state.number});
-      config.toTN = this.state.number;
-    }
+    // if (this.state.number.indexOf("+1") === -1) {
+    //   this.setState({number : "+1" + this.state.number});
+    //   config.toTN = this.state.number;
+    // }
     config.toRoutingId = config.toTN + '@' + config.domain;
   }
 
