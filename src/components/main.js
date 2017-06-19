@@ -413,9 +413,27 @@ _onReceivedNewId(data) {
     //   2) remote participant changes name
     // when either of these events occurs, update the remoteNames state
     // Lookup of names by jid in the horizontal box part can remain the same
+
     let names = this.state.remoteNames;
-    let newNameObject = {userName: profile.name, userJid: this._truncateJid(profile.jid)};
-    names.push(newNameObject);
+    //check if this jid is already in remoteNames. If it is, update the object
+    let userFound = false;
+    for (var i in names) {
+      if (names[i].userJid == profile.jid) {
+        console.log("Found user with this jid. Updating name from ", names[i].userName, " to ", profile.name)
+        names[i].userName = profile.name;
+        userFound = true;
+        break;
+      }
+    }
+
+    //if not found, create a new user object and pass it to remoteNames
+    if (!userFound) {
+      console.log("New user joined. Adding ", profile.name, " to remoteNames")
+      let newNameObject = {userName: profile.name, userJid: this._truncateJid(profile.jid)};
+      names.push(newNameObject);
+    }
+
+    //update state
     this.setState({
       remoteNames: names
     })
