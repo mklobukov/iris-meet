@@ -434,9 +434,10 @@ _onReceivedNewId(data) {
     }
 
     //update state
-    this.setState({
-      remoteNames: names
-    })
+    //UNCOMMENT THIS!!
+    // this.setState({
+    //   remoteNames: names
+    // })
   }
 
   _userLoggedIn() {
@@ -920,7 +921,7 @@ _deleteRoomData(roomname) {
                       rows={0.5}
                       key={connection.id}
                       style={styles.gridTile}
-                      title={name ? name : "Unknown User"}
+                      title={name ? name : "Remote Video"}
                       actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
                       titleStyle={styles.titleStyle}
                       titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
