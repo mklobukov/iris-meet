@@ -406,21 +406,19 @@ _onReceivedNewId(data) {
   }
 
   _onUserProfileChange(profile){
-    console.log('_onUserProfileChange main.js ', profile.jid, ' profileJson ', profile.name);
-    console.log(profile.name)
+    console.log('_onUserProfileChange in the client\nFull Jid before truncation: ', profile.jid)
+    console.log("Name: ", profile.name);
     // this function is called when:
     //   1) remote participant is first detected upon joining the room
     //   2) remote participant changes name
     // when either of these events occurs, update the remoteNames state
     // Lookup of names by jid in the horizontal box part can remain the same
-
     let names = this.state.remoteNames;
     let newNameObject = {userName: profile.name, userJid: this._truncateJid(profile.jid)};
     names.push(newNameObject);
     this.setState({
       remoteNames: names
     })
-
   }
 
   _userLoggedIn() {
@@ -777,7 +775,6 @@ _deleteRoomData(roomname) {
 }
 
   render() {
-    console.log("print window: ", window)
     const this_main = this;
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
     console.log("Remote names main: ", this.state.remoteNames)
