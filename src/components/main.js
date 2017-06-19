@@ -840,12 +840,12 @@ _deleteRoomData(roomname) {
 
             <MainVideo className={"main_video"}>
               {
-                this.props.videoType === 'remote' && false ?
+                this.props.videoType === 'remote' && true ?
                 <RemoteVideo
                   video={this.props.connection}
                 /> : null
               }
-              {this.props.videoType === 'local' && false ?
+              {this.props.videoType === 'local' && true ?
                 <LocalVideo
                   video={this.props.localVideos[0]}
                 /> : null
