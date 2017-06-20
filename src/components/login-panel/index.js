@@ -40,8 +40,8 @@ const styleButton = {
   margin: 12,
 };
 
-const styleText = {
-
+const labelStyle = {
+  color: "rgb(0, 188, 212)"
 }
 
 const dropDownStyle = {
@@ -76,9 +76,9 @@ const LoginPanelComponent = ({showUser, userNameText, _onUserNameTextChange, sho
             </div> : null}
 
             <DropDownMenu value={resolutionChoice} onChange={_onResolutionChoice}
-                          openImmediately={false} underlineStyle={dropDownStyle}>
+                          openImmediately={false} underlineStyle={dropDownStyle} labelStyle={labelStyle}>
               {validResolutions.map((resolution) => {
-                return <MenuItem value={resolution} primaryText={resolution} key={resolution}/>
+                return <MenuItem value={resolution} label={"Resolution: " + resolution} primaryText={resolution} key={resolution}/>
               }
             )}
             </DropDownMenu>
