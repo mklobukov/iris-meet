@@ -7,7 +7,7 @@ import './login-panel.css'
 import DropDownMenu from 'material-ui/DropDownMenu';
 import MenuItem from 'material-ui/MenuItem';
 
-const validResolutions = ['1080', 'fullhd', '720', 'hd', '960', '360', '640', 'vga', '180', '320'];
+const validResolutions = ['auto', '1080', 'fullhd', '720', 'hd', '960', '360', '640', 'vga', '180', '320'];
 
 const stylePaper = {
   height: 200,
