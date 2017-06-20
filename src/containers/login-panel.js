@@ -10,7 +10,7 @@ export default class LoginPanel extends React.Component {
     this.state = {
       userNameText: '',
       roomNameText: '',
-      resolution: 'auto',
+      resolution: "auto",
     }
   }
 
