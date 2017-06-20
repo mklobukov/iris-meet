@@ -149,7 +149,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       showFeatureInDev: false,
       showDomSpeakerSnackbar: false,
       myName: "",
-      remoteNames: [],
+      remoteNames: {},
       resolution: "hd",
     }
 
@@ -440,8 +440,6 @@ _onReceivedNewId(data) {
       showRoom: false,
       showUser: false,
     }, () => {
-      console.log("RESOLUTION FROM STATE: ", this.state.resolution)
-      console.log("refs: ", this.refs.loginpanel ? this.refs.loginpanel.resolution : null)
 
       //let requestedResolution = getQueryParameter('resolution');
       let requestedResolution = localStorage.getItem('irisMeet.resolution')
