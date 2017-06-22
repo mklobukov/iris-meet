@@ -13,7 +13,7 @@ class DisplayNumber extends Component {
   render(){
     return(
     <div className="phone-number-inputfield">
-      <input type="tel" className="phone-number-text" placeholder="000-000-0000"
+      <input type="tel" className="phone-number-text" placeholder="123-456-7890"
     value={this.props.number} onChange={this.props.onNumberChange}/>
     </div>
     );

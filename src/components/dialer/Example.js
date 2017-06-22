@@ -102,7 +102,6 @@ _updateToTN(num) {
 }
 
   _onDial() {
-    console.log("Inside onDial")
     if (this.state.callInProgress) {
       this.props.endSession()
       this.setState({callInProgress: false}, () => {console.log("Hanging up")})
@@ -111,7 +110,6 @@ _updateToTN(num) {
 
     getRoomId(this.state.roomName, this.state.accessToken)
     .then((response) => {
-      console.log("Response from getroomId: ", response);
       const roomId = response.room_id;
       if (!this.numberIsValid(this.state.toTN)) {
         console.log("\n\nERROR in Iris Dialer: Invalid number format \n\n");
@@ -139,8 +137,6 @@ _updateToTN(num) {
         callType: "audio",
         type: "pstn",
       }
-
-      console.log("CONFIG: ", config)
       this.props.initializeWebRTC(config)
       this.setState({callInProgress: true}, () => {console.log("Starting call")} )
     })
