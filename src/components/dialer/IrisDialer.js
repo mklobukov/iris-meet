@@ -27,7 +27,7 @@ export default class IrisDialer extends Component {
     const numLength = number.length;
     const text = numLength > 0 ? "Dialing" : "Dial a number";
     numLength <= this.props.maxNumberLength ?
-      this.setState({number: number, statusText: text})
+      this.setState({number: number, statusText: text}, () => this.props.updateToTN(this.state.number))
       :
       console.log("Number exceeds maximum length. No update")
   }
@@ -36,7 +36,7 @@ export default class IrisDialer extends Component {
     let number = this.state.number.slice(0, -1);
     console.log("Number : " + number);
     const text = number.length > 0 ? "Dialing" : "Dial a number";
-    this.setState({number : number, statusText: text});
+    this.setState({number : number, statusText: text}, () => this.props.updateToTN(this.state.number));
   }
 
   onNumberChange(event) {
@@ -44,7 +44,7 @@ export default class IrisDialer extends Component {
     const numLength = event.target.value.length;
     const text = numLength > 0 ? "Dialing" : "Dial a number";
     numLength <= this.props.maxNumberLength ?
-      this.setState({number: event.target.value, statusText: text})
+      this.setState({number: event.target.value, statusText: text}, () => this.props.updateToTN(this.state.number))
       :
       console.log("Number exceeds maximum length. No update")
   }

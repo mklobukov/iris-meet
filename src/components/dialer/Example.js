@@ -152,6 +152,7 @@ _updateToTN(num) {
         <IrisDialer
           onDial={this._onDial.bind(this)}
           maxNumberLength={16}
+          updateToTN={this._updateToTN.bind(this)}
           />
     </div>
 
