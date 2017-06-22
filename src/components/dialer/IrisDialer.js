@@ -5,65 +5,68 @@ import StatusText from './StatusText';
 import RemoteAudio from './RemoteAudio'
 import './css/style.css';
 
-class IrisDialer extends Component {
+export default class IrisDialer extends Component {
 
   constructor(props){
     super(props);
     this.state = {
       number: "",
-      onCall:false,
       onMute: false,
       onHold: false,
       statusText: "Dial a number",
       localStream: null,
       remoteStream: null,
     }
+    this.onDialDigit = this.onDialDigit.bind(this);
+    this.onDeleteDigit = this.onDeleteDigit.bind(this);
+    this.onNumberChange = this.onNumberChange.bind(this);
+  }
+
+  onDialDigit(number) {
+    console.log("Number : " + number);
+    const numLength = number.length;
+    const text = numLength > 0 ? "Dialing" : "Dial a number";
+    numLength <= this.props.maxNumberLength ?
+      this.setState({number: number, statusText: text})
+      :
+      console.log("Number exceeds maximum length. No update")
+  }
+
+  onDeleteDigit() {
+    let number = this.state.number.slice(0, -1);
+    console.log("Number : " + number);
+    const text = number.length > 0 ? "Dialing" : "Dial a number";
+    this.setState({number : number, statusText: text});
+  }
+
+  onNumberChange(event) {
+    console.log("Number: ", event.target.value)
+    const numLength = event.target.value.length;
+    const text = numLength > 0 ? "Dialing" : "Dial a number";
+    numLength <= this.props.maxNumberLength ?
+      this.setState({number: event.target.value, statusText: text})
+      :
+      console.log("Number exceeds maximum length. No update")
   }
 
   render() {
     return (
       <div className="iris-dialer-app">
         <div className="iris-dialer-container">
-          <DisplayNumber number={this.props.number}
-            onNumberChange={this.props.onNumberChange}/>
-          <DialPad number={this.props.number}
-            onDialDigit={this.props.onDialDigit ? this.props.onDialDigit : this._onDialDigit}
-            onDeleteDigit={this.props.onDeleteDigit ? this.props.onDeleteDigit : this._onDeleteDigit}
+          <DisplayNumber number={this.state.number}
+            onNumberChange={this.onNumberChange}/>
+          <DialPad number={this.state.number}
+            onDialDigit={this.props.onDialDigit ? this.props.onDialDigit : this.onDialDigit}
+            onDeleteDigit={this.props.onDeleteDigit ? this.props.onDeleteDigit : this.onDeleteDigit}
             onMuteUnmute={this.props.onMuteUnmute}
             onDial={this.props.onDial}
-            onTextChange={this.props.onTextChange}
-            onCall={this.state.onCall}
+            callInProgress={this.props.callInProgress}
             onMute={this.state.onMute}/>
-          <StatusText number={this.props.number} statusText={this.props.statusText}/>
+          <StatusText number={this.state.number} statusText={this.state.statusText}/>
           <RemoteAudio />
         </div>
       </div>
     );
   }
-  ///////////////////////////////////////////////////////////////////////
-  //functions that are local to the dialer. Give an option to override.
-  //these functions don't involve any reference to the iris APIs.
-  _onDialDigit(number) {
-    console.log("Number : " + number);
-    this.setState({number : number, statusText:"Dialing"});
-  }
 
-  _onDeleteDigit(){
-    let number = this.state.number.slice(0, -1);
-    console.log("Number : " + number);
-    this.setState({number : number});
-  }
-  ///////////////////////////////////////////////////////////////////////
-
-  //the rest of the functions will need to be passed as props. They are:
-    // -- onMuteUnmute
-    // -- onHoldUnhold
-    // -- onNumberChange
-    // -- onDial
-    //   *--- calls irisConnect
-    //     *-- calls irisStream
-    //       *- calls irisSession
 }
-
-
-export default IrisDialer;

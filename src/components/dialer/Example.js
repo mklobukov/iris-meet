@@ -1,8 +1,6 @@
 //This file will serve as a container for the dialer for experimental purposes
 //this is the client-side file. It imports the dialer from react-sdk and passes
 //it the props necessary to make calls.
-
-
 import React, {Component} from 'react';
 import IrisDialer from './IrisDialer';
 import { AuthManager } from 'iris-auth-js-sdk';
@@ -15,7 +13,6 @@ import { getRoomId } from '../../api/RoomId';
 
 import withWebRTC, { WebRTCConstants } from 'iris-react-webrtc'
 
-
 export default withWebRTC(class Example extends React.Component {
   constructor(props) {
     super(props);
@@ -25,12 +22,15 @@ export default withWebRTC(class Example extends React.Component {
       decodedToken : "Decoded token from auth manager",
       routingId : uuidV1() + '@' + Config.dialer.domain,
       fromTN : "+12674550136",
-      cname : "Nijaguna",
-      roomName: "dialerRoom",
-      userName: "Test username",
+      toTN: "2155002978",
+      cname : "Iris User",
+      roomName: "Iris Dialer Room",
+      userName: "Iris User",
       config: Config.dialer,
+      callInProgress: false,
       remoteStream : {}
     };
+    this.onRemoteStream = this.onRemoteStream.bind(this);
     this._initializeAndLogin();
   }
 
@@ -84,26 +84,37 @@ export default withWebRTC(class Example extends React.Component {
       })
   }
 
+ numberIsValid(num) {
+   if ((num.indexOf("+1") !== -1 && num.length < 12) || (num.indexOf("+1") === -1 && num.length < 10)) {
+     return false
+   }
+
+   if (num.indexOf("+1") === -1) {
+     this.setState({toTN: "+1" + num});
+   }
+   return true
+}
+
+_updateToTN(num) {
+  this.setState({toTN: num}, () => console.log("updated number: ", this.state.toTN))
+}
+
   _onDial() {
     console.log("Inside onDial")
+    if (this.state.callInProgress) {
+      this.props.endSession()
+      this.setState({callInProgress: false}, () => {console.log("Hanging up")})
+      return
+    }
+
     getRoomId(this.state.roomName, this.state.accessToken)
     .then((response) => {
       console.log("Response from getroomId: ", response);
       const roomId = response.room_id;
-
-      // let config = {
-      //   userName: this.props.userName,
-      //   roomId: roomId,
-      //   roomName: this.props.roomName,
-      //   domain: this.state.decodedToken.payload['domain'].toLowerCase(),
-      //   token: this.state.accessToken,
-      //   routingId: config.toTN + '@' + config.domain,
-      //   hosts: {
-      //     eventManagerUrl: Config.eventManagerUrl,
-      //     notificationServer: Config.notificationServer
-      //   }
-      // }
-
+      if (!this.numberIsValid(this.state.toTN)) {
+        console.log("\n\nERROR in Iris Dialer: Invalid number format \n\n");
+        return
+      }
 
       //ToTN is not defined in the config. Need to somehow grab it from dialer
       const config = {
@@ -114,8 +125,8 @@ export default withWebRTC(class Example extends React.Component {
         domain: this.state.decodedToken.payload['domain'].toLowerCase(),
         token: this.state.accessToken,
         routingId: uuidV1(),
-        toRoutingId: "2155002978",
-        toTN: "2155002978",
+        toRoutingId: this.state.toTN,
+        toTN: this.state.toTN,
         hosts: {
           eventManagerUrl: Config.eventManagerUrl,
           notificationServer: Config.notificationServer
@@ -129,9 +140,9 @@ export default withWebRTC(class Example extends React.Component {
 
       console.log("CONFIG: ", config)
       this.props.initializeWebRTC(config)
+      this.setState({callInProgress: true}, () => {console.log("Starting call")} )
     })
   }
-
 
   render() {
     console.log("Current state: ", this.state)
@@ -140,6 +151,7 @@ export default withWebRTC(class Example extends React.Component {
       <div className="dialer-main">
         <IrisDialer
           onDial={this._onDial.bind(this)}
+          maxNumberLength={16}
           />
     </div>
 

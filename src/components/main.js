@@ -502,8 +502,6 @@ _onReceivedNewId(data) {
             videoCodec: 'h264'
           }
           this.props.initializeWebRTC(config)
-
-
       })
     });
   }
