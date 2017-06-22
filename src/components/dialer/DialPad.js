@@ -1,11 +1,5 @@
 import React, { Component } from 'react'
 import './css/style.css';
-import Button from 'material-ui/FloatingActionButton';
-
-const style = {
-  marginRight: 20,
-  color: "white"
-};
 
 class DialPad extends Component {
     constructor(props) {
@@ -15,67 +9,63 @@ class DialPad extends Component {
         }
     }
 
-
-
     render() {
       return (
         <div className="dial-pad">
           <div className="digits-row">
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '1')}}
-            ><div>1</div></Button>
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '2')}}
-            ><div>2</div></Button>
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '3')}}
-            ><div>3</div></Button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '1')}}><div className="dialer-digit">1</div>
+            </button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '2')}}><div className="dialer-digit">2</div>
+            </button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '3')}}><div className="dialer-digit">3</div>
+            </button>
           </div>
           <div className="digits-row">
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '4')}}
-            ><div>4</div></Button>
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '5')}}
-            ><div>5</div></Button>
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '6')}}
-            ><div>6</div></Button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '4')}}><div className="dialer-digit">4</div>
+            </button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '5')}}><div className="dialer-digit">5</div>
+            </button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '6')}}><div className="dialer-digit">6</div>
+            </button>
           </div>
           <div className="digits-row">
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '7')}}
-            ><div>7</div></Button>
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '8')}}
-            ><div>8</div></Button>
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '9')}}
-            ><div>9</div></Button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '7')}}><div className="dialer-digit">7</div>
+            </button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '8')}}><div className="dialer-digit">8</div>
+            </button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '9')}}><div className="dialer-digit">9</div>
+            </button>
           </div>
           <div className="digits-row">
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '*')}}
-            ><div>*</div></Button>
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '0')}}
-            ><div>0</div></Button>
-            <Button style={style}
-              onClick={() => {this.props.onDialDigit(this.props.number + '#')}}
-            ><div>#</div></Button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '*')}}><div className="dialer-digit">*</div>
+            </button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '0')}}><div className="dialer-digit">0</div>
+            </button>
+            <button className="dialer-button"
+              onClick={() => {this.props.onDialDigit(this.props.number + '#')}}><div className="dialer-digit">#</div>
+            </button>
           </div>
           <div className="digits-row">
-            <Button style={style} secondary={this.props.onMute ? true : false} onClick={this.props.onMuteUnmute} >
-              <i className={'fa fa-fw fa-microphone ' + (this.props.onMute ? 'fa-microphone-slash': 'fa-microphone')}></i>
-            </Button>
-            <Button style={style} secondary={this.props.onCall ? true : false}
-                  onClick={this.props.onDial} disabled={this.props.disabled}>
-                <i className={'fa fa-fw fa-phone '+ (this.props.onCall ? 'fa-close': 'fa-phone')}></i>
-            </Button>
-            <Button style={style} secondary={true}
-              onClick={this.props.onDeleteDigit}>
-              <i className={'fa fa-times-rectangle-o'}></i>
-            </Button>
+            <button onClick={this.props.onMuteUnmute} className="dialer-button">
+              <div className="dialer-digit"><i className={'fa fa-fw fa-microphone ' + (this.props.onMute ? 'fa-microphone-slash': 'fa-microphone')}></i></div>
+            </button>
+            <button onClick={this.props.onDial} disabled={this.props.disabled} className="dialer-button">
+                <div className="dialer-digit"><i className={'fa fa-fw fa-phone '+ (this.props.onCall ? 'fa-close': 'fa-phone')} ></i></div>
+            </button>
+            <button onClick={this.props.onDeleteDigit} className="dialer-button">
+              <div className="dialer-digit"><i className={'fa fa-times-rectangle-o'}></i></div>
+            </button>
           </div>
         </div>
         );

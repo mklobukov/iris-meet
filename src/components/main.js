@@ -19,6 +19,7 @@ import Dialog from 'material-ui/Dialog';
 import CircularProgress from 'material-ui/CircularProgress';
 import {GridList, GridTile} from 'material-ui/GridList';
 import Avatar from '../containers/avatar';
+import AvatarImage from '../components/avatar-image';
 import IconButton from 'material-ui/IconButton';
 import sss from 'material-ui/svg-icons/toggle/star-border';
 import StarBorder from 'material-ui/svg-icons/hardware/headset-mic';
@@ -149,8 +150,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       showFeatureInDev: false,
       showDomSpeakerSnackbar: false,
       myName: "",
-      remoteNames: {},
+      userData: {},
       resolution: "hd",
+      mutedVideos: [],
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -392,8 +394,24 @@ _onReceivedNewId(data) {
     }
   }
 
-  _onParticipantVideoMuted(jid, muted){
-    console.log("_onParticipantVideoMuted jid " + jid + " muted "+muted);
+  _isRemoteVideoMuted(fullJid) {
+    let muted = false;
+    if (fullJid && this.state.userData[this._truncateJid(fullJid)]) {
+      console.log("Returning muted: ", this.state.userData[this._truncateJid(fullJid)].videoMuted )
+      muted = this.state.userData[this._truncateJid(fullJid)].videoMuted;
+    }
+    console.log("returning false")
+    return muted
+  }
+
+  _onParticipantVideoMuted(videoInfo){
+    console.log("_onParticipantVideoMuted jid " + videoInfo.jid + " muted "+ videoInfo.muted);
+
+    let profiles = this.state.userData;
+    profiles[this._truncateJid(videoInfo.jid)] ? profiles[this._truncateJid(videoInfo.jid)].videoMuted = videoInfo.muted : null;
+    this.setState({
+      userData: profiles
+    })
   }
 
   _onParticipantAudioMuted(jid, muted){
@@ -403,36 +421,52 @@ _onReceivedNewId(data) {
   _onUserProfileChange(profile){
     console.log('_onUserProfileChange in the client\nFull Jid before truncation: ', profile.jid)
     console.log("Name: ", profile.name);
+    console.log("Profile: ", profile)
     // this function is called when:
     //   1) remote participant is first detected upon joining the room
     //   2) remote participant changes name
     // when either of these events occurs, update the remoteNames state
     // Lookup of names by jid in the horizontal box part can remain the same
 
-    let names = this.state.remoteNames;
-    //check if this jid is already in remoteNames. If it is, update the object
-    let userFound = false;
-    for (var i in names) {
-      if (names[i].userJid == profile.jid) {
-        console.log("Found user with this jid. Updating name from ", names[i].userName, " to ", profile.name)
-        names[i].userName = profile.name;
-        userFound = true;
-        break;
-      }
-    }
+    let profiles = this.state.userData;
 
-    //if not found, create a new user object and pass it to remoteNames
+    console.log("CHECK PROFILES: ", profiles)
+    //check if this jid is already in remoteNames. If it is, update the object
+    // let userFound = false;
+    // for (var i in names) {
+    //   if (names[i].userJid == profile.jid) {
+    //     console.log("Found user with this jid. Updating name from ", names[i].userName, " to ", profile.name)
+    //     names[i].userName = profile.name;
+    //     userFound = true;
+    //     break;
+    //   }
+    // }
+    //
+    // //if not found, create a new user object and pass it to remoteNames
+    // if (!userFound) {
+    //   console.log("New user joined. Adding ", profile.name, " to remoteNames")
+    //   let newNameObject = {userName: profile.name, userJid: this._truncateJid(profile.jid)};
+    //   names.push(newNameObject);
+    // }
+
+
+    //changed code to use a map instead of array of objects
+    const userFound = profiles[this._truncateJid(profile.jid)] ? true : false;
+
+    //REDUNDANT CODE. Leaving it like this for now, may be necessary to separate the two conditions later when most stuff added
     if (!userFound) {
-      console.log("New user joined. Adding ", profile.name, " to remoteNames")
-      let newNameObject = {userName: profile.name, userJid: this._truncateJid(profile.jid)};
-      names.push(newNameObject);
+      //put user's name into the object
+      profiles[this._truncateJid(profile.jid)] = {"userName": profile.name, "videoMuted": false}
+    } else {
+      //update user's name
+      profiles[this._truncateJid(profile.jid)].userName = profile.name
     }
 
     //update state
     //UNCOMMENT THIS!!
-    // this.setState({
-    //   remoteNames: names
-    // })
+    this.setState({
+      userData: profiles
+    })
   }
 
   _userLoggedIn() {
@@ -787,8 +821,9 @@ _onResolutionChoice(res) {
   render() {
     const this_main = this;
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
-    console.log("Remote names main: ", this.state.remoteNames)
+    console.log("Remote names main: ", this.state.userData)
     console.log("Remote videos main: ", this.props.remoteVideos)
+    console.log("this props connection: ", this.props.connection)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         <Snackbar
@@ -836,19 +871,23 @@ _onResolutionChoice(res) {
             enableDomSwitchFunc={this.enableDomSwitching.bind(this)}
           /> : null}
 
-            <MainVideo className={"main_video"}>
-              {
-                this.props.videoType === 'remote' && true ?
-                <RemoteVideo
-                  video={this.props.connection}
-                /> : null
-              }
-              {this.props.videoType === 'local' && true ?
-                <LocalVideo
-                  video={this.props.localVideos[0]}
-                /> : null
-              }
-            </MainVideo>
+
+          <MainVideo className={"main_video"}>
+            {
+              this.props.videoType === 'remote' && true ?
+                <RemoteVideo video={this.props.connection} />
+              : null
+            }
+
+            {this.props.videoType === 'local' && true ?
+              <LocalVideo
+                video={this.props.localVideos[0]}
+              /> : null
+            }
+          </MainVideo>
+
+
+
 
           <section className={this.state.isVideoBarHidden ? "footer hideFooter" : "footer showFooter"} >
             <div className={"localVideo footer-item"}>
@@ -898,6 +937,8 @@ _onResolutionChoice(res) {
               {this.props.remoteVideos.map((connection) => {
                 if (connection) {
                   //UNCOMMENT THIS!! let name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
+                  let name = this.state.userData[this._truncateJid(connection.participantJid)] ? this.state.userData[this._truncateJid(connection.participantJid)].userName : null;
+                  console.log("USERNAME TO DISPLAY: ", name)
                   let displayHorizontalBox = (!this._isDominant(connection.id) && this.props.remoteVideos.length > 1) || !this.props.enableDomSwitch;
                   console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
                   return displayHorizontalBox ? (

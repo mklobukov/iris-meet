@@ -167,3 +167,11 @@ background-color: gray;
 ::-webkit-scrollbar-thumb:window-inactive {
 	background: rgb(0, 188, 212);
 }
+
+.mute_image {
+  text-align: center;
+  /*position: fixed;
+  left: 40%;*/
+  display: table;
+  margin: 0 auto;
+}

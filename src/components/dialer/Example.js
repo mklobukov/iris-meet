@@ -1,100 +1,148 @@
+//This file will serve as a container for the dialer for experimental purposes
+//this is the client-side file. It imports the dialer from react-sdk and passes
+//it the props necessary to make calls.
+
+
 import React, {Component} from 'react';
 import IrisDialer from './IrisDialer';
 import { AuthManager } from 'iris-auth-js-sdk';
 import Paper from 'material-ui/Paper';
-
+import IrisDialerTest from 'iris-react-webrtc'
+const uuidV1 = require('uuid/v1');
 import Config from '../../../config.json';
 const config = Config.dialer;
-var uuidV1 = require('uuid/v1');
+import { getRoomId } from '../../api/RoomId';
+
+import withWebRTC, { WebRTCConstants } from 'iris-react-webrtc'
 
 
-var IrisAuthManager = window.IrisAuthManager;
-var IrisEventManager = window.IrisEventManager;
-
-const paperStyle = {
-  "width" : "320px",
-  "justifyContent" : "center",
-  "paddingBottom" : "20px",
-  "paddingTop" : "10px",
-}
-
-
-class Example extends Component{
-
-  constructor(props){
+export default withWebRTC(class Example extends React.Component {
+  constructor(props) {
     super(props);
 
     this.state = {
-      "irisToken" : "irisToken from iris authManager",
-      "routingId":"Unique id of participant",
-      "fromTN":"+12674550136",
-      "cname":"Nijaguna"
+      accessToken : "Token from auth manager",
+      decodedToken : "Decoded token from auth manager",
+      routingId : uuidV1() + '@' + Config.dialer.domain,
+      fromTN : "+12674550136",
+      cname : "Nijaguna",
+      roomName: "dialerRoom",
+      userName: "Test username",
+      config: Config.dialer,
+      remoteStream : {}
     };
-    this.init();
+    this._initializeAndLogin();
   }
+
+  componentDidMount() {
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteStream);
+  }
+  componentWillUnmount() {
+    this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteStream);
+    this.props.leaveRoom();
+  }
+
+  onRemoteStream(stream) {
+    console.log("Got a remote stream: ", stream)
+    this.setState({remoteStream : stream });
+    let element = document.getElementById("remoteAudioStream");
+    if (!element || !stream) {
+      console.log("Element or stream is null");
+      return;
+    }
+    if (typeof element.src !== 'undefined') {
+      element.src = URL.createObjectURL(stream);
+    } else if (typeof element.srcObject !== 'undefined') {
+      element.srcObject = stream;
+    } else if (typeof element.mozSrcObject !== 'undefined') {
+      element.mozSrcObject = stream;
+    } else {
+      console.log('Error attaching stream to element.');
+    }
+  }
+
+  _initializeAndLogin(){
+    let routingId = this.state.routingId;
+    let appKey = this.state.config.appKey;
+    let aumUrl = this.state.config.urls.authManager;
+    this._login(routingId, appKey, aumUrl)
+  }
+
+  _login(routingId, appKey, aumUrl) {
+    let authApi = new AuthManager({'managementApiUrl': aumUrl, 'appkey': appKey});
+    return authApi.anonymousLoginAsync(routingId).then(
+      data => {
+        console.log("DATA: ", data)
+        this.setState({
+          accessToken : data.Token,
+          decodedToken : authApi.decodeToken(data.Token)
+        });
+      }
+    )
+    .catch(
+      error => {console.log("Dialer: Error logging in  -- " + error);
+      })
+  }
+
+  _onDial() {
+    console.log("Inside onDial")
+    getRoomId(this.state.roomName, this.state.accessToken)
+    .then((response) => {
+      console.log("Response from getroomId: ", response);
+      const roomId = response.room_id;
+
+      // let config = {
+      //   userName: this.props.userName,
+      //   roomId: roomId,
+      //   roomName: this.props.roomName,
+      //   domain: this.state.decodedToken.payload['domain'].toLowerCase(),
+      //   token: this.state.accessToken,
+      //   routingId: config.toTN + '@' + config.domain,
+      //   hosts: {
+      //     eventManagerUrl: Config.eventManagerUrl,
+      //     notificationServer: Config.notificationServer
+      //   }
+      // }
+
+
+      //ToTN is not defined in the config. Need to somehow grab it from dialer
+      const config = {
+        fromTN: this.state.fromTN,
+        userName: this.state.userName,
+        roomId: roomId,
+        roomName: this.state.roomName,
+        domain: this.state.decodedToken.payload['domain'].toLowerCase(),
+        token: this.state.accessToken,
+        routingId: uuidV1(),
+        toRoutingId: "2155002978",
+        toTN: "2155002978",
+        hosts: {
+          eventManagerUrl: Config.eventManagerUrl,
+          notificationServer: Config.notificationServer
+        },
+        cname: this.state.cname,
+        isPSTN: true,
+        streamType: "audio",
+        callType: "audio",
+        type: "pstn",
+      }
+
+      console.log("CONFIG: ", config)
+      this.props.initializeWebRTC(config)
+    })
+  }
+
 
   render() {
+    console.log("Current state: ", this.state)
     return (
-      <div className="App-main">
-      <Paper style={paperStyle}>
-        <h2>Iris Dialer App</h2>
-        <IrisDialer config={{
-            "irisToken":this.state.irisToken,
-            "routingId":this.state.routingId,
-            "fromTN":this.state.fromTN,
-            "cname":this.state.cname
-          }}/>
-      </Paper>
+
+      <div className="dialer-main">
+        <IrisDialer
+          onDial={this._onDial.bind(this)}
+          />
     </div>
+
     );
   }
-
-_login(routingId, appKey, aumUrl) {
-  let authApi = new AuthManager({'managementApiUrl': aumUrl, 'appkey': appKey});
-  return authApi.anonymousLoginAsync(routingId).then(
-    data => {
-      console.log("DATA: ", data)
-      this.setState({
-        "irisToken" : data.Token,
-        "routingId" : routingId,
-      });
-    }
-  )
-  .catch(
-    error => {console.log("Error logging in  -- " + error);
-    })
-}
-
-
-init(){
-
-  console.log(localStorage.getItem('irisMeet.userName'))
-  let routingId = uuidV1() + "@" + config.domain;
-  console.log("Routing id: " , routingId)
-  let appKey = config.appKey;
-  let aumUrl = config.urls.authManager;
-  console.log(aumUrl)
-  config.routingId = routingId;
-  console.log("WINDOW print: ", window)
-
-  this._login(routingId, appKey, aumUrl)
-  // IrisAuthManager.anonymousLogin(routingId, appKey, aumUrl, (res) => {
-  //   console.log(res);
-  //     if (200 <= res.statusCode <= 300) {
-  //         config.irisToken = res.body.Token;
-  //         if(config.irisToken){
-  //           this.setState({
-  //             "irisToken" : config.irisToken,
-  //             "routingId":config.routingId
-  //           });
-  //         }
-  //     } else {
-  //         console.log("Anonymous login failed")
-  //     }
-  // });
-
-}
-
-}
-
-export default Example;
+})
