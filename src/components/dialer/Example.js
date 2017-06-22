@@ -22,7 +22,7 @@ export default withWebRTC(class Example extends React.Component {
       decodedToken : "Decoded token from auth manager",
       routingId : uuidV1() + '@' + Config.dialer.domain,
       fromTN : "+12674550136",
-      toTN: "2155002978",
+      toTN: "Destination number",
       cname : "Iris User",
       roomName: "Iris Dialer Room",
       userName: "Iris User",
@@ -85,7 +85,9 @@ export default withWebRTC(class Example extends React.Component {
   }
 
  numberIsValid(num) {
-   if ((num.indexOf("+1") !== -1 && num.length < 12) || (num.indexOf("+1") === -1 && num.length < 10)) {
+   if ((num.indexOf("+1") !== -1 && num.length < 12) ||
+      (num.indexOf("+1") === -1 && num.length < 10) ||
+      (num.match(/[a-z]/i)) )   {
      return false
    }
 
@@ -145,14 +147,13 @@ _updateToTN(num) {
   }
 
   render() {
-    console.log("Current state: ", this.state)
     return (
-
       <div className="dialer-main">
         <IrisDialer
           onDial={this._onDial.bind(this)}
           maxNumberLength={16}
           updateToTN={this._updateToTN.bind(this)}
+          displayStatusBox={false}
           />
     </div>
 

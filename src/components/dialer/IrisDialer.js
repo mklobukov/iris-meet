@@ -62,7 +62,9 @@ export default class IrisDialer extends Component {
             onDial={this.props.onDial}
             callInProgress={this.props.callInProgress}
             onMute={this.state.onMute}/>
-          <StatusText number={this.state.number} statusText={this.state.statusText}/>
+          {this.props.displayStatusBox ?
+            <StatusText number={this.state.number} statusText={this.state.statusText}/>
+            : null}
           <RemoteAudio />
         </div>
       </div>
