@@ -10,7 +10,7 @@ import { Provider } from 'react-redux';
 import reducersCombined from './reducers';
 import thunk from 'redux-thunk';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
-import Example from './components/dialer/Example';
+import Example from './containers/dialer';
 
 let store = createStore(
   reducersCombined,

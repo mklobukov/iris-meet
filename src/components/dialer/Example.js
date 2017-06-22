@@ -23,19 +23,21 @@ export default withWebRTC(class Example extends React.Component {
       routingId : uuidV1() + '@' + Config.dialer.domain,
       fromTN : "+12674550136",
       toTN: "Destination number",
-      cname : "Iris User",
-      roomName: "Iris Dialer Room",
+      cname : "Nijaguna",
+      roomName: "irisdialerroom",
       userName: "Iris User",
       config: Config.dialer,
       callInProgress: false,
       remoteStream : {}
     };
     this.onRemoteStream = this.onRemoteStream.bind(this);
+    this.onCalleeLeft = this.onCalleeLeft.bind(this);
     this._initializeAndLogin();
   }
 
   componentDidMount() {
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteStream);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onCalleeLeft);
   }
   componentWillUnmount() {
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteStream);
@@ -59,6 +61,11 @@ export default withWebRTC(class Example extends React.Component {
     } else {
       console.log('Error attaching stream to element.');
     }
+  }
+
+  onCalleeLeft(data) {
+    this.props.endSession();
+    this.setState({callInProgress: false}, () => {console.log("Callee left -- hanging up")})
   }
 
   _initializeAndLogin(){
