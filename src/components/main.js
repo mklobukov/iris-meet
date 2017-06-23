@@ -430,30 +430,10 @@ _onReceivedNewId(data) {
 
     let profiles = this.state.userData;
 
-    console.log("CHECK PROFILES: ", profiles)
-    //check if this jid is already in remoteNames. If it is, update the object
-    // let userFound = false;
-    // for (var i in names) {
-    //   if (names[i].userJid == profile.jid) {
-    //     console.log("Found user with this jid. Updating name from ", names[i].userName, " to ", profile.name)
-    //     names[i].userName = profile.name;
-    //     userFound = true;
-    //     break;
-    //   }
-    // }
-    //
-    // //if not found, create a new user object and pass it to remoteNames
-    // if (!userFound) {
-    //   console.log("New user joined. Adding ", profile.name, " to remoteNames")
-    //   let newNameObject = {userName: profile.name, userJid: this._truncateJid(profile.jid)};
-    //   names.push(newNameObject);
-    // }
+    console.log("ALL PROFILES: ", profiles)
 
-
-    //changed code to use a map instead of array of objects
     const userFound = profiles[this._truncateJid(profile.jid)] ? true : false;
 
-    //REDUNDANT CODE. Leaving it like this for now, may be necessary to separate the two conditions later when most stuff added
     if (!userFound) {
       //put user's name into the object
       profiles[this._truncateJid(profile.jid)] = {"userName": profile.name, "videoMuted": false}
@@ -462,8 +442,7 @@ _onReceivedNewId(data) {
       profiles[this._truncateJid(profile.jid)].userName = profile.name
     }
 
-    //update state
-    //UNCOMMENT THIS!!
+    //update state with the new profile
     this.setState({
       userData: profiles
     })
@@ -752,24 +731,6 @@ _getUserName(userJid, roomname) {
     );
 }
 
-_findUserName(namesArray, jid) {
-  jid = jid.replace(/\//g, '_')
-  console.log("Looking for jid : ", jid)
-  console.log("in array: ")
-  console.log(namesArray)
-  let userObject = namesArray.filter(function(obj) {
-    return obj.userJid === jid
-  })
-  //it is possible that more than one object with a given jid are found.
-  //Ignore all results past the first one, this won't be an issue with actual
-  //calls (unless the user opens the same room several times in different browsers/incognito
-  //with different user names, which is unlikely)
-  if (userObject.length !== 0) {
-    console.log("Object valid. Name is : ", userObject[0].userName)
-  }
-  return userObject[0] ? userObject[0].userName : null
-}
-
 _truncateJid(jid) {
   //remote the roomID part of the jid, and return just the user part
   return jid.substring(jid.indexOf("/") + 1, jid.length)
@@ -934,7 +895,6 @@ _onResolutionChoice(res) {
             <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
               {this.props.remoteVideos.map((connection) => {
                 if (connection) {
-                  //UNCOMMENT THIS!! let name = this._findUserName(this.state.remoteNames, this._truncateJid(connection.participantJid))
                   let name = this.state.userData[this._truncateJid(connection.participantJid)] ? this.state.userData[this._truncateJid(connection.participantJid)].userName : null;
                   console.log("USERNAME TO DISPLAY: ", name)
                   let displayHorizontalBox = (!this._isDominant(connection.id) && this.props.remoteVideos.length > 1) || !this.props.enableDomSwitch;
