@@ -36,11 +36,12 @@ export default class UserNameBox extends React.Component {
   render() {
     return(
       <div>
-        <form onSubmit={this._changeMyName.bind(this)}>
+        <form onSubmit={this._changeMyName.bind(this)} >
           <TextField
             inputStyle={styles.textStyle}
             hintStyle={styles.hintStyle}
             type="text"
+            autoComplete={"off"}
             multiLine={false}
             className="user-name-box"
             id="user-name-box"

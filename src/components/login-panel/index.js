@@ -57,6 +57,7 @@ const LoginPanelComponent = ({showUser, userNameText, _onUserNameTextChange, sho
             {showUser === true ? <div className="form-group">
               <TextField
                 type="text"
+                autoComplete="off"
                 className="form-control"
                 id="userName"
                 hintText="Name"

@@ -21,11 +21,12 @@ import {GridList, GridTile} from 'material-ui/GridList';
 import Avatar from '../containers/avatar';
 import AvatarImage from '../components/avatar-image';
 import IconButton from 'material-ui/IconButton';
-import sss from 'material-ui/svg-icons/toggle/star-border';
-import StarBorder from 'material-ui/svg-icons/hardware/headset-mic';
+import VolumeUp from 'material-ui/svg-icons/av/volume-up';
+import VolumeOff from 'material-ui/svg-icons/av/volume-off';
 import Snackbar from 'material-ui/Snackbar';
 import { NameServer } from '../api/nameserver';
 import UserNameBox from '../containers/username-box';
+import VideoActionIcons from '../containers/video-action-icons';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -65,7 +66,9 @@ const styles = {
     color: 'rgb(0, 188, 212)',
     fontSize: '12px',
     marginBottom: '0px',
-    minWidth: '160px'
+    minWidth: '160px',
+    //test!!!!
+    display: 'flex'
   },
   gridTile: {
     width: '160px',
@@ -864,7 +867,7 @@ _setDisplayName(name) {
                   className={'gridTileClass'}
                   title={<UserNameBox setDisplayName={this._setDisplayName.bind(this)} name={localStorage.getItem('irisMeet.userName')} />}
                   containerElement={'HorizontalBox'}
-                  actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
+                  actionIcon={<VideoActionIcons />}
                   titleStyle={styles.titleStyle}
                   titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
                 >
@@ -913,7 +916,7 @@ _setDisplayName(name) {
                       key={connection.id}
                       style={styles.gridTile}
                       title={name ? name : "Remote Video"}
-                      actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
+                      actionIcon={<VideoActionIcons />}
                       titleStyle={styles.titleStyle}
                       titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
                     >
@@ -938,7 +941,7 @@ _setDisplayName(name) {
                     style={styles.gridTile}
                     key={connection.id}
                     title={name ? name : "Remote Video"}
-                    actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
+                    actionIcon={<VideoActionIcons />}
                     titleStyle={styles.titleStyle}
                     titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
                   > <Avatar
