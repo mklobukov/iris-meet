@@ -29,7 +29,6 @@ export default class UserNameBox extends React.Component {
 
   _changeMyName(e) {
     e.preventDefault();
-    console.log("inside change my name")
     this.props.setDisplayName(this.state.name);
     return false;
   }
@@ -42,6 +41,7 @@ export default class UserNameBox extends React.Component {
             inputStyle={styles.textStyle}
             hintStyle={styles.hintStyle}
             type="text"
+            multiLine={false}
             className="user-name-box"
             id="user-name-box"
             hintText={"Edit your name"}

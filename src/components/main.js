@@ -420,7 +420,7 @@ _onReceivedNewId(data) {
     console.log("_onParticipantAudioMuted jid " + jid + " muted "+muted);
   }
 
-  _onUserProfileChange(profile){
+  _onUserProfileChange(profile) {
     console.log('_onUserProfileChange in the client\nFull Jid before truncation: ', profile.jid)
     console.log("Name: ", profile.name);
     console.log("Profile: ", profile)
