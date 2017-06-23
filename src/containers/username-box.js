@@ -4,11 +4,14 @@ import TextField from 'material-ui/TextField';
 const styles = {
   "textStyle" : {
     "color" : "rgb(0, 188, 212)",
-    "fontSize" : "12px"
+    "fontSize" : "12px",
   },
   "hintStyle" : {
     "color" : "white",
     "fontSize" : "10px"
+  },
+  "boxStyle" : {
+    "width" : "75%"
   }
 }
 
@@ -40,13 +43,14 @@ export default class UserNameBox extends React.Component {
           <TextField
             inputStyle={styles.textStyle}
             hintStyle={styles.hintStyle}
+            style={styles.boxStyle}
             type="text"
             autoComplete={"off"}
             multiLine={false}
             className="user-name-box"
             id="user-name-box"
             hintText={"Edit your name"}
-            value={this.state.name}
+            value={this.state.name ? this.state.name : ""}
             onChange={this._onTextChange.bind(this)}
           />
           </form>

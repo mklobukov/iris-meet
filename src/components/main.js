@@ -855,9 +855,6 @@ _setDisplayName(name) {
             }
           </MainVideo>
 
-
-
-
           <section className={this.state.isVideoBarHidden ? "footer hideFooter" : "footer showFooter"} >
             <div className={"localVideo footer-item"}>
               <div style={styles.root2}>
@@ -865,9 +862,8 @@ _setDisplayName(name) {
                   style={this.props.localVideos.length > 0 ? styles.localTile : null}
                   key={'localVideo'}
                   className={'gridTileClass'}
-                  title={<UserNameBox setDisplayName={this._setDisplayName.bind(this)} name={localStorage.getItem('irisMeet.userName')} />}
+                  title={<UserNameBox style={{"maxWidth" : "50px"}} setDisplayName={this._setDisplayName.bind(this)} name={localStorage.getItem('irisMeet.userName')} />}
                   containerElement={'HorizontalBox'}
-                  actionIcon={<VideoActionIcons />}
                   titleStyle={styles.titleStyle}
                   titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
                 >
