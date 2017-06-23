@@ -25,6 +25,7 @@ import sss from 'material-ui/svg-icons/toggle/star-border';
 import StarBorder from 'material-ui/svg-icons/hardware/headset-mic';
 import Snackbar from 'material-ui/Snackbar';
 import { NameServer } from '../api/nameserver';
+import UserNameBox from '../containers/username-box';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -168,6 +169,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.onParticipantVideoMuted = this._onParticipantVideoMuted.bind(this);
     this.onParticipantAudioMuted = this._onParticipantAudioMuted.bind(this);
     this.onUserProfileChange = this._onUserProfileChange.bind(this);
+    this.changeMyName = this.props.setDisplayName.bind(this)
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -777,6 +779,11 @@ _onResolutionChoice(res) {
    })
 }
 
+_setDisplayName(name) {
+  this.changeMyName(name);
+  localStorage.setItem('irisMeet.userName', name);
+}
+
   render() {
     const this_main = this;
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
@@ -855,7 +862,7 @@ _onResolutionChoice(res) {
                   style={this.props.localVideos.length > 0 ? styles.localTile : null}
                   key={'localVideo'}
                   className={'gridTileClass'}
-                  title={this.state.myName}
+                  title={<UserNameBox setDisplayName={this._setDisplayName.bind(this)} name={localStorage.getItem('irisMeet.userName')} />}
                   containerElement={'HorizontalBox'}
                   actionIcon={<IconButton><StarBorder color="rgb(0, 188, 212)" /></IconButton>}
                   titleStyle={styles.titleStyle}

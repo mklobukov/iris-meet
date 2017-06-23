@@ -52,46 +52,49 @@ const LoginPanelComponent = ({showUser, userNameText, _onUserNameTextChange, sho
   <div id="main-login">
     <Paper style={stylePaper} zDepth={1} rounded={false}>
       <Paper style={enterRoomPaper} zDepth={1} rounded={false}>
-        <div id="login-panel" className="form">
-          {showUser === true ? <div className="form-group">
-            <TextField
-              type="text"
-              className="form-control"
-              id="userName"
-              hintText="Name"
-              value={userNameText}
-              onChange={_onUserNameTextChange}
-            />
-          </div> : null}
-          <div id="inputs">
-            {showRoom === true ? <div className="form-group">
+        <form onsubmit={onAction}>
+          <div id="login-panel" className="form">
+            {showUser === true ? <div className="form-group">
               <TextField
                 type="text"
                 className="form-control"
-                id="roomName"
-                hintText="Enter room name"
-                value={roomNameText}
-                onChange={_onRoomNameTextChange.bind(this)}
+                id="userName"
+                hintText="Name"
+                value={userNameText}
+                onChange={_onUserNameTextChange}
               />
             </div> : null}
+            <div id="inputs">
+              {showRoom === true ? <div className="form-group">
+                <TextField
+                  type="text"
+                  className="form-control"
+                  id="roomName"
+                  hintText="Enter room name"
+                  value={roomNameText}
+                  onChange={_onRoomNameTextChange.bind(this)}
+                />
+              </div> : null}
 
-            <DropDownMenu value={resolutionChoice} onChange={_onResolutionChoice}
-                          openImmediately={false} underlineStyle={dropDownStyle} labelStyle={labelStyle}>
-              {validResolutions.map((resolution) => {
-                return <MenuItem value={resolution} label={"Resolution: " + resolution} primaryText={resolution} key={resolution}/>
-              }
-            )}
-            </DropDownMenu>
-          </div>
 
-          <RaisedButton
-            label="Enter"
-            primary={true}
-            style={styleButton}
-            type="submit"
-            onClick={onAction}
-          />
-      </div>
+              <DropDownMenu value={resolutionChoice} onChange={_onResolutionChoice}
+                            openImmediately={false} underlineStyle={dropDownStyle} labelStyle={labelStyle}>
+                {validResolutions.map((resolution) => {
+                  return <MenuItem value={resolution} label={"Resolution: " + resolution} primaryText={resolution} key={resolution}/>
+                }
+              )}
+              </DropDownMenu>
+            </div>
+
+            <RaisedButton
+              label="Enter"
+              primary={true}
+              style={styleButton}
+              type="submit"
+              onClick={onAction}
+            />
+        </div>
+      </form>
 
       </Paper>
 
