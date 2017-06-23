@@ -442,7 +442,7 @@ _onReceivedNewId(data) {
       profiles[this._truncateJid(profile.jid)].userName = profile.name
     }
 
-    //update state with the new profile
+    // update state with the new profile
     this.setState({
       userData: profiles
     })
