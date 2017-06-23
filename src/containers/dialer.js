@@ -22,7 +22,6 @@ export default withWebRTC(class Example extends React.Component {
       cname : "Nijaguna",
       roomName: "irisdialerroom",
       userName: "Iris User",
-      config: Config.dialer,
       callInProgress: false,
       remoteStream : {}
     };
@@ -65,9 +64,9 @@ export default withWebRTC(class Example extends React.Component {
   }
 
   _initializeAndLogin(){
-    let routingId = this.state.routingId;
-    let appKey = this.state.config.appKey;
-    let aumUrl = this.state.config.urls.authManager;
+    const routingId = this.state.routingId;
+    const appKey = Config.dialer.appKey;
+    const aumUrl = Config.authUrl;
     this._login(routingId, appKey, aumUrl)
   }
 
@@ -132,7 +131,8 @@ _updateToTN(num) {
         toTN: this.state.toTN,
         hosts: {
           eventManagerUrl: Config.eventManagerUrl,
-          notificationServer: Config.notificationServer
+          notificationServer: Config.notificationServer,
+          UEStatsServer: Config.UEStatsServer,
         },
         cname: this.state.cname,
         isPSTN: true,
