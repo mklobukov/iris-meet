@@ -399,11 +399,12 @@ _onReceivedNewId(data) {
     }
   }
 
-  _isRemoteVideoMuted(fullJid) {
+  _isRemoteVideoMuted(connection) {
     let muted = false;
-    if (fullJid && this.state.userData[this._truncateJid(fullJid)]) {
-      console.log("Returning muted: ", this.state.userData[this._truncateJid(fullJid)].videoMuted )
-      muted = this.state.userData[this._truncateJid(fullJid)].videoMuted;
+    console.log("GOT THIS CONNECTION: ", connection)
+    if (connection && connection.participantJid && this.state.userData[this._truncateJid(connection.participantJid)]) {
+      console.log("Returning muted: ", this.state.userData[this._truncateJid(connection.participantJid)].videoMuted )
+      muted = this.state.userData[this._truncateJid(connection.participantJid)].videoMuted;
     }
     console.log("returning false")
     return muted
@@ -416,11 +417,11 @@ _onReceivedNewId(data) {
     profiles[this._truncateJid(videoInfo.jid)] ? profiles[this._truncateJid(videoInfo.jid)].videoMuted = videoInfo.muted : null;
     this.setState({
       userData: profiles
-    })
+    }, () => {console.log("Updated profiles videmute: ", this.state.userData)})
   }
 
-  _onParticipantAudioMuted(jid, muted){
-    console.log("_onParticipantAudioMuted jid " + jid + " muted "+muted);
+  _onParticipantAudioMuted(audioInfo){
+    console.log("_onParticipantAudioMuted: ", audioInfo)
   }
 
   _onUserProfileChange(profile) {
@@ -787,6 +788,21 @@ _setDisplayName(name) {
   localStorage.setItem('irisMeet.userName', name);
 }
 
+_remoteVideoAndImage() {
+  return (<div>
+            <RemoteVideo video={this.props.connection} />
+            <img src="https://physics.tau.ac.il/sites/exactsci_en.tau.ac.il/files/styles/faculty_banner_729x359/public/astrophysics_home_page_729X359-2_0.jpg?itok=xQl7j2W9" />
+          </div>)
+}
+
+_localVideoAndImage() {
+  return (<div>
+            <LocalVideo video={this.props.localVideos[0]} />
+            <img src="https://physics.tau.ac.il/sites/exactsci_en.tau.ac.il/files/styles/faculty_banner_729x359/public/astrophysics_home_page_729X359-2_0.jpg?itok=xQl7j2W9" />
+          </div>)
+}
+
+
   render() {
     const this_main = this;
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
@@ -845,7 +861,7 @@ _setDisplayName(name) {
             {
               this.props.videoType === 'remote' && true ?
                 <RemoteVideo video={this.props.connection} />
-              : null
+              : this._isRemoteVideoMuted(this.props.connection) ? this._remoteVideoAndImage() : null
             }
 
             {this.props.videoType === 'local' && true ?
@@ -862,7 +878,7 @@ _setDisplayName(name) {
                   style={this.props.localVideos.length > 0 ? styles.localTile : null}
                   key={'localVideo'}
                   className={'gridTileClass'}
-                  title={<UserNameBox style={{"maxWidth" : "50px"}} setDisplayName={this._setDisplayName.bind(this)} name={localStorage.getItem('irisMeet.userName')} />}
+                  title={<UserNameBox setDisplayName={this._setDisplayName.bind(this)} name={localStorage.getItem('irisMeet.userName')} />}
                   containerElement={'HorizontalBox'}
                   titleStyle={styles.titleStyle}
                   titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
