@@ -199,6 +199,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
 
 
   componentDidMount() {
+    //this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_SESSION_CREATED)
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_DOMINANT_SPEAKER_CHANGED, this.onDominantSpeakerChanged);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
@@ -411,13 +412,13 @@ _onReceivedNewId(data) {
   }
 
   _onParticipantVideoMuted(videoInfo){
-    console.log("_onParticipantVideoMuted jid " + videoInfo.jid + " muted "+ videoInfo.muted);
+    console.log("_onParticipantVideoMuted client. \nJid: ", videoInfo.jid, "\nMuted: ", videoInfo.muted);
 
     let profiles = this.state.userData;
     profiles[this._truncateJid(videoInfo.jid)] ? profiles[this._truncateJid(videoInfo.jid)].videoMuted = videoInfo.muted : null;
     this.setState({
       userData: profiles
-    }, () => {console.log("Updated profiles videmute: ", this.state.userData)})
+    }, () => {console.log("Updated profiles videomute: ", this.state.userData)})
   }
 
   _onParticipantAudioMuted(audioInfo){
@@ -428,16 +429,13 @@ _onReceivedNewId(data) {
     console.log('_onUserProfileChange in the client\nFull Jid before truncation: ', profile.jid)
     console.log("Name: ", profile.name);
     console.log("Profile: ", profile)
-    // this function is called when:
+    // this function currently only takes care of the names. It's is called when:
     //   1) remote participant is first detected upon joining the room
     //   2) remote participant changes name
     // when either of these events occurs, update the remoteNames state
     // Lookup of names by jid in the horizontal box part can remain the same
 
     let profiles = this.state.userData;
-
-    console.log("ALL PROFILES: ", profiles)
-
     const userFound = profiles[this._truncateJid(profile.jid)] ? true : false;
 
     if (!userFound) {
@@ -451,7 +449,7 @@ _onReceivedNewId(data) {
     // update state with the new profile
     this.setState({
       userData: profiles
-    })
+    }, console.log("Updated names/profiles: ", this.state.userData))
   }
 
   _userLoggedIn() {
@@ -802,13 +800,38 @@ _localVideoAndImage() {
           </div>)
 }
 
+_renderMainVideo(videoType, remoteMuted) {
+  if (videoType === "remote") {
+    console.log("Rendering the main video. videoType: ", videoType, "muted: ", remoteMuted)
+    return (
+      <div>
+      <RemoteVideo video={this.props.connection} />
+      {remoteMuted ?
+        (<img src="https://physics.tau.ac.il/sites/exactsci_en.tau.ac.il/files/styles/faculty_banner_729x359/public/astrophysics_home_page_729X359-2_0.jpg?itok=xQl7j2W9" />)
+      : null }
+    </div>
+    )
+  } else if (videoType === "local") {
+    console.log("Rendering the main video. videoType: ", videoType, "muted: ", this.state.isVideoMuted)
+      return (
+        <div>
+          <LocalVideo video={this.props.localVideos[0]} />
+          {this.state.isVideoMuted ?
+            (<img src="https://physics.tau.ac.il/sites/exactsci_en.tau.ac.il/files/styles/faculty_banner_729x359/public/astrophysics_home_page_729X359-2_0.jpg?itok=xQl7j2W9" />)
+          : null }
+        </div>
+    )
+  }
+}
 
   render() {
     const this_main = this;
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
     console.log("Remote names main: ", this.state.userData)
     console.log("Remote videos main: ", this.props.remoteVideos)
+    console.log("Local videos main: ", this.props.localVideos)
     console.log("this props connection: ", this.props.connection)
+    console.log("this props video index: ", this.props.videoIndex)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         <Snackbar
@@ -858,17 +881,9 @@ _localVideoAndImage() {
 
 
           <MainVideo className={"main_video"}>
-            {
-              this.props.videoType === 'remote' && true ?
-                <RemoteVideo video={this.props.connection} />
-              : this._isRemoteVideoMuted(this.props.connection) ? this._remoteVideoAndImage() : null
-            }
-
-            {this.props.videoType === 'local' && true ?
-              <LocalVideo
-                video={this.props.localVideos[0]}
-              /> : null
-            }
+            <div>
+              {this._renderMainVideo(this.props.videoType, this._isRemoteVideoMuted(this.props.connection))}
+            </div>
           </MainVideo>
 
           <section className={this.state.isVideoBarHidden ? "footer hideFooter" : "footer showFooter"} >
