@@ -165,6 +165,8 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.onParticipantLeft = this._onParticipantLeft.bind(this);
     this.startScreenShare = this.props.startScreenshare.bind(this);
     this.endScreenshare = this.props.endScreenshare.bind(this);
+    this.muteRemoteAudio = this.props.muteParticipantAudio.bind(this);
+    this.muteRemoteVideo = this.props.muteParticipantVideo.bind(this);
     this.onReceivedNewId = this._onReceivedNewId.bind(this);
     this.extInstalled = this._isExtInstalled.bind(this);
     this.unimplementedButtonToggle = this.unimplementedButtonToggle.bind(this);
@@ -932,8 +934,9 @@ _renderMainVideo(videoType, remoteMuted) {
             <GridList className={"remoteGrid"} style={styles.gridList} cols={2.2}>
               {this.props.remoteVideos.map((connection) => {
                 if (connection) {
-                  let name = this.state.userData[this._truncateJid(connection.participantJid)] ? this.state.userData[this._truncateJid(connection.participantJid)].userName : null;
+                  const name = this.state.userData[this._truncateJid(connection.participantJid)] ? this.state.userData[this._truncateJid(connection.participantJid)].userName : null;
                   console.log("USERNAME TO DISPLAY: ", name)
+                  const jid = connection.participantJid;
                   let displayHorizontalBox = (!this._isDominant(connection.id) && this.props.remoteVideos.length > 1) || !this.props.enableDomSwitch;
                   console.log("Display HB for ", connection.id, "? -- ", displayHorizontalBox)
                   return displayHorizontalBox ? (
@@ -943,7 +946,11 @@ _renderMainVideo(videoType, remoteMuted) {
                       key={connection.id}
                       style={styles.gridTile}
                       title={name ? name : "Remote Video"}
-                      actionIcon={<VideoActionIcons />}
+                      actionIcon={<VideoActionIcons
+                        muteVideo={this.muteRemoteVideo}
+                        muteAudio={this.muteRemoteAudio}
+                        participantJid={jid}
+                        />}
                       titleStyle={styles.titleStyle}
                       titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
                     >

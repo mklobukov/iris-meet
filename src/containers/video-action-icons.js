@@ -33,17 +33,43 @@ const styles = {
 export default class UserNameBox extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      audioMuted: false,
+      videoMuted: false
+    }
   }
+
+_muteAudio() {
+  const jid = this.props.participantJid;
+  const muted = this.state.audioMuted;
+  this.props.muteAudio(jid, !muted);
+  this.setState({
+    audioMuted: !muted,
+  });
+}
+
+_muteVideo() {
+  console.log("THIS PROPSSSS: ", this.props)
+  const jid = this.props.participantJid;
+  const muted = this.state.videoMuted;
+  this.props.muteVideo(jid, !muted);
+  this.setState({
+    videoMuted: !muted,
+  });
+}
+
+
 
   render() {
     return (
       <div id="video-action-icons" className={styles.container}>
         <IconButton iconStyle={styles.topIconStyle}
-          tooltip=" Mute Audio "
+          tooltip="Mute Audio"
           tooltipPosition="top-left"
           tooltipStyles={styles.tooltipStyles}
-          onTouchTap={this.props.muteUnmuteAudio}>
-            {this.props.audioMuted ?
+          onTouchTap={this._muteAudio.bind(this)}>
+            {this.state.audioMuted ?
               <VolumeOff />
             :
               <VolumeUp />
@@ -51,11 +77,11 @@ export default class UserNameBox extends React.Component {
         </IconButton>
 
         <IconButton iconStyle={styles.bottomIconStyle}
-          tooltip=" Mute Video "
+          tooltip="Mute Video"
           tooltipPosition="top-left"
           tooltipStyles={styles.tooltipStyles}
-          onTouchTap={this.props.muteUnmuteVideo}>
-          {this.props.videoMuted ?
+          onTouchTap={this._muteVideo.bind(this)}>
+          {this.state.videoMuted ?
             <VideocamOff />
           :
             <Videocam />
