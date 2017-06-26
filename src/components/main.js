@@ -819,7 +819,7 @@ _renderMainVideo(videoType, remoteMuted) {
         <div>
           <LocalVideo video={this.props.localVideos[0]} />
           {this.state.isVideoMuted ?
-            (<img src="https://physics.tau.ac.il/sites/exactsci_en.tau.ac.il/files/styles/faculty_banner_729x359/public/astrophysics_home_page_729X359-2_0.jpg?itok=xQl7j2W9" />)
+            <AvatarImage hash={this.props.connection.id} />
           : null }
         </div>
     )
@@ -975,7 +975,11 @@ _renderMainVideo(videoType, remoteMuted) {
                     style={styles.gridTile}
                     key={connection.id}
                     title={name ? name : "Remote Video"}
-                    actionIcon={<VideoActionIcons />}
+                    actionIcon={<VideoActionIcons
+                      muteVideo={this.muteRemoteVideo}
+                      muteAudio={this.muteRemoteAudio}
+                      participantJid={jid}
+                      />}
                     titleStyle={styles.titleStyle}
                     titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"
                   > <Avatar
