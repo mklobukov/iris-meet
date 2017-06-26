@@ -809,7 +809,7 @@ _renderMainVideo(videoType, remoteMuted) {
       <div>
       <RemoteVideo video={this.props.connection} />
       {remoteMuted ?
-        (<img src="https://physics.tau.ac.il/sites/exactsci_en.tau.ac.il/files/styles/faculty_banner_729x359/public/astrophysics_home_page_729X359-2_0.jpg?itok=xQl7j2W9" />)
+        <AvatarImage hash={this.props.connection.participantJid} />
       : null }
     </div>
     )
