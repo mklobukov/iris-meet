@@ -1,7 +1,5 @@
 import React from 'react';
-import Dialog from 'material-ui/Dialog';
 import LoginPanelComponent from '../components/login-panel'
-import CircularProgress from 'material-ui/CircularProgress';
 
 export default class LoginPanel extends React.Component {
   constructor(props) {

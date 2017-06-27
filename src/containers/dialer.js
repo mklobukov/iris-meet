@@ -1,10 +1,8 @@
-import React, {Component} from 'react';
+import React from 'react';
 import { IrisDialer } from 'iris-react-webrtc';
 import { AuthManager } from 'iris-auth-js-sdk';
-import Paper from 'material-ui/Paper';
 const uuidV1 = require('uuid/v1');
 import Config from '../../config.json';
-const config = Config.dialer;
 import { getRoomId } from '../api/RoomId';
 
 import withWebRTC, { WebRTCConstants } from 'iris-react-webrtc'

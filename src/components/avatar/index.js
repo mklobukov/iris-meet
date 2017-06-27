@@ -4,7 +4,7 @@ import './avatar.css'
 
 const Avatar = ({data, userName, onClick}) => (
   <div className="testdiv" onClick={onClick}>
-    <img className="testim" src={"data:image/svg+xml;base64, " + data} />
+    <img className="testim" src={"data:image/svg+xml;base64, " + data} alt={"user icon"} />
   </div>
 );
 

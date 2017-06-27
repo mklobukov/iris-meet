@@ -20,6 +20,8 @@ const avatarImageStyle = {
   verticalAlign: "middle",
   display: "table",
   margin: "0 auto",
+  maxHeight: "500px",
+  maxWidth: "500px"
 }
 
 class AvatarImage extends React.Component {

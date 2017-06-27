@@ -1,9 +1,7 @@
 import React from 'react';
 import MainVideo from './main-video';
 import MeetToolbar from '../containers/meet-toolbar';
-import HorizontalWrapper from './horizontal-wrapper';
 import HorizontalBox from '../containers/horizontal-box';
-import BlackBox from '../containers/black-box'
 import LoginPanel from '../containers/login-panel';
 import { withRouter } from 'react-router';
 import withWebRTC, { LocalVideo, RemoteVideo, WebRTCConstants } from 'iris-react-webrtc';
@@ -20,13 +18,14 @@ import CircularProgress from 'material-ui/CircularProgress';
 import {GridList, GridTile} from 'material-ui/GridList';
 import Avatar from '../containers/avatar';
 import AvatarImage from '../components/avatar-image';
-import IconButton from 'material-ui/IconButton';
-import VolumeUp from 'material-ui/svg-icons/av/volume-up';
-import VolumeOff from 'material-ui/svg-icons/av/volume-off';
 import Snackbar from 'material-ui/Snackbar';
 import { NameServer } from '../api/nameserver';
 import UserNameBox from '../containers/username-box';
 import VideoActionIcons from '../containers/video-action-icons';
+import Drawer from 'material-ui/Drawer';
+import MenuItem from 'material-ui/MenuItem';
+import RaisedButton from 'material-ui/RaisedButton';
+import ChatBox from './chat/chat-box'
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -87,13 +86,6 @@ const styles = {
     width: 'auto',
   }
 };
-
-const styleTest = {
-  height: '120px',
-  width: '140px',
-  position: 'relative'
-}
-
 
 const mapStateToProps = (state) => {
   return {
@@ -157,6 +149,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       userData: {},
       resolution: "hd",
       mutedVideos: [],
+      drawerOpen: false,
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -417,7 +410,7 @@ _onReceivedNewId(data) {
     console.log("_onParticipantVideoMuted client. \nJid: ", videoInfo.jid, "\nMuted: ", videoInfo.muted);
 
     let profiles = this.state.userData;
-    profiles[this._truncateJid(videoInfo.jid)] ? profiles[this._truncateJid(videoInfo.jid)].videoMuted = videoInfo.muted : null;
+    profiles[this._truncateJid(videoInfo.jid)] ? profiles[this._truncateJid(videoInfo.jid)].videoMuted = videoInfo.muted : console.log("no such profile: ", videoInfo.jid);
     this.setState({
       userData: profiles
     }, () => {console.log("Updated profiles videomute: ", this.state.userData)})
@@ -826,6 +819,8 @@ _renderMainVideo(videoType, remoteMuted) {
   }
 }
 
+_handleDrawerToggle = () => this.setState({drawerOpen: !this.state.drawerOpen})
+
   render() {
     const this_main = this;
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
@@ -836,6 +831,20 @@ _renderMainVideo(videoType, remoteMuted) {
     console.log("this props video index: ", this.props.videoIndex)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
+
+
+        <div>
+          <RaisedButton
+            label="Toggle Drawer"
+            style={{transform: "translateY(50%)"}}
+            onClick={this._handleDrawerToggle}
+          />
+          <Drawer open={this.state.drawerOpen}>
+            <MenuItem>Menu Item</MenuItem>
+            <MenuItem>Menu Item 2</MenuItem>
+            <ChatBox />
+          </Drawer>
+        </div>
         <Snackbar
           open={this.state.showFeatureInDev}
           message="This feature is currently in development"
