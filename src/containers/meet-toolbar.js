@@ -61,6 +61,7 @@ export default class MeetToolbar extends React.Component {
           _showInDev={this.props.showInDev}
           domSpeakerSwitchEnabled={this.props.domSpeakerSwitchEnabled}
           _enableDom={this.props.enableDomSwitchFunc.bind(this)}
+          showChat={this.props.handleDrawerToggle}
         />
       )
     }

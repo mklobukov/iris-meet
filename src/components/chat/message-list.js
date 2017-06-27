@@ -1,10 +1,11 @@
 import React from 'react';
 import Message from './message';
+import './chat.css'
 
 class MessageList extends React.Component {
     render() {
         return (
-            <div>
+            <div className={"chat-messages"} id={"chat-messages-id"}>
                 {
                     this.props.messages.map( message =>
                         <Message timestamp={message.timestamp}

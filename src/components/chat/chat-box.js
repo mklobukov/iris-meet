@@ -2,6 +2,7 @@ import React from 'react';
 import MessageList from './message-list';
 import ClearButton from './clear-button';
 import PostMessageForm from './post-message-form';
+import './chat.css'
 
 // const styles = {
 //   container: {
@@ -42,7 +43,7 @@ class ChatBox extends React.Component {
     render() {
         let isDisabled = this.props.messages.length === 0;
         return (
-            <div>
+            <div className={"chat-container"}>
                 <MessageList messages={this.props.messages} />
                 <PostMessageForm name={this.props.name} appendChatMessage={this.appendChatMessage} />
             </div>

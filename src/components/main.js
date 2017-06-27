@@ -25,7 +25,9 @@ import VideoActionIcons from '../containers/video-action-icons';
 import Drawer from 'material-ui/Drawer';
 import MenuItem from 'material-ui/MenuItem';
 import RaisedButton from 'material-ui/RaisedButton';
-import ChatBox from './chat/chat-box'
+import ChatBox from './chat/chat-box';
+import ExitButton from 'material-ui/svg-icons/content/clear';
+import IconButton from 'material-ui/IconButton';
 
 const authUrl = Config.authUrl;
 const appKey = Config.appKey;
@@ -171,6 +173,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.changeMyName = this.props.setDisplayName.bind(this);
     this.sendChatMessage = this.props.sendChatMessage.bind(this);
     this.onChatMessage = this.onChatMessage.bind(this);
+    this.handleDrawerToggle = this._handleDrawerToggle.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -876,18 +879,18 @@ _sendMessage(jid, message) {
     console.log("this props connection: ", this.props.connection)
     console.log("this props video index: ", this.props.videoIndex)
     console.log("chat message: ", this.state.chatMessages)
+    let out = document.getElementById("chat-messages-id");
+    if (out) {
+      out.scrollTop = out.scrollHeight;
+    }
+
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
-
-
         <div>
-          <RaisedButton
-            label="Open Chat"
-            style={{transform: "translateY(100%)"}}
-            onClick={this._handleDrawerToggle}
-          />
           <Drawer open={this.state.drawerOpen}>
-            <MenuItem onClick={this._handleDrawerToggle}>Close Chat</MenuItem>
+            <IconButton>
+              <ExitButton onClick={this._handleDrawerToggle} />
+            </IconButton>
             <ChatBox name={this.state.myName}
                      myId={this.props.localVideos[0] ? this.props.localVideos[0].id : null}
                      messages={this.state.chatMessages}
@@ -937,6 +940,7 @@ _sendMessage(jid, message) {
             showInDev={this.unimplementedButtonToggle.bind(this)}
             domSpeakerSwitchEnabled={this.props.enableDomSwitch !== undefined ? this.props.enableDomSwitch : true}
             enableDomSwitchFunc={this.enableDomSwitching.bind(this)}
+            handleDrawerToggle={this.handleDrawerToggle}
           /> : null}
 
 

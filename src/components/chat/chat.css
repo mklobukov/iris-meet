@@ -1,0 +1,35 @@
+.chat-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  margin-left: 15px;
+  height: 90%;
+}
+
+.chat-messages {
+  overflow-y: auto;
+  max-height: 90%;
+}
+
+.chat-message-sender {
+
+}
+
+.chat-message {
+  margin-bottom: 5px;
+}
+
+.chat-message-time {
+  font-size: 11px;
+  color: gray;
+}
+
+.chat-message-form {
+  -webkit-align-self: flex-end;
+  align-self: end;
+  margin-bottom: auto;
+}
+
+.send-button {
+
+}

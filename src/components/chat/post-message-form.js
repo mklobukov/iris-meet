@@ -4,8 +4,15 @@ import FloatingActionButton from 'material-ui/FloatingActionButton';
 import ContentAdd from 'material-ui/svg-icons/content/add';
 import Arrow from 'material-ui/svg-icons/content/forward';
 import FlatButton from 'material-ui/FlatButton';
+import './chat.css';
+
 
 const styles = {
+  formStyle: {
+    display: "flex",
+    justifyContent: "center",
+  },
+
   sendButton: {
     color: "rgb(0, 188, 212)"
   }
@@ -49,7 +56,7 @@ class PostMessageForm extends React.Component {
 
     render() {
         return (
-            <form style={{display: "flex", justifyContent: "center"}} onSubmit={this.handleSubmit}>
+            <form style={styles.formStyle} onSubmit={this.handleSubmit}>
               <TextField
                 type="text"
                 autoComplete="off"
@@ -62,9 +69,9 @@ class PostMessageForm extends React.Component {
                 onChange={this.onTextChange}
               />
             <FlatButton
-              style={styles.sendButon}
+              className={"send-button"}
               onClick={this.handleSubmit}
-              icon={<Arrow />}
+              icon={<Arrow color={"rgb(0, 188, 212)"} />}
             />
             </form>
         );
