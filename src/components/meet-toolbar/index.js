@@ -17,7 +17,10 @@ const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute,
           <i className="fa fa-ban fa-stack-2x text-danger" aria-hidden="true"></i>
         </span>
         : <i className="fa fa-camera" aria-hidden="true"></i>}</a>
-      <a className="button" onClick={showChat} style={hasUnreadMessages ? {color: "red"} : null}><i className="fa fa-comments" aria-hidden="true"></i></a>
+      <a className="button" onClick={showChat} >
+        <i className={hasUnreadMessages? "fa fa-comments text-danger" : "fa fa-comments"} aria-hidden="true">
+          {hasUnreadMessages ? 1 : null}
+        </i></a>
 
 
       { extInstalled ?
