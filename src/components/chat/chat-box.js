@@ -2,7 +2,8 @@ import React from 'react';
 import MessageList from './message-list';
 import ClearButton from './clear-button';
 import PostMessageForm from './post-message-form';
-import './chat.css'
+import Divider from 'material-ui/Divider';
+import './chat.css';
 
 // const styles = {
 //   container: {
@@ -41,10 +42,12 @@ class ChatBox extends React.Component {
     }
 
     render() {
+
         let isDisabled = this.props.messages.length === 0;
         return (
             <div className={"chat-container"}>
                 <MessageList messages={this.props.messages} />
+                <Divider style={{marginRight: "15px"}}/>
                 <PostMessageForm name={this.props.name} appendChatMessage={this.appendChatMessage} />
             </div>
         );

@@ -866,8 +866,12 @@ _sendMessage(jid, message) {
     sender: this.state.myName,
     text: message
   }
-  this.setState({ chatMessages: [ ...this.state.chatMessages, newMessage ] })
+  this.setState({ chatMessages: [ ...this.state.chatMessages , newMessage] })
   this.sendChatMessage(jid, message)
+  // let out = document.getElementById("chat-messages-id");
+  // if (out) {
+  //   out.scrollTop = out.scrollHeight;
+  // }
 }
 
   render() {
@@ -879,11 +883,7 @@ _sendMessage(jid, message) {
     console.log("this props connection: ", this.props.connection)
     console.log("this props video index: ", this.props.videoIndex)
     console.log("chat message: ", this.state.chatMessages)
-    let out = document.getElementById("chat-messages-id");
-    if (out) {
-      out.scrollTop = out.scrollHeight;
-    }
-
+    const messages = this.state.chatMessages.slice()
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         <div>
@@ -893,7 +893,7 @@ _sendMessage(jid, message) {
             </IconButton>
             <ChatBox name={this.state.myName}
                      myId={this.props.localVideos[0] ? this.props.localVideos[0].id : null}
-                     messages={this.state.chatMessages}
+                     messages={messages.reverse()}
                      sendChatMessage={this._sendMessage.bind(this)}/>
           </Drawer>
         </div>

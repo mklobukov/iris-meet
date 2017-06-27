@@ -50,7 +50,7 @@ class PostMessageForm extends React.Component {
     onTextChange(e) {
       this.setState({
         message: e.target.value,
-      }, () => {console.log("updating message ", this.state.message)});
+      });
     }
 
 
