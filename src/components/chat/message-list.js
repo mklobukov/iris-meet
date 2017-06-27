@@ -8,7 +8,7 @@ class MessageList extends React.Component {
                 {
                     this.props.messages.map( message =>
                         <Message timestamp={message.timestamp}
-                                 owner={message.owner}
+                                 sender={message.sender}
                                  text={message.text}
                                  key={message.id} />
                       )

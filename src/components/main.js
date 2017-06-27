@@ -150,6 +150,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       resolution: "hd",
       mutedVideos: [],
       drawerOpen: false,
+      chatMessages: [],
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -167,7 +168,9 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.onParticipantVideoMuted = this._onParticipantVideoMuted.bind(this);
     this.onParticipantAudioMuted = this._onParticipantAudioMuted.bind(this);
     this.onUserProfileChange = this._onUserProfileChange.bind(this);
-    this.changeMyName = this.props.setDisplayName.bind(this)
+    this.changeMyName = this.props.setDisplayName.bind(this);
+    this.sendChatMessage = this.props.sendChatMessage.bind(this);
+    this.onChatMessage = this.onChatMessage.bind(this);
 
     this.timer = setTimeout(() => {
       console.log('inside setTimeOut(), constructor')
@@ -203,6 +206,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_VIDEO_MUTED, this.onParticipantVideoMuted);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_PARTICIPANT_AUDIO_MUTED, this.onParticipantAudioMuted);
     this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_USER_PROFILE_CHANGE, this.onUserProfileChange);
+    this.props.addWebRTCListener(WebRTCConstants.WEB_RTC_ON_CHAT_MESSAGE_RECEIVED, this.onChatMessage);
 
     const requestedResolution = getQueryParameter('resolution');
     console.log("Resolution: ", requestedResolution);
@@ -309,6 +313,7 @@ componentWillReceiveProps = (nextProps) => {
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_LOCAL_VIDEO, this.onLocalVideo);
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_VIDEO, this.onRemoteVideo);
     this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_REMOTE_PARTICIPANT_LEFT, this.onParticipantLeft);
+    this.props.removeWebRTCListener(WebRTCConstants.WEB_RTC_ON_CHAT_MESSAGE_RECEIVED, this._onChatMessageReceived);
     this.setState({
       showRoom: false,
       showUser: false,
@@ -447,6 +452,32 @@ _onReceivedNewId(data) {
     }, console.log("Updated names/profiles: ", this.state.userData))
   }
 
+  onChatMessage(messageJson) {
+    console.log("Client got message: ", messageJson);
+
+    //identify sender
+    const jid = this._truncateJid(messageJson.from);
+    const sender = this.state.userData[jid].userName;
+
+    //get timestamp
+    const offset = -8.0
+    const clientDate = new Date();
+    const utc = clientDate.getTime() + (clientDate.getTimezoneOffset() * 60000);
+    const mydate = new Date(utc + (3600000*offset));
+    const hhmm = mydate.toISOString().substr(11,5);
+    console.log("At: ", hhmm)
+
+    let newMessage = {
+      id: this.state.chatMessages.length + 1,
+      timestamp: clientDate.getTime(),
+      hhmm: hhmm,
+      sender: sender,
+      text: messageJson.message
+    }
+    this.setState({ chatMessages: [ ...this.state.chatMessages, newMessage ] });
+
+  }
+
   _userLoggedIn() {
     this.setState({
       showRoom: false,
@@ -513,6 +544,7 @@ _displayDialer() {
     const userName = this.refs.loginpanel.userName ? this.refs.loginpanel.userName : localStorage.getItem('irisMeet.userName');
     const roomName = this.refs.loginpanel.roomName ? this.refs.loginpanel.roomName : this.props.params.roomname;
     localStorage.setItem('irisMeet.userName', userName);
+    this.setState({myName: userName})
 
     //now that we have both username and roomname, update entry in the IDS
 
@@ -779,6 +811,7 @@ _onResolutionChoice(res) {
 _setDisplayName(name) {
   this.changeMyName(name);
   localStorage.setItem('irisMeet.userName', name);
+  this.setState({myName: name})
 }
 
 _remoteVideoAndImage() {
@@ -796,7 +829,8 @@ _localVideoAndImage() {
 }
 
 _renderMainVideo(videoType, remoteMuted) {
-  if (videoType === "remote") {
+  const show = false;
+  if (videoType === "remote" && show) {
     console.log("Rendering the main video. videoType: ", videoType, "muted: ", remoteMuted)
     return (
       <div>
@@ -806,7 +840,7 @@ _renderMainVideo(videoType, remoteMuted) {
       : null }
     </div>
     )
-  } else if (videoType === "local") {
+  } else if (videoType === "local" && show) {
     console.log("Rendering the main video. videoType: ", videoType, "muted: ", this.state.isVideoMuted)
       return (
         <div>
@@ -821,6 +855,18 @@ _renderMainVideo(videoType, remoteMuted) {
 
 _handleDrawerToggle = () => this.setState({drawerOpen: !this.state.drawerOpen})
 
+_sendMessage(jid, message) {
+  const clientDate = new Date();
+  let newMessage = {
+    id: this.state.chatMessages.length + 1,
+    timestamp: clientDate.getTime(),
+    sender: this.state.myName,
+    text: message
+  }
+  this.setState({ chatMessages: [ ...this.state.chatMessages, newMessage ] })
+  this.sendChatMessage(jid, message)
+}
+
   render() {
     const this_main = this;
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
@@ -829,20 +875,23 @@ _handleDrawerToggle = () => this.setState({drawerOpen: !this.state.drawerOpen})
     console.log("Local videos main: ", this.props.localVideos)
     console.log("this props connection: ", this.props.connection)
     console.log("this props video index: ", this.props.videoIndex)
+    console.log("chat message: ", this.state.chatMessages)
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
 
 
         <div>
           <RaisedButton
-            label="Toggle Drawer"
-            style={{transform: "translateY(50%)"}}
+            label="Open Chat"
+            style={{transform: "translateY(100%)"}}
             onClick={this._handleDrawerToggle}
           />
           <Drawer open={this.state.drawerOpen}>
-            <MenuItem>Menu Item</MenuItem>
-            <MenuItem>Menu Item 2</MenuItem>
-            <ChatBox />
+            <MenuItem onClick={this._handleDrawerToggle}>Close Chat</MenuItem>
+            <ChatBox name={this.state.myName}
+                     myId={this.props.localVideos[0] ? this.props.localVideos[0].id : null}
+                     messages={this.state.chatMessages}
+                     sendChatMessage={this._sendMessage.bind(this)}/>
           </Drawer>
         </div>
         <Snackbar
