@@ -2,7 +2,7 @@ import React from 'react'
 import PropTypes from 'prop-types'
 import './meet-toolbar.css'
 
-const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute, microphoneMuted, _onCameraMute, cameraMuted, _onExpandHide, barHidden, _onHangup, _isExtInstalled, extInstalled, _showInDev, domSpeakerSwitchEnabled, _enableDom, showChat }) => (
+const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute, microphoneMuted, _onCameraMute, cameraMuted, _onExpandHide, barHidden, _onHangup, _isExtInstalled, extInstalled, _showInDev, domSpeakerSwitchEnabled, _enableDom, showChat, hasUnreadMessages }) => (
   <div id="header">
     <span id="toolbar" className={isHidden ? "toolbarHide" : "toolbarShow"}>
       <a className="button" onClick={_onMicrophoneMute.bind(this)}>{microphoneMuted ?
@@ -17,7 +17,7 @@ const MeetToolbarComponent = ({ screenShareControl, isHidden, _onMicrophoneMute,
           <i className="fa fa-ban fa-stack-2x text-danger" aria-hidden="true"></i>
         </span>
         : <i className="fa fa-camera" aria-hidden="true"></i>}</a>
-      <a className="button" onClick={showChat}><i className="fa fa-comments" aria-hidden="true"></i></a>
+      <a className="button" onClick={showChat} style={hasUnreadMessages ? {color: "red"} : null}><i className="fa fa-comments" aria-hidden="true"></i></a>
 
 
       { extInstalled ?
@@ -53,7 +53,8 @@ MeetToolbarComponent.propTypes = {
   _showInDev: PropTypes.func.isRequired,
   domSpeakerSwitchEnabled: PropTypes.bool.isRequired,
   _enableDom: PropTypes.func.isRequired,
-  showChat: PropTypes.func.isRequired
+  showChat: PropTypes.func.isRequired,
+  hasUnreadMessages: PropTypes.bool.isRequired
 }
 
 export default MeetToolbarComponent

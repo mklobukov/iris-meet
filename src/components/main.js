@@ -153,6 +153,7 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
       mutedVideos: [],
       drawerOpen: false,
       chatMessages: [],
+      hasUnreadMessages: false,
     }
 
     this.onDominantSpeakerChanged = this._onDominantSpeakerChanged.bind(this);
@@ -456,7 +457,11 @@ _onReceivedNewId(data) {
   }
 
   onChatMessage(messageJson) {
-    console.log("Client got message: ", messageJson);
+    if (!this.state.drawerOpen) {
+      this.setState({
+        hasUnreadMessages: true
+      })
+    }
 
     //identify sender
     const jid = this._truncateJid(messageJson.from);
@@ -856,7 +861,7 @@ _renderMainVideo(videoType, remoteMuted) {
   }
 }
 
-_handleDrawerToggle = () => this.setState({drawerOpen: !this.state.drawerOpen})
+_handleDrawerToggle = () => this.setState({drawerOpen: !this.state.drawerOpen, hasUnreadMessages: false})
 
 _sendMessage(jid, message) {
   const clientDate = new Date();
@@ -941,6 +946,7 @@ _sendMessage(jid, message) {
             domSpeakerSwitchEnabled={this.props.enableDomSwitch !== undefined ? this.props.enableDomSwitch : true}
             enableDomSwitchFunc={this.enableDomSwitching.bind(this)}
             handleDrawerToggle={this.handleDrawerToggle}
+            hasUnreadMessages={this.state.hasUnreadMessages}
           /> : null}
 
 

@@ -47,7 +47,7 @@ class ChatBox extends React.Component {
         return (
             <div className={"chat-container"}>
                 <MessageList messages={this.props.messages} />
-                <Divider style={{marginRight: "15px"}}/>
+
                 <PostMessageForm name={this.props.name} appendChatMessage={this.appendChatMessage} />
             </div>
         );
@@ -55,7 +55,7 @@ class ChatBox extends React.Component {
 }
 
 export default ChatBox;
-
+//<Divider style={{marginRight: "15px"}}/>
 
 // clearMessages() {
 //     this.setState( { messages: [] } );
