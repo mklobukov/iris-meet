@@ -383,8 +383,9 @@ _onReceivedNewId(data) {
     const matchedConnection = this.props.remoteVideos.find((connection) => {
       let participantId = connection.participantJid;
       //first index in the next line may need to be 0 after the SDK update 6/15/2017
-      participantId = participantId.substring(participantId.indexOf("/")+1, participantId.indexOf("@iris-meet.comcast.com"))
-      const endPoint = participantId.substring(participantId.lastIndexOf("/")+1)
+      console.log("Checking this participantId: ", participantId)
+      const endPoint = participantId.substring(0, participantId.indexOf("@iris-meet.comcast.com"))
+      console.log("after truncation: ", endPoint)
       console.log("endpoint and dom: " + endPoint + ", " + dom)
       return endPoint === dom;
       });
