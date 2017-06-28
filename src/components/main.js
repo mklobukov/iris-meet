@@ -852,13 +852,15 @@ _localVideoAndImage() {
 }
 
 _renderMainVideo(videoType, remoteMuted) {
-  const show = false;
+  const show = true;
+  const showPic = false;
+
   if (videoType === "remote" && show) {
     console.log("Rendering the main video. videoType: ", videoType, "muted: ", remoteMuted)
     return (
       <div>
       <RemoteVideo video={this.props.connection} />
-      {remoteMuted ?
+      {remoteMuted && showPic ?
         <AvatarImage hash={this.props.connection.participantJid} />
       : null }
     </div>
