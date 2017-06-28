@@ -11,16 +11,21 @@ const styles = {
 }
 
 class MessageList extends React.Component {
+
+    componentDidUpdate() {
+      //force the messages div to stay scrolled down
+      //unless user scrolls up. Then it will stay where it is.
+      //If the user scrolls all the way down again, stay there.
+      const chat = document.getElementById("chat-messages-id");
+      if (chat) {
+        const diff = chat.scrollHeight - chat.clientHeight;
+        if (Math.abs(diff - chat.scrollTop) < 50) {
+          chat.scrollTop = diff;
+        }
+      }
+    }
+
     render() {
-
-        // let out = document.getElementById("chat-messages-id");
-        // if (out) {
-        //   // allow 1px inaccuracy by adding 1
-        //   const isScrolledToBottom = out.scrollHeight - out.clientHeight <= out.scrollTop + 1;
-        //   if (isScrolledToBottom) out.scrollTop = out.scrollHeight - out.clientHeight;
-        // }
-
-
         return (
           this.props.messages.length > 0 ?
             (<div style={styles.messages} className={"chat-messages"} id={"chat-messages-id"}>

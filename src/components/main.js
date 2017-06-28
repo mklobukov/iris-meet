@@ -892,7 +892,7 @@ _localVideoAndImage() {
 }
 
 _renderMainVideo(videoType, remoteMuted) {
-  const show = true;
+  const show = false;
   const showPic = false;
 
   if (videoType === "remote" && show) {
@@ -952,16 +952,18 @@ _sendMessage(jid, message) {
     console.log("This state: ", this.state)
     const messages = this.state.chatMessages.slice()
 
-    const chat = document.getElementById("chat-messages-id");
-    if (chat) {
-      console.log("Scrolltop: ", chat.scrollTop)
-      console.log("Scrollheight: ", chat.scrollHeight)
-      console.log("Outerheight: ", chat.style.height)
-      if (chat.scrollTop < 10) {
-        chat.scrollTop = 0;
-      }
-      console.log("Updated scrolltop: ", chat.scrollTop)
-    }
+    // const chat = document.getElementById("chat-messages-id");
+    // if (chat) {
+    //   console.log("Scrolltop: ", chat.scrollTop)
+    //   console.log("Scrollheight: ", chat.scrollHeight)
+    //   console.log("client height: ", chat.clientHeight)
+    //   const diff = chat.scrollHeight - chat.clientHeight;
+    //   if (Math.abs(diff - chat.scrollTop) < 50) {
+    //     console.log("Forcing scrollbar down")
+    //     chat.scrollTop = diff + 1000;
+    //   }
+    //   console.log("Updated scrolltop: ", chat.scrollTop)
+    // }
 
 
     return (
