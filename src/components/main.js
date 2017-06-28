@@ -455,6 +455,19 @@ _onReceivedNewId(data) {
     this.setState({
       userData: profiles
     }, console.log("Updated names/profiles: ", this.state.userData))
+
+    //now also change names in the chat
+    const messages = this.state.chatMessages.slice();
+    let modified = false;
+    const this_main = this;
+    messages.forEach(function(message) {
+      if(message.senderJid === this_main._truncateJid(profile.jid)) {
+        message.sender = profile.name;
+        modified = true;
+      }
+    })
+    modified ? this.setState({chatMessages: messages}) : console.log("Updated name: no sender names changed")
+
   }
 
   onChatMessage(messageJson) {
@@ -473,6 +486,7 @@ _onReceivedNewId(data) {
     let newMessage = {
       id: this.state.chatMessages.length + 1,
       timestamp: clientDate,
+      senderJid: jid,
       sender: sender,
       text: messageJson.message
     }
@@ -494,6 +508,7 @@ _onReceivedNewId(data) {
         console.log('Requested resolution is not valid.  Switching to default hd.');
         requestedResolution = 'hd';
       }
+      const this_main = this;
       getRoomId(this.props.roomName, this.props.accessToken)
       .then((response) => {
         console.log("Response with roomid: ", response);
@@ -519,23 +534,42 @@ _onReceivedNewId(data) {
           getChatMessagesss(config.roomName, this.props.accessToken, 100)
           .then((response) => {
             console.log("Response from chat messages storage: ", response);
-            let messages = [];
             response.forEach(function(item) {
               if (item.event_type === "chat") {
                 const message = JSON.parse(item.userdata).data.text;
-                const sender = item.root_node_id;
+                const senderJid = item.event_deposited_by;
+                const timestamp = item.time_posted;
+                this_main._addMessageToState(message, senderJid, timestamp)
                 console.log("this message: ", message)
-                console.log("from: ", sender)
+                console.log("from: ", senderJid)
+                console.log("timestamp: ", timestamp)
 
               }
             })
           })
           .catch(
-            error => {console.log("Something went bad...")}
+            error => {console.log("Something went bad...", error)}
           )
       })
 
     });
+  }
+
+  _addMessageToState(message, senderJid, timestamp) {
+    console.log("inside add message");
+    console.log("Jid before: ", senderJid);
+    const jid = this._truncateJidFromEVM(senderJid);
+    console.log("jid after: ", jid)
+    const senderName = this.state.userData[jid] ? this.state.userData[jid].userName : "Anonymous participant"
+    let newMessage = {
+      id: this.state.chatMessages.length + 1,
+      timestamp: new Date(timestamp),
+      senderJid: jid,
+      sender: senderName,
+      text: message
+    }
+    console.log("adding message to state: ", newMessage);
+    this.setState({chatMessages: [newMessage, ...this.state.chatMessages]})
   }
 
 
@@ -787,7 +821,12 @@ _getUserName(userJid, roomname) {
 
 _truncateJid(jid) {
   //remote the roomID part of the jid, and return just the user part
-  return jid.substring(jid.indexOf("/") + 1, jid.length)
+  //return jid.substring(jid.indexOf("/") + 1, jid.length)
+  return jid.substring(0, jid.indexOf("@"))
+}
+
+_truncateJidFromEVM(jid) {
+  return jid.substring(0, jid.indexOf("@"))
 }
 
 _setUserName(userJid, roomname, username) {
@@ -852,7 +891,7 @@ _localVideoAndImage() {
 }
 
 _renderMainVideo(videoType, remoteMuted) {
-  const show = true;
+  const show = false;
   const showPic = false;
 
   if (videoType === "remote" && show) {
@@ -882,6 +921,10 @@ _handleDrawerToggle = () => this.setState({drawerOpen: !this.state.drawerOpen, h
 
 _sendMessage(jid, message) {
   const clientDate = new Date();
+  console.log("new date: ", clientDate)
+  console.log("get time: ", clientDate.getTime())
+  const exp = new Date(clientDate.getTime())
+  console.log("and now: ", exp)
   let newMessage = {
     id: this.state.chatMessages.length + 1,
     timestamp: clientDate,
@@ -899,7 +942,7 @@ _sendMessage(jid, message) {
   render() {
     const this_main = this;
     console.log("Enabledomswitch: ", this.props.enableDomSwitch)
-    console.log("Remote names main: ", this.state.userData)
+    console.log("User data main: ", this.state.userData)
     console.log("Remote videos main: ", this.props.remoteVideos)
     console.log("Local videos main: ", this.props.localVideos)
     console.log("this props connection: ", this.props.connection)
