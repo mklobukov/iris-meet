@@ -6,7 +6,7 @@ const styles = {
   messages: {
     display: "flex",
     //flexDirection: "column-reverse"
-    flexDirection: "column"
+    flexDirection: "column-reverse"
   }
 }
 
