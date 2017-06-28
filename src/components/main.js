@@ -466,7 +466,7 @@ _onReceivedNewId(data) {
         modified = true;
       }
     })
-    modified ? this.setState({chatMessages: messages}) : console.log("Updated name: no sender names changed")
+    modified ? this.setState({chatMessages: messages}, console.log("Updated name: updated names in the chat")) : console.log("Updated name: no sender names changed")
 
   }
 
@@ -560,7 +560,7 @@ _onReceivedNewId(data) {
     console.log("Jid before: ", senderJid);
     const jid = this._truncateJidFromEVM(senderJid);
     console.log("jid after: ", jid)
-    const senderName = this.state.userData[jid] ? this.state.userData[jid].userName : "Anonymous participant"
+    const senderName = this.state.userData[jid] ? this.state.userData[jid].userName : "Anonymous user (left room)"
     let newMessage = {
       id: this.state.chatMessages.length + 1,
       timestamp: new Date(timestamp),
@@ -891,7 +891,7 @@ _localVideoAndImage() {
 }
 
 _renderMainVideo(videoType, remoteMuted) {
-  const show = false;
+  const show = true;
   const showPic = false;
 
   if (videoType === "remote" && show) {
