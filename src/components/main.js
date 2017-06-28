@@ -9,6 +9,7 @@ import Config from '../../config.json';
 import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
+import { getChatMessages, getChatMessagess, getChatMessagesss } from '../api/get-chat-messages';
 import './style.css';
 import { changeMainView, changeDominantSpeaker, changeExtInstalledState } from '../actions/video-control-actions';
 import { connect } from 'react-redux';
@@ -484,7 +485,8 @@ _onReceivedNewId(data) {
       showRoom: false,
       showUser: false,
     }, () => {
-
+      const domain = this.props.decodedToken.payload['domain'].toLowerCase();
+      let roomIdResponse = null;
       //let requestedResolution = getQueryParameter('resolution');
       let requestedResolution = localStorage.getItem('irisMeet.resolution')
       console.log("requested resolution: ", requestedResolution);
@@ -494,8 +496,10 @@ _onReceivedNewId(data) {
       }
       getRoomId(this.props.roomName, this.props.accessToken)
       .then((response) => {
-        console.log(response);
+        console.log("Response with roomid: ", response);
         const roomId = response.room_id;
+        roomIdResponse = roomId;
+        this.setState({roomId: roomId })
 
           let config = {
             userName: this.props.userName,
@@ -512,7 +516,25 @@ _onReceivedNewId(data) {
             videoCodec: 'h264'
           }
           this.props.initializeWebRTC(config)
+          getChatMessagesss(config.roomName, this.props.accessToken, 100)
+          .then((response) => {
+            console.log("Response from chat messages storage: ", response);
+            let messages = [];
+            response.forEach(function(item) {
+              if (item.event_type === "chat") {
+                const message = JSON.parse(item.userdata).data.text;
+                const sender = item.root_node_id;
+                console.log("this message: ", message)
+                console.log("from: ", sender)
+
+              }
+            })
+          })
+          .catch(
+            error => {console.log("Something went bad...")}
+          )
       })
+
     });
   }
 
@@ -881,7 +903,21 @@ _sendMessage(jid, message) {
     console.log("this props connection: ", this.props.connection)
     console.log("this props video index: ", this.props.videoIndex)
     console.log("chat message: ", this.state.chatMessages)
+    console.log("This state: ", this.state)
     const messages = this.state.chatMessages.slice()
+
+    const chat = document.getElementById("chat-messages-id");
+    if (chat) {
+      console.log("Scrolltop: ", chat.scrollTop)
+      console.log("Scrollheight: ", chat.scrollHeight)
+      console.log("Outerheight: ", chat.style.height)
+      if (chat.scrollTop < 10) {
+        chat.scrollTop = 0;
+      }
+      console.log("Updated scrolltop: ", chat.scrollTop)
+    }
+
+
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         <div>

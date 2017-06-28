@@ -5,7 +5,8 @@ import './chat.css'
 const styles = {
   messages: {
     display: "flex",
-    flexDirection: "column-reverse"
+    //flexDirection: "column-reverse"
+    flexDirection: "column"
   }
 }
 
