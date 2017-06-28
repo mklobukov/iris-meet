@@ -466,19 +466,12 @@ _onReceivedNewId(data) {
     //identify sender
     const jid = this._truncateJid(messageJson.from);
     const sender = this.state.userData[jid].userName;
-
     //get timestamp
-    const offset = -8.0
     const clientDate = new Date();
-    const utc = clientDate.getTime() + (clientDate.getTimezoneOffset() * 60000);
-    const mydate = new Date(utc + (3600000*offset));
-    const hhmm = mydate.toISOString().substr(11,5);
-    console.log("At: ", hhmm)
 
     let newMessage = {
       id: this.state.chatMessages.length + 1,
-      timestamp: clientDate.getTime(),
-      hhmm: hhmm,
+      timestamp: clientDate,
       sender: sender,
       text: messageJson.message
     }
@@ -867,7 +860,7 @@ _sendMessage(jid, message) {
   const clientDate = new Date();
   let newMessage = {
     id: this.state.chatMessages.length + 1,
-    timestamp: clientDate.getTime(),
+    timestamp: clientDate,
     sender: this.state.myName,
     text: message
   }
