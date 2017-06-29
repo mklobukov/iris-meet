@@ -49,10 +49,12 @@ const VideoReducer = (state = {}, action) => {
       }
 
     case VideoControlConstants.VIDEO_CONTROL_UPDATE_DOMINANT_SPEAKER:
-      if (action.data.dominantSpeakerId) {
-        console.log("changing dominant speaker to: " + action.data.dominantSpeakerId)
+      if (action.data.dominantSpeakerId && action.data.dominantSpeakerJid) {
+        console.log("changing dominant speaker ID to: " + action.data.dominantSpeakerId)
+        console.log("changing dominant speaker JID to: " + action.data.dominantSpeakerJid)
         return Object.assign({}, state, {
-          dominantSpeakerIndex: action.data.dominantSpeakerId
+          dominantSpeakerIndex: action.data.dominantSpeakerId,
+          dominantSpeakerJid: action.data.dominantSpeakerJid,
         })
       }
       else {

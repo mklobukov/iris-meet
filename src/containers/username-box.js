@@ -25,9 +25,15 @@ export default class UserNameBox extends React.Component {
   }
 
   _onTextChange(e) {
-    this.setState({
-      name: e.target.value,
-    }, () => {console.log("updating name: ", this.state.name)});
+    //set limit on the number of characters
+    if (e.target.value.length <= this.props.charLimit) {
+      this.setState({
+        name: e.target.value,
+      }, () => {console.log("updating name: ", this.state.name)});
+    }
+    else {
+      console.log("Username can't be longer than", this.props.charLimit, "chars")
+    }
   }
 
   _changeMyName(e) {

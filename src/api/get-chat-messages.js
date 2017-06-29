@@ -20,22 +20,8 @@ const parseJSON = (response) => {
   return response.json();
 }
 
-export const getChatMessagess = (routingId, roomId, token, count) => {
-  console.log("Inside getChatMessages2")
-  const EVM_API_ENDPOINT = `https://${Config.eventManagerUrl}/v1/view/routingid/${routingId}/room/${roomId}/records/${count}`;
-  return fetch(EVM_API_ENDPOINT, {
-    method: 'GET',
-    headers: {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    }
-  })
-  .then(checkStatus)
-  .then(parseJSON)
-}
-
-export const getChatMessagesss = (roomname, token, count) => {
-  console.log("Inside getChatMessages3")
+export const getChatMessages = (roomname, token, count) => {
+  //Gets all event history for a given roomname within a domain.
   const EVM_API_ENDPOINT = `https://${Config.eventManagerUrl}/v1/view/events/room/${roomname}/records/${count}`
   return fetch(EVM_API_ENDPOINT, {
     method: 'GET',
@@ -49,9 +35,22 @@ export const getChatMessagesss = (roomname, token, count) => {
 }
 
 
+export const getChatMessagesByRoutingAndRoomId = (routingId, roomId, token, count) => {
+  //Sends 500 Internal Server error
+  const EVM_API_ENDPOINT = `https://${Config.eventManagerUrl}/v1/view/routingid/${routingId}/room/${roomId}/records/${count}`;
+  return fetch(EVM_API_ENDPOINT, {
+    method: 'GET',
+    headers: {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    }
+  })
+  .then(checkStatus)
+  .then(parseJSON)
+}
 
-export const getChatMessages = (routingId, token, count) => {
-  console.log("Inside getchatmessages")
+export const getChatMessagesByRoutingId = (routingId, token, count) => {
+  //Sends 500 Internal Server error.
   const EVM_API_ENDPOINT = `https://${Config.eventManagerUrl}/v1/view/routingid/${routingId}/event/chat/records/${count}`;
   return fetch(EVM_API_ENDPOINT, {
     method: 'GET',

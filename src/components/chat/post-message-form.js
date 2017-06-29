@@ -14,7 +14,9 @@ const styles = {
   },
 
   sendButton: {
-    color: "rgb(0, 188, 212)"
+    color: "rgb(0, 188, 212)",
+    minWidth: "55px",
+    marginRight: "5px"
   }
 }
 
@@ -69,6 +71,7 @@ class PostMessageForm extends React.Component {
                 onChange={this.onTextChange}
               />
             <FlatButton
+              style={styles.sendButton}
               className={"send-button"}
               onClick={this.handleSubmit}
               icon={<Arrow color={"rgb(0, 188, 212)"} />}

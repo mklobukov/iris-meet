@@ -9,7 +9,7 @@ import Config from '../../config.json';
 import getQueryParameter from '../utils/query-params';
 import validResolution from '../utils/verify-resolution';
 import { getRoomId } from '../api/RoomId';
-import { getChatMessages, getChatMessagess, getChatMessagesss } from '../api/get-chat-messages';
+import { getChatMessages } from '../api/get-chat-messages';
 import './style.css';
 import { changeMainView, changeDominantSpeaker, changeExtInstalledState } from '../actions/video-control-actions';
 import { connect } from 'react-redux';
@@ -102,6 +102,7 @@ const mapStateToProps = (state) => {
     decodedToken: state.userReducer.decodedToken,
     showSpinner: state.userReducer.showSpinner,
     dominantSpeakerIndex: state.videoReducer.dominantSpeakerIndex,
+    dominantSpeakerJid: state.videoReducer.dominantSpeakerJid,
     screenShareExtInstalled: state.videoReducer.screenShareExtInstalled,
     enableDomSwitch: state.videoReducer.enableDomSwitch,
   }
@@ -119,8 +120,8 @@ const mapDispatchToProps = (dispatch, ownProps) => {
     leaveRoom: () => {
       dispatch(leaveRoom())
     },
-    changeDominantSpeaker: (dominantSpeakerIndex) => {
-      dispatch(changeDominantSpeaker(dominantSpeakerIndex))
+    changeDominantSpeaker: (dominantSpeakerIndex, dominantSpeakerJid) => {
+      dispatch(changeDominantSpeaker(dominantSpeakerIndex, dominantSpeakerJid))
     },
     changeExtensionStatus: (isExtInstalled) => {
       dispatch(changeExtInstalledState(isExtInstalled))
@@ -261,10 +262,6 @@ export default connect(mapStateToProps, mapDispatchToProps)(withWebRTC(withRoute
 componentWillReceiveProps = (nextProps) => {
   //Initially, the accessToken is undefined.
   //It receives a value when the user is logged in
-  console.log("Will receive props! Current props: ")
-  console.log(this.props)
-  console.log("Next props: ")
-  console.log(nextProps)
 
   if (this.props.localVideos.length === 0 && nextProps.localVideos.length > 0) {
     console.log("Local video loaded. Stop displaying the spinner")
@@ -354,32 +351,31 @@ _onReceivedNewId(data) {
 
   _onParticipantLeft(participantInfo) {
     console.log('Remote participant left: ', participantInfo);
-    console.log(this.props.remoteVideos.length);
-    if (this.props.remoteVideos.length === 0) {
-      if (this.props.localVideos.length > 0) {
+
+    if (this.props.remoteVideos.length === 0 && this.props.localVideos.length > 0) {
         // no participants so go back to local video
-        console.log('Remote participant back to local');
+        console.log('No remote videos left. Switch main screen to local video');
         this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
-      }
+        return
     }
 
-    if (this.state.mainVideoConnection.connection &&
-        this.state.mainVideoConnection.connection.participantJid === participantInfo.participantJid) {
-      if (this.props.localVideos.length > 0) {
-        // if the participant who left was on main screen replace it with local
-        // video
-        this.props.VideoControl('local', this.props.localVideos[0].id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
-      }
+    //if there are remote videos, check if it was the dominant speaker that left
+    //if so, switch to my own local video. Otherwise, do nothing
+
+    //const matchedConnection = this._findDominantSpeaker(participantInfo.participantJid);
+    if (participantInfo.participantJid === this.props.dominantSpeakerJid) {
+      //if #remote videos is 1, switch to the other participant. Otherwise, switch to local
+      const type = this.props.remoteVideos.length === 1 ? 'remote' : 'local';
+      const id = type === 'remote' ? this.props.remoteVideos[0].id : this.props.localVideos[0].id;
+      console.log("Dominant speaker left. Switching to " + type + " video");
+      this.props.VideoControl(type, id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch);
+    } else {
+      console.log("Non-dominant speaker left.")
     }
   }
 
-  _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
-    //let participant = track.getParticipantId();
-    //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
-    console.log("Got a new dominant speaker notification\nLooking through remotes...")
-
-    //extract the part of dominantSpeakerEndpoint to use for comparison with connection id
-    const dom = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"));
+  _findDominantSpeaker(jid) {
+    const dom = jid.substring(0, jid.lastIndexOf("@"));
     const matchedConnection = this.props.remoteVideos.find((connection) => {
       let participantId = connection.participantJid;
       //first index in the next line may need to be 0 after the SDK update 6/15/2017
@@ -390,11 +386,31 @@ _onReceivedNewId(data) {
       return endPoint === dom;
       });
 
+    return matchedConnection ? matchedConnection : null
+  }
+
+
+  _onDominantSpeakerChanged(dominantSpeakerEndpoint) {
+    //let participant = track.getParticipantId();
+    //let baseId = participant.replace(/(-.*$)|(@.*$)/,'');
+    console.log("Got a new dominant speaker notification\nLooking through remotes for: ", dominantSpeakerEndpoint)
+    const matchedConnection = this._findDominantSpeaker(dominantSpeakerEndpoint);
+    // //extract the part of dominantSpeakerEndpoint to use for comparison with connection id
+    // const dom = dominantSpeakerEndpoint.substring(0, dominantSpeakerEndpoint.lastIndexOf("@"));
+    // const matchedConnection = this.props.remoteVideos.find((connection) => {
+    //   let participantId = connection.participantJid;
+    //   //first index in the next line may need to be 0 after the SDK update 6/15/2017
+    //   console.log("Checking this participantId: ", participantId)
+    //   const endPoint = participantId.substring(0, participantId.indexOf("@iris-meet.comcast.com"))
+    //   console.log("after truncation: ", endPoint)
+    //   console.log("endpoint and dom: " + endPoint + ", " + dom)
+    //   return endPoint === dom;
+    //   });
     if (matchedConnection) {
       console.log("New dominant speaker among remotes: ", matchedConnection.participantJid)
       //entering this if statement implies that the dominant speaker is remote
       //no further checks are necessary
-      this.props.changeDominantSpeaker(matchedConnection.id)
+      this.props.changeDominantSpeaker(matchedConnection.id, matchedConnection.participantJid)
       this.props.VideoControl('remote', matchedConnection.id, this.props.dominantSpeakerIndex, false, this.props.localVideos, this.props.remoteVideos, this.props.enableDomSwitch)
 
     } else if (this.props.localVideos.length > 0) {
@@ -402,18 +418,17 @@ _onReceivedNewId(data) {
       //no remote participants found so assume it is local speaker
       //change dominant speaker but don't change main view, keep displaying
       //the most recent remote dominant speaker
-      this.props.changeDominantSpeaker(this.props.localVideos[0].id)
+      this.props.changeDominantSpeaker(this.props.localVideos[0].id, 'local')
     }
   }
 
   _isRemoteVideoMuted(connection) {
     let muted = false;
-    console.log("GOT THIS CONNECTION: ", connection)
+    console.log("Remote video muted: ", connection);
     if (connection && connection.participantJid && this.state.userData[this._truncateJid(connection.participantJid)]) {
-      console.log("Returning muted: ", this.state.userData[this._truncateJid(connection.participantJid)].videoMuted )
+      console.log("Muted? --> ", this.state.userData[this._truncateJid(connection.participantJid)].videoMuted )
       muted = this.state.userData[this._truncateJid(connection.participantJid)].videoMuted;
     }
-    console.log("returning false")
     return muted
   }
 
@@ -532,7 +547,7 @@ _onReceivedNewId(data) {
             videoCodec: 'h264'
           }
           this.props.initializeWebRTC(config)
-          getChatMessagesss(config.roomName, this.props.accessToken, 100)
+          getChatMessages(config.roomName, this.props.accessToken, 100)
           .then((response) => {
             console.log("Response from chat messages storage: ", response);
             response.forEach(function(item) {
@@ -541,7 +556,8 @@ _onReceivedNewId(data) {
                 const senderJid = item.event_deposited_by;
                 const timestamp = item.time_posted;
                 this_main._addMessageToState(message, senderJid, timestamp)
-                this_main.setState({hasUnreadMessages: true})
+                //Tell user that there are unread messages from before user joined?
+                //this_main.setState({hasUnreadMessages: true})
                 console.log("this message: ", message)
                 console.log("from: ", senderJid)
                 console.log("timestamp: ", timestamp)
@@ -893,7 +909,7 @@ _localVideoAndImage() {
 }
 
 _renderMainVideo(videoType, remoteMuted) {
-  const show = false;
+  const show = true;
   const showPic = false;
 
   if (videoType === "remote" && show) {
@@ -942,31 +958,11 @@ _sendMessage(jid, message) {
 }
 
   render() {
+
+    console.log("Dominant speaker ID: ", this.props.dominantSpeakerIndex)
+    console.log("remote videos main: ", this.props.remoteVideos)
     const this_main = this;
-    console.log("Enabledomswitch: ", this.props.enableDomSwitch)
-    console.log("User data main: ", this.state.userData)
-    console.log("Remote videos main: ", this.props.remoteVideos)
-    console.log("Local videos main: ", this.props.localVideos)
-    console.log("this props connection: ", this.props.connection)
-    console.log("this props video index: ", this.props.videoIndex)
-    console.log("chat message: ", this.state.chatMessages)
-    console.log("This state: ", this.state)
     const messages = this.state.chatMessages.slice()
-
-    // const chat = document.getElementById("chat-messages-id");
-    // if (chat) {
-    //   console.log("Scrolltop: ", chat.scrollTop)
-    //   console.log("Scrollheight: ", chat.scrollHeight)
-    //   console.log("client height: ", chat.clientHeight)
-    //   const diff = chat.scrollHeight - chat.clientHeight;
-    //   if (Math.abs(diff - chat.scrollTop) < 50) {
-    //     console.log("Forcing scrollbar down")
-    //     chat.scrollTop = diff + 1000;
-    //   }
-    //   console.log("Updated scrolltop: ", chat.scrollTop)
-    // }
-
-
     return (
       <div onMouseMove={this._onMouseMove.bind(this)}>
         <div>
@@ -1041,7 +1037,10 @@ _sendMessage(jid, message) {
                   style={this.props.localVideos.length > 0 ? styles.localTile : null}
                   key={'localVideo'}
                   className={'gridTileClass'}
-                  title={<UserNameBox setDisplayName={this._setDisplayName.bind(this)} name={localStorage.getItem('irisMeet.userName')} />}
+                  title={<UserNameBox
+                    setDisplayName={this._setDisplayName.bind(this)}
+                    name={localStorage.getItem('irisMeet.userName')}
+                    charLimit={20} />}
                   containerElement={'HorizontalBox'}
                   titleStyle={styles.titleStyle}
                   titleBackground="linear-gradient(to top, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)"

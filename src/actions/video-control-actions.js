@@ -13,10 +13,11 @@ export const changeMainView = (videoType, videoId, domId, triggeredOnClick, loca
     }
 })
 
-export const changeDominantSpeaker = (dominantSpeakerId) => ({
+export const changeDominantSpeaker = (dominantSpeakerId, dominantSpeakerJid) => ({
   type: VideoControlConstants.VIDEO_CONTROL_UPDATE_DOMINANT_SPEAKER,
   data: {
-    dominantSpeakerId
+    dominantSpeakerId,
+    dominantSpeakerJid,
   }
 })
 
