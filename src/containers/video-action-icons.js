@@ -17,19 +17,28 @@ const styles = {
     marginRight: "-5px",
     background: "linear-gradient(to left, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)",
     height: "150px",
-    marginTop: "0px"
+
+
+    // background: "black",
+    // opacity: "0.4",
+    marginTop: "0px",
   },
 
   topIconStyle : {
-    color : "rgb(0, 188, 212)",
-
+    // color : "rgb(0, 188, 212)",
+    color: "#FFFFFF",
+    //background: "linear-gradient(to left, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)",
+    borderRadius: "100%"
     //paddingBottom:
 
   },
 
   bottomIconStyle : {
-    color : "rgb(0, 188, 212)",
+    // color : "rgb(0, 188, 212)",
+    color: "#FFFFFF",
     // marginBottom: "40px",
+    //background: "linear-gradient(to left, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)",
+    borderRadius: "100%"
 
   },
 
