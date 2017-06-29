@@ -541,6 +541,7 @@ _onReceivedNewId(data) {
                 const senderJid = item.event_deposited_by;
                 const timestamp = item.time_posted;
                 this_main._addMessageToState(message, senderJid, timestamp)
+                this_main.setState({hasUnreadMessages: true})
                 console.log("this message: ", message)
                 console.log("from: ", senderJid)
                 console.log("timestamp: ", timestamp)
@@ -561,7 +562,7 @@ _onReceivedNewId(data) {
     console.log("Jid before: ", senderJid);
     const jid = this._truncateJidFromEVM(senderJid);
     console.log("jid after: ", jid)
-    const senderName = this.state.userData[jid] ? this.state.userData[jid].userName : "Anonymous user (left room)"
+    const senderName = this.state.userData[jid] ? this.state.userData[jid].userName : "Iris user (left room)"
     let newMessage = {
       id: this.state.chatMessages.length + 1,
       timestamp: new Date(timestamp),
@@ -1090,7 +1091,7 @@ _sendMessage(jid, message) {
                       rows={0.5}
                       key={connection.id}
                       style={styles.gridTile}
-                      title={name ? name : "Remote Video"}
+                      title={name ? <div>{name}</div> : "Remote Video"}
                       actionIcon={<VideoActionIcons
                         muteVideo={this.muteRemoteVideo}
                         muteAudio={this.muteRemoteAudio}

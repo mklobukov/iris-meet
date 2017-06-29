@@ -9,23 +9,32 @@ import VideocamOff from 'material-ui/svg-icons/av/videocam-off';
 const styles = {
   container: {
     display: "flex",
+    flexDirection: "column",
     justifyContent: "flex-start",
-    verticalAlign: "top",
+    // verticalAlign: "top",
+    // height: "30px",
+    marginBottom: "50px",
+    marginRight: "-5px",
+    background: "linear-gradient(to left, rgba(0,0,0,0.7) 0%,rgba(0,0,0,0.3) 70%,rgba(0,0,0,0) 100%)",
+    height: "150px",
+    marginTop: "0px"
   },
 
   topIconStyle : {
     color : "rgb(0, 188, 212)",
-    marginBottom: "0px",
-    padding: "0px",
+
+    //paddingBottom:
 
   },
 
   bottomIconStyle : {
     color : "rgb(0, 188, 212)",
-    marginBottom: "40px",
+    // marginBottom: "40px",
+
   },
 
   tooltipStyles : {
+    display: "none"
 
   }
 }
@@ -63,11 +72,8 @@ _muteVideo() {
 
   render() {
     return (
-      <div id="video-action-icons" className={styles.container}>
+      <div id="video-action-icons" style={styles.container}>
         <IconButton iconStyle={styles.topIconStyle}
-          tooltip="Mute Audio"
-          tooltipPosition="top-left"
-          tooltipStyles={styles.tooltipStyles}
           onTouchTap={this._muteAudio.bind(this)}>
             {this.state.audioMuted ?
               <VolumeOff />
@@ -91,3 +97,16 @@ _muteVideo() {
     )
   }
 }
+
+// WITH TOOLTIP. It interferes with clicking
+// <IconButton iconStyle={styles.topIconStyle}
+//   tooltip="Mute Audio"
+//   tooltipPosition="top-left"
+//   tooltipStyles={styles.tooltipStyles}
+//   onTouchTap={this._muteAudio.bind(this)}>
+//     {this.state.audioMuted ?
+//       <VolumeOff />
+//     :
+//       <VolumeUp />
+//     }
+// </IconButton>
