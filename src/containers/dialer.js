@@ -4,6 +4,7 @@ import { AuthManager } from 'iris-auth-js-sdk';
 const uuidV1 = require('uuid/v1');
 import Config from '../../config.json';
 import { getRoomId } from '../api/RoomId';
+import Paper from 'material-ui/Paper';
 
 import withWebRTC, { WebRTCConstants } from 'iris-react-webrtc'
 
@@ -11,21 +12,23 @@ export default withWebRTC(class Example extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      accessToken : "Token from auth manager",
-      decodedToken : "Decoded token from auth manager",
-      routingId : uuidV1() + '@' + Config.dialer.domain,
-      fromTN : "+12674550136",
-      toTN: "Destination number",
-      cname : "Nijaguna",
-      roomName: "irisdialerroom",
-      userName: "Iris User",
-      callInProgress: false,
-      remoteStream : {}
-    };
+    if (Config.dialer) {
+      this.state = {
+        accessToken : "Token from auth manager",
+        decodedToken : "Decoded token from auth manager",
+        routingId : uuidV1() + '@' + Config.dialer.domain,
+        fromTN : "+12674550136",
+        toTN: "Destination number",
+        cname : "Nijaguna",
+        roomName: "irisdialerroom",
+        userName: "Iris User",
+        callInProgress: false,
+        remoteStream : {}
+      };
     this.onRemoteStream = this.onRemoteStream.bind(this);
     this.onCalleeLeft = this.onCalleeLeft.bind(this);
     this._initializeAndLogin();
+    }
   }
 
   componentDidMount() {
@@ -144,15 +147,20 @@ _updateToTN(num) {
   }
 
   render() {
+
     return (
-      <div className="dialer-main">
-        <IrisDialer
-          onDial={this._onDial.bind(this)}
-          maxNumberLength={16}
-          updateToTN={this._updateToTN.bind(this)}
-          displayStatusBox={false}
-          />
-    </div>
+
+      Config.dialer ?
+      (  <div className="dialer-main">
+          <IrisDialer
+            onDial={this._onDial.bind(this)}
+            maxNumberLength={16}
+            updateToTN={this._updateToTN.bind(this)}
+            displayStatusBox={false}
+            />
+        </div>
+      ) :
+      <div>Dialer disabled: no config provided</div>
 
     );
   }
