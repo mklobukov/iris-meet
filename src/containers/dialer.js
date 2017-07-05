@@ -4,7 +4,6 @@ import { AuthManager } from 'iris-auth-js-sdk';
 const uuidV1 = require('uuid/v1');
 import Config from '../../config.json';
 import { getRoomId } from '../api/RoomId';
-import Paper from 'material-ui/Paper';
 
 import withWebRTC, { WebRTCConstants } from 'iris-react-webrtc'
 
